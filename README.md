@@ -83,51 +83,51 @@ The framework implements a clean, modular, service-oriented architecture separat
 
 ```mermaid
 graph TD
-    subgraph USERS["👥 Agricultural Stakeholders"]
-        U1["👨‍🌾 Farmers"]
-        U2["🌾 Agricultural Officers"]
-        U3["🔬 Researchers & Agronomists"]
-        U4["⚙️ System Administrators"]
+    subgraph USERS["Agricultural Stakeholders"]
+        U1["Farmers"]
+        U2["Agricultural Officers"]
+        U3["Researchers & Agronomists"]
+        U4["System Administrators"]
     end
 
-    subgraph PRESENTATION["💻 Presentation Layer (Next.js 14 / React)"]
-        UI_DASH["📊 Executive Overview Dashboard"]
-        UI_PRED["🔮 Real-Time Prediction Portal"]
-        UI_MAP["🗺️ Geospatial Risk Heatmap (Leaflet)"]
-        UI_ALERT["🚨 Early Warning Alert Feed"]
-        UI_ANALYTICS["📈 Historical Trend Analytics"]
+    subgraph PRESENTATION["Presentation Layer (Next.js 14 / React)"]
+        UI_DASH["Executive Overview Dashboard"]
+        UI_PRED["Real-Time Prediction Portal"]
+        UI_MAP["Geospatial Risk Heatmap (Leaflet)"]
+        UI_ALERT["Early Warning Alert Feed"]
+        UI_ANALYTICS["Historical Trend Analytics"]
     end
 
-    subgraph API_GATEWAY["⚡ API Layer (FastAPI / Uvicorn / Pydantic)"]
-        AUTH["🔐 JWT Authentication & RBAC"]
-        ROUTER["🔀 Versioned REST Endpoints (/api/v1)"]
-        VALIDATOR["🛡️ Input Validation & Sanitization"]
+    subgraph API_GATEWAY["API Layer (FastAPI / Uvicorn / Pydantic)"]
+        AUTH["JWT Authentication & RBAC"]
+        ROUTER["Versioned REST Endpoints (/api/v1)"]
+        VALIDATOR["Input Validation & Sanitization"]
     end
 
-    subgraph APPLICATION_SERVICES["⚙️ Domain Application Services"]
-        SRV_PRED["🤖 Prediction Service"]
-        SRV_RISK["⚖️ Risk Categorization Engine"]
-        SRV_ALERT["📢 Alert & Notification Service"]
-        SRV_ANALYTICS["📉 Statistical Analytics Service"]
+    subgraph APPLICATION_SERVICES["Domain Application Services"]
+        SRV_PRED["Prediction Service"]
+        SRV_RISK["Risk Categorization Engine"]
+        SRV_ALERT["Alert & Notification Service"]
+        SRV_ANALYTICS["Statistical Analytics Service"]
     end
 
-    subgraph ML_ENGINE["🧠 ML Inference & Intelligence Engine"]
-        PREPROC["🧹 Imputation, Scaling & Encoding"]
-        FEAT_ENG["📐 Temporal & Agro-Climatic Feature Extractor"]
-        MODEL_REG["📦 Model Registry (XGBoost / LightGBM / RF)"]
-        CALIBRATOR["🎯 Probability Calibration (Platt / Isotonic)"]
-        SHAP_EXP["🔍 SHAP Local & Global Explainability"]
+    subgraph ML_ENGINE["ML Inference & Intelligence Engine"]
+        PREPROC["Imputation, Scaling & Encoding"]
+        FEAT_ENG["Temporal & Agro-Climatic Feature Extractor"]
+        MODEL_REG["Model Registry (XGBoost / LightGBM / RF)"]
+        CALIBRATOR["Probability Calibration (Platt / Isotonic)"]
+        SHAP_EXP["SHAP Local & Global Explainability"]
     end
 
-    subgraph DATA_LAYER["🗄️ Persistence & Storage Layer"]
-        PG[("🐘 PostgreSQL / PostGIS Relational DB")]
-        OBJ_STORE[("📁 Model Artifact Store (Joblib / ONNX)")]
+    subgraph DATA_LAYER["Persistence & Storage Layer"]
+        PG[("PostgreSQL / PostGIS Relational DB")]
+        OBJ_STORE[("Model Artifact Store (Joblib / ONNX)")]
     end
 
-    subgraph EXTERNAL["🌐 External Data Telemetry (V2)"]
-        EXT_WEATHER["⛅ OpenWeather / IMD Weather API"]
-        EXT_SAT["🛰️ Sentinel-2 / Landsat NDVI Imagery"]
-        EXT_IOT["📡 In-Field LoRaWAN Sensor Nodes"]
+    subgraph EXTERNAL["External Data Telemetry (V2)"]
+        EXT_WEATHER["OpenWeather / IMD Weather API"]
+        EXT_SAT["Sentinel-2 / Landsat NDVI Imagery"]
+        EXT_IOT["In-Field LoRaWAN Sensor Nodes"]
     end
 
     USERS --> PRESENTATION
@@ -146,15 +146,15 @@ graph TD
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Farmer as 👨‍🌾 Farmer / Agro Officer
-    participant Web as 💻 Web Dashboard
-    participant API as ⚡ FastAPI Backend
-    participant Pipe as 🔄 Feature Pipeline
-    participant Model as 🧠 ML Model (XGBoost/RF)
-    participant Risk as ⚖️ Risk Engine
-    participant XAI as 🔍 SHAP Explainer
-    participant DB as 🐘 PostgreSQL DB
-    participant Alert as 🚨 Alert Dispatcher
+    actor Farmer as Farmer / Agro Officer
+    participant Web as Web Dashboard
+    participant API as FastAPI Backend
+    participant Pipe as Feature Pipeline
+    participant Model as ML Model (XGBoost/RF)
+    participant Risk as Risk Engine
+    participant XAI as SHAP Explainer
+    participant DB as PostgreSQL DB
+    participant Alert as Alert Dispatcher
 
     Farmer->>Web: Input field observations (Location, Crop, Micro-climate)
     Web->>API: POST /api/v1/predictions
@@ -225,29 +225,32 @@ The project incorporates real-world agricultural surveillance records and extens
 The architectural foundation has been built with clean abstractions to unlock major future expansions:
 
 ```mermaid
-mindmap
-  root((🚀 Projected Features))
-    Remote Sensing & GIS
-      Sentinel-2 NDVI & NDWI Ingestion
-      Automated Crop Stress Anomaly Detection
-      PostGIS Spatio-Temporal Outbreak Heatmaps
-      Kriging Spatial Interpolation
-    Edge IoT & Telemetry
-      Solar-Powered LoRaWAN Micro-Weather Nodes
-      Sub-Canopy Humidity & Soil Moisture Probes
-      Automated Smart Pheromone Trap Counters
-    Multimodal Computer Vision
-      YOLOv8 Edge Pest & Insect Counting
-      Mobile In-Field Camera Leaf Lesion Classification
-      Severeness Segmentation via Lightweight Vision Transformers
-    Vernacular Omnichannel Alerts
-      WhatsApp Business Conversational Bot
-      Two-Way Vernacular SMS Advisories
-      Automated IVR Regional Voice Calls
-    Prescriptive Agronomy Engine
-      Bio-Pesticide & Neem Formulation Dosage Calculator
-      Natural Predator Population Preservation Advisor
-      Economic Threshold (ETL) Spray Cost-Benefit Evaluator
+graph TD
+    ROOT["Projected Features & V2 Horizons"] --> F1["Remote Sensing & GIS"]
+    ROOT --> F2["Edge IoT & Telemetry"]
+    ROOT --> F3["Multimodal Computer Vision"]
+    ROOT --> F4["Vernacular Omnichannel Alerts"]
+    ROOT --> F5["Prescriptive Agronomy Engine"]
+
+    F1 --> F1a["Sentinel-2 NDVI & NDWI Ingestion"]
+    F1 --> F1b["Crop Stress Anomaly Detection"]
+    F1 --> F1c["PostGIS Outbreak Heatmaps & Kriging"]
+
+    F2 --> F2a["Solar LoRaWAN Micro-Weather Nodes"]
+    F2 --> F2b["Sub-Canopy Humidity Probes"]
+    F2 --> F2c["Automated Smart Pheromone Traps"]
+
+    F3 --> F3a["YOLOv8 Edge Pest & Insect Counting"]
+    F3 --> F3b["Mobile Leaf Lesion Classification"]
+    F3 --> F3c["Lightweight Vision Transformers"]
+
+    F4 --> F4a["WhatsApp Business Conversational Bot"]
+    F4 --> F4b["Two-Way Vernacular SMS Advisories"]
+    F4 --> F4c["Automated IVR Regional Voice Calls"]
+
+    F5 --> F5a["Bio-Pesticide Dosage Calculator"]
+    F5 --> F5b["Natural Predator Population Protection"]
+    F5 --> F5c["Economic Threshold ETL Cost-Benefit Evaluator"]
 ```
 
 ### 🛰️ 1. Satellite Remote Sensing & Vegetation Indices
@@ -545,7 +548,7 @@ The comprehensive system design and technical requirements are indexed under [`D
 
 ## 15. Academic Credits & Acknowledgements
 
-- **Author / Developer:** Divye Bhatnagar
+- **Author / Developer:** Divye Bhatnagar, Faizan Ali Rahman, Gunika, Shatakshi
 - **Academic Mentor:** Dr. Swati Vashisht
 - **Institution:** IILM University
 - **Project Domain:** Artificial Intelligence, Machine Learning, AgriTech, and Disaster Mitigation
