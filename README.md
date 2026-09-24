@@ -14,7 +14,7 @@
 
 <br/>
 
-**Major Academic Project** &nbsp;•&nbsp; **Academic Mentor:** Dr. Swati Vashisht &nbsp;•&nbsp; **Domain:** AI / ML + AgriTech + Predictive Analytics
+**Major Academic Project** &nbsp;•&nbsp; **Domain:** AI / ML + AgriTech + Predictive Analytics
 
 </div>
 
