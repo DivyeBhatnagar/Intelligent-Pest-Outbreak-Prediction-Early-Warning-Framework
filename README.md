@@ -184,6 +184,12 @@ The project incorporates real-world agricultural surveillance records and extens
 | Dataset File / Asset | Format | Size | Description & Key Features | Primary Research Role |
 |---|---|---|---|---|
 | **[`RICE.csv`](./Dataset/RICE.csv)** | CSV | ~1.67 MB | Granular weekly entomological field records from ICAR Cuttack spanning multi-year observation cycles. Contains: *Observation Year, Standard Meteorological Week (SMW), Pest Value (Number/hill), Collection Type, MaxT (°C), MinT (°C), Morning Relative Humidity RH1 (%), Evening RH2 (%), Rainfall RF (mm), Wind Speed WS (km/h), Bright Sunshine Hours SSH (hrs), Evaporation EVP (mm), Pest Name (`Brownplanthopper`), Location (`Cuttack`)*. | Primary dataset for longitudinal time-series forecasting, biometeorological thresholding, and insect population surge modeling. |
+| **[`Multi_Pest_Weather_Surveillance.csv`](./Dataset/Multi_Pest_Weather_Surveillance.csv)** | CSV | ~55 KB | Micro-climatic surveillance dataset capturing 8 major agricultural pests: *Brownplanthopper, Greenleafhopper, Whitebackedplanthopper, LeafFolder, Yellowstemborer (Light Trap & Pheromone Trap), Gallmidge, Caseworm, and Miridbug* aligned with daily/weekly $MaxT, MinT, RH_1, RH_2, RF, WS, SSH, EVP$. | Multi-class insect pest emergence classification and biometeorological correlation. |
+| **[`Smart_Trap_Insect_Catch_Timeseries.csv`](./Dataset/Smart_Trap_Insect_Catch_Timeseries.csv)** | CSV | ~14 KB | High-resolution electronic automated smart trap timeseries capturing insect counts, daily emergence events, hourly temperature deltas, day min/max temperatures, and relative humidity indices. | Validation of IoT smart trap ingestion and real-time edge early warning triggers. |
+| **[`TNAU_Crop_Pest_Threshold_and_Control.csv`](./Dataset/TNAU_Crop_Pest_Threshold_and_Control.csv)** | CSV | ~3.2 KB | Official Tamil Nadu Agricultural University (TNAU) and State Agriculture Department surveillance records with Economic Threshold Levels (ETL), growth stage vulnerability, chemical remedies, and biological bio-agents for Rice, Cotton, Sugarcane, and Pulses. | Ground-truth ETL threshold calibration and prescriptive IPM recommendation rules. |
+| **[`Pest_Economic_Thresholds_and_IPM.csv`](./Dataset/Pest_Economic_Thresholds_and_IPM.csv)** | CSV | ~10 KB | Comprehensive entomological pest damage database covering *Pink Bollworm, Fall Armyworm (FAW), Stem Borers, and Sucking Pests* with dangerous life stages, diagnostic leaf/boll symptoms, biological parasitoids, and cultural control protocols. | Explanatory decision-support advisory system and threshold warning matrix. |
+| **[`Crop_Pest_Phenology_Advisory.csv`](./Dataset/Crop_Pest_Phenology_Advisory.csv)** | CSV | ~2.3 KB | Agronomic crop profiles detailing crop durations (days), seasonal water requirements (mm), optimal temperature & pH ranges, critical growth stages, endemic pests/diseases, and harvesting windows for major Indian staple crops. | Crop phenology matching and growth-stage-sensitive risk adjustment. |
+| **[`Historical_Regional_Pest_Infestation.csv`](./Dataset/Historical_Regional_Pest_Infestation.csv)** | CSV | ~56 KB | Historical seasonal infestation logs tracking multi-crop pest life cycle stages (pupa, larvae, adult), seasonal infestation intensities (Low, Moderate, High), and regional distribution. | Seasonal outbreak baseline training and anomaly detection. |
 | **[`Cotton_ICAR_Data.xlsx`](./Dataset/Cotton_ICAR_Data.xlsx)** | Excel | ~1.14 MB | Indian Council of Agricultural Research (ICAR) cotton crop pest surveillance records covering bollworm complex (*Helicoverpa armigera*, *Pectinophora gossypiella*) and sucking insect pests (*Aphids, Whiteflies, Jassids, Thrips*) across multiple agro-ecological zones. | Secondary crop validation; multi-crop generalization benchmark. |
 | **[`Maize Pest and Diseases Dataset`](./Dataset/Maize%20Pest%20and%20Diseases%20Dataset%20)** | Images + Data | ~36 MB | Visual and tabular dataset containing field imagery and lesion incidence for maize pests (Fall Armyworm *Spodoptera frugiperda*) and endemic foliar diseases (Maize Leaf Blight, Common Rust). | Foundation for projected multimodal vision diagnostics and leaf damage classification. |
 | **[`Custom_Crops_yield_Historical_Dataset.csv`](./Dataset/Custom_Crops_yield_Historical_Dataset.csv)** | CSV | ~7.58 MB | Broad historical multi-district agricultural production records detailing acreage, seasonal yield, soil conditions, and climatic variations across diverse Indian states. | Agro-economic damage estimation and yield risk correlation modeling. |
@@ -491,18 +497,24 @@ gantt
 
 ```text
 Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework/
-├── README.md                      # Comprehensive project documentation
-├── .gitignore                     # Git ignore rules for Python, Node, OS files
+├── README.md                                  # Comprehensive project documentation
+├── .gitignore                                 # Git ignore rules for Python, Node, OS files
 │
-├── Dataset/                       # Real-world agricultural & pest datasets
-│   ├── RICE.csv                   # ICAR Cuttack Brown Planthopper surveillance dataset
-│   ├── Cotton_ICAR_Data.xlsx      # ICAR multi-district cotton pest surveillance
-│   ├── Maize Pest and Diseases Dataset/ # Visual images & foliar damage datasets
+├── Dataset/                                   # Real-world agricultural & pest datasets
+│   ├── RICE.csv                               # ICAR Cuttack Brown Planthopper surveillance dataset
+│   ├── Multi_Pest_Weather_Surveillance.csv    # 8-Pest agro-climatic weekly observation dataset
+│   ├── Smart_Trap_Insect_Catch_Timeseries.csv # Automated electronic insect trap timeseries
+│   ├── TNAU_Crop_Pest_Threshold_and_Control.csv # TNAU official ETL & IPM control guidelines
+│   ├── Pest_Economic_Thresholds_and_IPM.csv   # Detailed bio-agent & chemical threshold reference
+│   ├── Crop_Pest_Phenology_Advisory.csv       # Crop growth duration, water, temp & stage data
+│   ├── Historical_Regional_Pest_Infestation.csv # Multi-state seasonal pest outbreak records
+│   ├── Cotton_ICAR_Data.xlsx                  # ICAR multi-district cotton pest surveillance
+│   ├── Maize Pest and Diseases Dataset/       # Visual images & foliar damage datasets
 │   ├── Custom_Crops_yield_Historical_Dataset.csv # Historical yield & crop statistics
-│   ├── Pestreport2020-21.pdf      # Official National DPPQS / ICAR Surveillance Bulletin
-│   └── csv                        # Mandi price and crop arrival records
+│   ├── Pestreport2020-21.pdf                  # Official National DPPQS / ICAR Surveillance Bulletin
+│   └── csv                                    # Mandi price and crop arrival records
 │
-└── Documentation/                 # Architectural specifications & requirements
+└── Documentation/                             # Architectural specifications & requirements
     ├── Overview.md — Intelligent Pest Outbreak Prediction & Early Warning Framework.md
     ├── PRD — Intelligent Pest Outbreak Prediction & Early Warning Framework.md
     ├── TRD.md — Intelligent Pest Outbreak Prediction & Early Warning Framework.md
