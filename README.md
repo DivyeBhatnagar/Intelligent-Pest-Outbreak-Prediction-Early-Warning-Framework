@@ -10,7 +10,7 @@
 [![Scikit--Learn](https://img.shields.io/badge/Scikit--Learn-1.4+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 [![XGBoost](https://img.shields.io/badge/XGBoost-Enabled-EB5424?style=for-the-badge&logo=xgboost&logoColor=white)](https://xgboost.ai)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![Project Status](https://img.shields.io/badge/Status-Specification%20%26%20V1%20Roadmap-22c55e?style=for-the-badge)](https://github.com/divyebhatnagariilm/Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework)
+[![Project Status](https://img.shields.io/badge/Status-Specification%20%26%20V1%20Roadmap-22c55e?style=for-the-badge)](https://github.com/DivyeBhatnagar/Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework)
 
 <br/>
 
@@ -522,7 +522,7 @@ Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/divyebhatnagariilm/Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework.git
+git clone https://github.com/DivyeBhatnagar/Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework.git
 cd Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework
 ```
 
