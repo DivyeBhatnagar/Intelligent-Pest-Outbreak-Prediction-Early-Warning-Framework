@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Dict, Optional, Union
 import pandas as pd
@@ -6,6 +7,47 @@ from src.config import DATASETS, COLUMN_MAPPINGS
 from src.utils.logger import get_logger
 
 log = get_logger("data.loader")
+
+
+def parse_cotton_record(val: Optional[str]):
+    """
+    Parses complex composite cotton pest strings, e.g.:
+    'AmericanBollworm-Adult (Number/ Pheromone trap)' -> ('American Bollworm', 'Adult', 'Number/ Pheromone trap')
+    """
+    if pd.isna(val):
+        return "Unknown", "All", "Unknown"
+    val = str(val).strip()
+    match = re.search(r"^(.*?)\s*[\(\[]\s*(.*?)\s*[\)\]]$", val)
+    if match:
+        pest_part, unit = match.group(1).strip(), match.group(2).strip()
+    else:
+        pest_part, unit = val, "Unknown"
+
+    stage = "All"
+    pest_species = pest_part
+    for s in ["Adult", "Larva", "Egg", "Damage", "Nymph", "PT", "LT"]:
+        if pest_part.endswith("-" + s):
+            pest_species = pest_part[: -len("-" + s)]
+            stage = s
+            break
+
+    mapping = {
+        "AmericanBollworm": "American Bollworm",
+        "PinkBollworm": "Pink Bollworm",
+        "SpottedBollworm": "Spotted Bollworm",
+        "Whitefly": "Whitefly",
+        "Jassid": "Jassid",
+        "Aphid": "Aphid",
+        "Thrips": "Thrips",
+        "Spodoptera": "Spodoptera",
+        "Mealybug": "Mealybug",
+        "Miridbug": "Mirid Bug",
+        "BacteriaLeafBlight": "Bacterial Leaf Blight",
+        "AlternariaLeafBlight": "Alternaria Leaf Blight",
+        "AlternariaLeafSpot": "Alternaria Leaf Spot",
+    }
+    pest_species = mapping.get(pest_species, pest_species)
+    return pest_species, stage, unit
 
 
 def load_dataset(dataset_key: str) -> pd.DataFrame:
@@ -41,7 +83,8 @@ def load_dataset(dataset_key: str) -> pd.DataFrame:
 def load_surveillance_data(crop: str = "all") -> pd.DataFrame:
     """
     Loads historical weekly field surveillance records (Rice ICAR, Cotton ICAR).
-    Harmonizes columns into a standard schema so downstream ML sees consistent features.
+    Harmonizes columns, parses biological life stages and collection methods,
+    and maps them into a standard unified schema.
     """
     dfs = []
     crop_filter = crop.lower().strip()
@@ -49,9 +92,12 @@ def load_surveillance_data(crop: str = "all") -> pd.DataFrame:
     # 1. Rice surveillance
     if crop_filter in ["all", "rice"]:
         rice_df = load_dataset("rice_icar")
-        # Standardize column headers
         rice_df = rice_df.rename(columns=COLUMN_MAPPINGS)
         rice_df["crop"] = "Rice"
+        if "life_stage" not in rice_df.columns:
+            rice_df["life_stage"] = "Adult"
+        if "collection_type" not in rice_df.columns:
+            rice_df["collection_type"] = "Number/Light trap"
         dfs.append(rice_df)
 
     # 2. Cotton surveillance
@@ -59,13 +105,24 @@ def load_surveillance_data(crop: str = "all") -> pd.DataFrame:
         cotton_df = load_dataset("cotton_icar")
         cotton_df = cotton_df.rename(columns=COLUMN_MAPPINGS)
         cotton_df["crop"] = "Cotton"
+
+        # Parse composite 'pest_disease_raw' column
+        if "pest_disease_raw" in cotton_df.columns:
+            parsed = cotton_df["pest_disease_raw"].apply(parse_cotton_record)
+            cotton_df["pest_name"] = [p[0] for p in parsed]
+            cotton_df["life_stage"] = [p[1] for p in parsed]
+            cotton_df["collection_type"] = [p[2] for p in parsed]
+            cotton_df = cotton_df.drop(columns=["pest_disease_raw"])
+
         dfs.append(cotton_df)
 
     if not dfs:
         raise ValueError(f"No surveillance data available for crop filter: '{crop}'")
 
     combined = pd.concat(dfs, ignore_index=True)
-    log.info(f"Consolidated surveillance data: {len(combined)} records across {combined['crop'].unique()}")
+    log.info(
+        f"Consolidated surveillance data: {len(combined)} records across {combined['crop'].unique().tolist()}"
+    )
     return combined
 
 
@@ -75,11 +132,8 @@ def load_smart_trap_data() -> pd.DataFrame:
     Parses timestamp columns for high-frequency timeseries analysis.
     """
     df = load_dataset("smart_trap")
-    
-    # Clean up column headers (lowercase + strip spaces)
     df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
-    # Combine date and time if present
     if "date" in df.columns and "time" in df.columns:
         df["timestamp"] = pd.to_datetime(
             df["date"].astype(str) + " " + df["time"].astype(str),
@@ -90,10 +144,28 @@ def load_smart_trap_data() -> pd.DataFrame:
     return df
 
 
+def load_multi_pest_weather() -> pd.DataFrame:
+    """
+    Loads Multi-Pest Weather surveillance observations dataset.
+    Standardizes weather column names.
+    """
+    df = load_dataset("multi_pest_weather")
+    df = df.rename(columns=COLUMN_MAPPINGS)
+    return df
+
+
+def load_regional_infestations() -> pd.DataFrame:
+    """
+    Loads Historical Regional Pest Infestation records.
+    """
+    df = load_dataset("regional_infestations")
+    df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+    return df
+
+
 def load_reference_tables() -> Dict[str, pd.DataFrame]:
     """
     Loads static advisory references: TNAU thresholds, IPM guidelines, and crop phenologies.
-    These are used by the risk engine and explainability layer for actionable insights.
     """
     return {
         "tnau_thresholds": load_dataset("tnau_thresholds"),

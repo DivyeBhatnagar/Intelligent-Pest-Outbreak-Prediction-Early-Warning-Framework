@@ -158,49 +158,91 @@ Centralized configuration module decoupling constants from logic:
 
 ## 6. Pipeline Orchestrator & Benchmark (`src/pipeline.py`)
 
-A standalone CLI runner that ingests, cleans, features, and persists processed model datasets:
+A standalone CLI runner that ingests, cleans, engineers features, encodes categories, scales signals, and splits data into ML-ready matrices:
 
 ```bash
-python3 -m src.pipeline --crop all
+python3 -m src.pipeline --crop all --split-method temporal
 ```
 
 ### Benchmark Output on Full Dataset:
 ```text
-=================================================================
-📊 DATASET PIPELINE DIAGNOSTIC SUMMARY
-=================================================================
-Total Surveillance Records : 35,499
-Crops Represented          : ['Rice', 'Cotton']
-Pests Monitored            : 12 unique species
-Top 5 Pests                : {'Unknown': 16095, 'Yellow Stem Borer': 4333, 'Gall Midge': 3016, 'Greenleafhopper': 2287, 'Leafblast': 2090}
-Outbreak Label Distribution: 0 (Normal): 19,209, 1 (Outbreak): 16,290
-Outbreak Class Rate (t+1)  : 45.89%
-Smart Trap Telemetry Rows  : 153
-Engineered Feature Columns : 38
-=================================================================
+======================================================================
+🌾 INTELLIGENT PEST OUTBREAK FRAMEWORK — DATASET PREPARATION SUMMARY
+======================================================================
+Total Consolidated Records     : 35,499
+Crops Monitored                : ['Rice', 'Cotton']
+Unique Pest Species            : 23
+Geographic Locations (Stations): 12 centers
+Clean Missing Values (NaN)     : 0 remaining (100% clean)
+----------------------------------------------------------------------
+📦 PREPARED TRAINING & TESTING DATASETS
+----------------------------------------------------------------------
+Split Strategy                 : TEMPORAL (Cutoff: year <= 2006)
+Training Observations (X_train): 27,439 rows (77.3%)
+Testing Observations  (X_test) : 8,060 rows (22.7%)
+ML Feature Dimensions          : 92 input columns (numeric + one-hot categories)
+Train Outbreak Rate (t+1)      : 44.93%
+Test Outbreak Rate (t+1)       : 50.94%
+----------------------------------------------------------------------
+📂 GENERATED ARTIFACTS IN artifacts/processed/ & artifacts/models/
+----------------------------------------------------------------------
+ • Tabular Raw Train CSV       : train.csv (27,439 rows)
+ • Tabular Raw Test CSV        : test.csv (8,060 rows)
+ • Encoded ML X_train Matrix   : X_train.parquet / X_train.csv ((27439, 92))
+ • Encoded ML X_test Matrix    : X_test.parquet / X_test.csv ((8060, 92))
+ • Targets (y_train / y_test)  : y_train.csv / y_test.csv (binary, multiclass, regression)
+ • Preprocessor Pipeline       : preprocessor.joblib (ColumnTransformer/Scaler/OHE)
+ • Multi-Pest Weather Splits   : multi_pest_weather_train.csv (956), test.csv (240)
+ • IoT Smart Trap Telemetry    : processed_smart_traps.csv (153 rows)
+ • Regional Infestation Splits : regional_infestations_train.csv (800), test.csv (200)
+======================================================================
 ```
 
 ---
 
-## 7. API Layer & Validation Schemas (`api/`)
+## 7. Categorical Encoding & Scaler Pipeline (`src/data/encoder.py`)
 
-### 7.1 Pydantic Validation Schemas (`api/schemas.py`)
+The `SurveillanceDataPreprocessor` class provides a unified Scikit-Learn-compatible transformation pipeline:
+- **One-Hot Encoding:** Applied to `['crop', 'pest_name', 'location', 'life_stage', 'collection_type']` with `handle_unknown='ignore'`.
+- **Standard Scaling:** Normalizes 30 continuous meteorological, degree-day, vapor pressure deficit, and autoregressive lag variables to $\mathcal{N}(0, 1)$ strictly fitted on the training split.
+- **Ordinal / Integer Encoding:** Generates `{feature}_code` columns for tree algorithms with native categorical handling (LightGBM/CatBoost).
+- **Serialization & Reproducibility:** Fitted pipeline is saved to `artifacts/models/preprocessor.joblib` and feature schema dictionary to `artifacts/models/feature_metadata.json` for deterministic API inference.
+
+---
+
+## 8. Dataset Splitting & Preprocessing Orchestrator (`src/data/split.py`)
+
+- **Temporal Split (Primary):** Chronological holdout splitting on year $\le 2006$ (Train: 27,439 observations) vs $> 2006$ (Test: 8,060 observations), simulating real-world predictive lead time without future-lookahead data leakage.
+- **Target Separation:**
+  - `outbreak_next_week`: Binary classification ground-truth label ($t+1$).
+  - `risk_category`: 4-tier ordinal severity level (0: Negligible, 1: Moderate, 2: High, 3: Critical).
+  - `pest_count`: Continuous numeric pest population count for regression modeling.
+- **Auxiliary Dataset Pipelines:**
+  - `Multi-Pest Weather`: Categorical label-encoded target, 80/20 stratified split.
+  - `IoT Smart Trap`: Timestamp parsing, localized moving metrics, and sensor sanity validation.
+  - `Regional Infestations`: State, season, and life-cycle categorical encoding with stratified severity split.
+
+---
+
+## 9. API Layer & Validation Schemas (`api/`)
+
+### 9.1 Pydantic Validation Schemas (`api/schemas.py`)
 - `WeatherObservation`: Validates temperature ($-10^\circ\text{C}$ to $60^\circ\text{C}$), morning/evening RH ($0\%$ to $100\%$), rainfall, wind speed, sunshine hours, and evaporation.
 - `PredictionRequest`: Enforces crop name, pest species, location, standard meteorological week ($1 \le \text{SMW} \le 53$), current field scout count, and embedded `WeatherObservation`.
 - `PredictionResponse`: Returns calibrated risk score ($0.0 \text{ to } 1.0$), categorical risk level, early warning boolean flag, GDD accumulation, RH differential, top contributing climatic factors, and prescriptive advisory text.
 - `HealthCheckResponse`: Returns live system status and record counts.
 
-### 7.2 FastAPI Service (`api/main.py`)
+### 9.2 FastAPI Service (`api/main.py`)
 Exposes versioned REST endpoints under `/api/v1`:
 * **`GET /`**: Welcome message, service status, and link to interactive Swagger `/docs`.
 * **`GET /api/v1/health`**: Health diagnostic reporting dataset readiness and processed record counts.
-* **`GET /api/v1/reference/pests`**: Returns all 10 monitored pest species with their respective $T_{base}$ and ETL thresholds.
+* **`GET /api/v1/reference/pests`**: Returns all 23 monitored pest species with their respective $T_{base}$ and ETL thresholds.
 * **`GET /api/v1/reference/advisories`**: Returns official TNAU & IPM guidelines for in-field interventions.
 * **`POST /api/v1/predictions/evaluate`**: Real-time bio-climatic risk scoring computing GDD, humidity persistence, and actionable advisory output.
 
 ---
 
-## 8. Verification & Test Execution Results
+## 10. Verification & Test Execution Results
 
 All routes and features were validated via automated test execution:
 
@@ -211,12 +253,12 @@ client.get('/api/v1/health')
 
 # Test 2: Reference Data
 client.get('/api/v1/reference/pests')
-# Result: 200 OK -> 10 monitored pests returned
+# Result: 200 OK -> 23 monitored pests returned
 
 # Test 3: Prediction Evaluation
 client.post('/api/v1/predictions/evaluate', json={
     'crop': 'Rice',
-    'pest_name': 'Brownplanthopper',
+    'pest_name': 'Brown Planthopper',
     'location': 'Cuttack',
     'standard_week': 32,
     'current_pest_count': 6.0,
@@ -225,7 +267,10 @@ client.post('/api/v1/predictions/evaluate', json={
         'temp_min': 25.0,
         'rh_morning': 92.0,
         'rh_evening': 74.0,
-        'rainfall': 45.0
+        'rainfall': 45.0,
+        'wind_speed': 3.5,
+        'sunshine_hours': 6.0,
+        'evaporation': 4.0
     }
 })
 # Result: 200 OK ->
@@ -235,13 +280,13 @@ client.post('/api/v1/predictions/evaluate', json={
 #   "is_warning": True,
 #   "gdd_accumulated": 16.25,
 #   "rh_differential": 18.0,
-#   "advisory": "Status: CRITICAL. Initiate immediate targeted IPM intervention. Target ETL threshold for Brownplanthopper is 5.0. Accumulated degree-days: 16.2 GDD."
+#   "advisory": "Status: CRITICAL. Initiate immediate targeted IPM intervention. Target ETL threshold for Brown Planthopper is 5.0. Accumulated degree-days: 16.2 GDD."
 # }
 ```
 
 ---
 
-## 9. How to Run Locally
+## 11. How to Run Locally
 
 ### 1. Install Dependencies
 ```bash
@@ -250,11 +295,11 @@ pip install -r requirements.txt
 
 ### 2. Run the Data Preprocessing Pipeline
 ```bash
-# Process all crops (Rice + Cotton) and generate features
-python3 -m src.pipeline --crop all
+# Process all crops with temporal split (<=2006 train, >2006 test)
+python3 -m src.pipeline --crop all --split-method temporal
 
-# Or process only rice
-python3 -m src.pipeline --crop rice
+# Or run with stratified 80/20 split
+python3 -m src.pipeline --crop all --split-method stratified --test-size 0.20
 ```
 
 ### 3. Launch the FastAPI Development Server
@@ -265,9 +310,9 @@ Open **[http://localhost:8000/docs](http://localhost:8000/docs)** to test the in
 
 ---
 
-## 10. Upcoming Roadmap Milestones
+## 12. Upcoming Roadmap Milestones
 
-Now that Phase 2 data engineering is initialized and operating, the next recommended milestones from Phase 3 are:
-1. **Model Training Script (`src/ml/train.py`):** Train baseline Decision Tree, Random Forest, and XGBoost models on the 38 engineered features in `artifacts/processed/processed_surveillance.csv`.
-2. **Model Evaluation & Cross-Validation (`src/ml/evaluate.py`):** Calculate stratified Precision, Recall, F1, ROC-AUC, and Early Warning Lead Time.
-3. **SHAP Feature Importance Engine (`src/ml/explain.py`):** Save global and local explainability vectors for prediction explanations.
+Now that Phase 2 data cleaning, missing value imputation, categorical encoding, and train/test dataset preparation are complete:
+1. **Model Training Suite (`src/ml/train.py`):** Train baseline Decision Tree, Random Forest, LightGBM, and XGBoost models on `X_train.parquet` and `y_train.csv`.
+2. **Model Evaluation & Cross-Validation (`src/ml/evaluate.py`):** Calculate stratified Precision, Recall, F1, ROC-AUC, PR-AUC, and Early Warning Lead Time on `X_test.parquet` and `y_test.csv`.
+3. **SHAP Feature Importance Engine (`src/ml/explain.py`):** Generate global beeswarm plots and local waterfall explanations for top bio-climatic risk factors.
