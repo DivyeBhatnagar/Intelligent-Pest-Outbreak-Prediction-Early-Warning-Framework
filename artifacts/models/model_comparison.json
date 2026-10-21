@@ -1,0 +1,82 @@
+{
+  "champion_model": "Random Forest",
+  "selection_metric": "f1_score",
+  "champion_score": 0.9055,
+  "models": {
+    "Logistic Regression": {
+      "accuracy": 0.9026,
+      "precision": 0.9039,
+      "recall": 0.905,
+      "f1_score": 0.9045,
+      "roc_auc": 0.9321,
+      "pr_auc": 0.9213,
+      "false_negative_rate": 0.095,
+      "confusion_matrix": {
+        "true_negative": 3559,
+        "false_positive": 395,
+        "false_negative": 390,
+        "true_positive": 3716
+      }
+    },
+    "Decision Tree": {
+      "accuracy": 0.8963,
+      "precision": 0.8928,
+      "recall": 0.905,
+      "f1_score": 0.8989,
+      "roc_auc": 0.9454,
+      "pr_auc": 0.9406,
+      "false_negative_rate": 0.095,
+      "confusion_matrix": {
+        "true_negative": 3508,
+        "false_positive": 446,
+        "false_negative": 390,
+        "true_positive": 3716
+      }
+    },
+    "Random Forest": {
+      "accuracy": 0.903,
+      "precision": 0.8984,
+      "recall": 0.9128,
+      "f1_score": 0.9055,
+      "roc_auc": 0.9571,
+      "pr_auc": 0.9538,
+      "false_negative_rate": 0.0872,
+      "confusion_matrix": {
+        "true_negative": 3530,
+        "false_positive": 424,
+        "false_negative": 358,
+        "true_positive": 3748
+      }
+    },
+    "LightGBM": {
+      "accuracy": 0.9016,
+      "precision": 0.901,
+      "recall": 0.9065,
+      "f1_score": 0.9037,
+      "roc_auc": 0.9599,
+      "pr_auc": 0.9587,
+      "false_negative_rate": 0.0935,
+      "confusion_matrix": {
+        "true_negative": 3545,
+        "false_positive": 409,
+        "false_negative": 384,
+        "true_positive": 3722
+      }
+    },
+    "XGBoost": {
+      "accuracy": 0.9033,
+      "precision": 0.9058,
+      "recall": 0.9043,
+      "f1_score": 0.9051,
+      "roc_auc": 0.9603,
+      "pr_auc": 0.9596,
+      "false_negative_rate": 0.0957,
+      "confusion_matrix": {
+        "true_negative": 3568,
+        "false_positive": 386,
+        "false_negative": 393,
+        "true_positive": 3713
+      }
+    }
+  }
+}

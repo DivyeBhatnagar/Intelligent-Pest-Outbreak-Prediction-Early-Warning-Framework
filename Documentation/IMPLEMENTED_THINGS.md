@@ -238,11 +238,68 @@ Exposes versioned REST endpoints under `/api/v1`:
 * **`GET /api/v1/health`**: Health diagnostic reporting dataset readiness and processed record counts.
 * **`GET /api/v1/reference/pests`**: Returns all 23 monitored pest species with their respective $T_{base}$ and ETL thresholds.
 * **`GET /api/v1/reference/advisories`**: Returns official TNAU & IPM guidelines for in-field interventions.
-* **`POST /api/v1/predictions/evaluate`**: Real-time bio-climatic risk scoring computing GDD, humidity persistence, and actionable advisory output.
+* **`GET /api/v1/models/benchmark`**: Returns live benchmark evaluation metrics across all 5 candidate ML models.
+* **`POST /api/v1/predictions/evaluate`**: Real-time bio-climatic risk scoring using the champion Machine Learning model (`Random Forest`), computing degree-days, VPD, and local feature attributions.
 
 ---
 
-## 10. Verification & Test Execution Results
+## 10. Machine Learning & Prediction Engine (`src/ml/`)
+
+In accordance with **Phase 3** of the Implementation Plan, the automated model training, evaluation, champion selection, and SHAP explainability pipeline has been fully developed:
+
+### 10.1 Candidate Model Suite (`src/ml/train.py`)
+Trains 5 justified candidate algorithms on the 92 engineered & scaled features in `X_train` ($27,439$ records):
+1. **Logistic Regression:** Regularized linear baseline with balanced class weights.
+2. **Decision Tree Classifier:** Non-linear decision baseline (max depth 8, min samples split 20).
+3. **Random Forest Classifier:** Bagging ensemble of 100 decision trees (max depth 14).
+4. **LightGBM Classifier:** Fast histogram gradient boosting (150 estimators, learning rate 0.05).
+5. **XGBoost Classifier:** Regularized gradient boosting (150 estimators, learning rate 0.05, subsample 0.8).
+
+### 10.2 Model Evaluation & Benchmark Protocol (`src/ml/evaluate.py`)
+All models were evaluated on the future holdout test split ($2007-2011$, **$8,060$ records**), simulating real-world predictive lead time:
+
+```text
+============================================================================================
+🏆 PEST OUTBREAK EARLY WARNING (t+1) — MODEL BENCHMARK COMPARISON
+============================================================================================
+Model                  | Accuracy  | Recall   | Precision  | F1-Score  | ROC-AUC  | FNR   
+--------------------------------------------------------------------------------------------
+Logistic Regression    | 0.9026    | 0.9050   | 0.9039     | 0.9045    | 0.9321   | 0.0950
+Decision Tree          | 0.8963    | 0.9050   | 0.8928     | 0.8989    | 0.9454   | 0.0950
+Random Forest ★        | 0.9030    | 0.9128   | 0.8984     | 0.9055    | 0.9571   | 0.0872
+LightGBM               | 0.9016    | 0.9065   | 0.9010     | 0.9037    | 0.9599   | 0.0935
+XGBoost                | 0.9033    | 0.9043   | 0.9058     | 0.9051    | 0.9603   | 0.0957
+--------------------------------------------------------------------------------------------
+★ CHAMPION MODEL        : Random Forest
+  • Primary Metric (f1_score): 0.9055
+  • Outbreak Recall     : 91.28% (True Positive Rate)
+  • Outbreak Precision  : 89.84%
+  • False Negatives     : 358 out of 4,106 outbreaks missed (8.72%)
+  • ROC-AUC Score       : 0.9571
+============================================================================================
+```
+
+- **Champion Model:** **Random Forest** achieved the highest Outbreak Recall (**91.28%**) and lowest False Negative Rate (**8.72%**), which is critical in agricultural early-warning systems to ensure farmers are never caught off-guard by undetected outbreaks.
+- **Top Discrimination:** **XGBoost** achieved the highest ROC-AUC (**0.9603**), closely followed by LightGBM (**0.9599**) and Random Forest (**0.9571**).
+
+### 10.3 Explainable AI with SHAP (`src/ml/explain.py`)
+- **Global Feature Attributions:** Generated TreeExplainer summary plot at `artifacts/models/shap_summary.png`. Top driving features:
+  1. *Outbreak Current ($t$)* — Prevailing field infestation baseline.
+  2. *Field Scout Population vs ETL* — Ratio of in-field insects to Economic Threshold Level.
+  3. *Previous Week Pest Lag ($t-1, t-2$)* — Autoregressive temporal momentum.
+  4. *Growing Degree-Days (GDD)* — Physiological heat unit accumulation accelerating life cycle transitions.
+  5. *Vapor Pressure Deficit (VPD)* & *Morning Humidity* — Canopy micro-climatic moisture persistence.
+- **Local Single-Prediction Explainer:** Dynamically computes top positive threat factors and dampening factors for individual API requests.
+
+### 10.4 Machine Learning CLI Orchestrator (`src/ml/pipeline.py`)
+Run the full ML training, evaluation, champion selection, and SHAP generation with one command:
+```bash
+python3 -m src.ml.pipeline --metric f1_score --shap-samples 500
+```
+
+---
+
+## 11. Verification & Test Execution Results
 
 All routes and features were validated via automated test execution:
 
@@ -251,11 +308,11 @@ All routes and features were validated via automated test execution:
 client.get('/api/v1/health')
 # Result: 200 OK -> {'status': 'healthy', 'datasets_ready': True, 'total_surveillance_records': 35499}
 
-# Test 2: Reference Data
-client.get('/api/v1/reference/pests')
-# Result: 200 OK -> 23 monitored pests returned
+# Test 2: Model Benchmark Endpoint
+client.get('/api/v1/models/benchmark')
+# Result: 200 OK -> {'champion_model': 'Random Forest', 'champion_score': 0.9055, 'models': {...}}
 
-# Test 3: Prediction Evaluation
+# Test 3: ML-Powered Prediction Evaluation
 client.post('/api/v1/predictions/evaluate', json={
     'crop': 'Rice',
     'pest_name': 'Brown Planthopper',
@@ -275,18 +332,23 @@ client.post('/api/v1/predictions/evaluate', json={
 })
 # Result: 200 OK ->
 # {
-#   "risk_score": 0.98,
+#   "risk_score": 0.94,
 #   "risk_level": "CRITICAL",
 #   "is_warning": True,
 #   "gdd_accumulated": 16.25,
 #   "rh_differential": 18.0,
-#   "advisory": "Status: CRITICAL. Initiate immediate targeted IPM intervention. Target ETL threshold for Brown Planthopper is 5.0. Accumulated degree-days: 16.2 GDD."
+#   "top_factors": [
+#     {"feature": "Outbreak Current", "impact": "Elevating Risk", "description": "Observed feature signal: 1.11 (Attribution weight: 0.344)"},
+#     {"feature": "Field Scout Population vs ETL", "impact": "Moderating Risk", "description": "Observed feature signal: -0.13 (Attribution weight: 0.207)"}
+#   ],
+#   "advisory": "Status: CRITICAL. Initiate immediate targeted IPM intervention. Target ETL threshold for Brown Planthopper is 5.0. Accumulated degree-days: 16.2 GDD. VPD: 0.65 kPa.",
+#   "model_version": "v2.0-ml-random-forest"
 # }
 ```
 
 ---
 
-## 11. How to Run Locally
+## 12. How to Run Locally
 
 ### 1. Install Dependencies
 ```bash
@@ -297,12 +359,15 @@ pip install -r requirements.txt
 ```bash
 # Process all crops with temporal split (<=2006 train, >2006 test)
 python3 -m src.pipeline --crop all --split-method temporal
-
-# Or run with stratified 80/20 split
-python3 -m src.pipeline --crop all --split-method stratified --test-size 0.20
 ```
 
-### 3. Launch the FastAPI Development Server
+### 3. Run the Machine Learning Training & Benchmark Suite
+```bash
+# Train candidate models, evaluate, select champion, and generate SHAP plots
+python3 -m src.ml.pipeline
+```
+
+### 4. Launch the FastAPI Development Server
 ```bash
 uvicorn api.main:app --reload --port 8000
 ```
@@ -310,9 +375,9 @@ Open **[http://localhost:8000/docs](http://localhost:8000/docs)** to test the in
 
 ---
 
-## 12. Upcoming Roadmap Milestones
+## 13. Upcoming Roadmap Milestones
 
-Now that Phase 2 data cleaning, missing value imputation, categorical encoding, and train/test dataset preparation are complete:
-1. **Model Training Suite (`src/ml/train.py`):** Train baseline Decision Tree, Random Forest, LightGBM, and XGBoost models on `X_train.parquet` and `y_train.csv`.
-2. **Model Evaluation & Cross-Validation (`src/ml/evaluate.py`):** Calculate stratified Precision, Recall, F1, ROC-AUC, PR-AUC, and Early Warning Lead Time on `X_test.parquet` and `y_test.csv`.
-3. **SHAP Feature Importance Engine (`src/ml/explain.py`):** Generate global beeswarm plots and local waterfall explanations for top bio-climatic risk factors.
+With **Phase 2 (Data Engineering)** and **Phase 3 (Machine Learning Engine & SHAP Explainability)** complete, the next milestone is **Phase 4**:
+1. **Interactive Full-Stack Dashboard / Web UI:** An intuitive, responsive dashboard with dynamic maps of India, crop risk gauges, historical surveillance charts, and automated IPM alert generators.
+2. **Alert Notification Service:** Automated email / SMS / WhatsApp advisory dispatches when in-field sensors cross warning thresholds.
+3. **Database Integration:** SQLite / PostgreSQL persistence for real-time field scout telemetry and model prediction audit logs.

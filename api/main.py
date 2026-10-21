@@ -1,7 +1,10 @@
+import json
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+import joblib
+import numpy as np
 import pandas as pd
 
 from src.config import (
@@ -9,9 +12,13 @@ from src.config import (
     ECONOMIC_THRESHOLD_LEVELS,
     RISK_LEVELS,
     PROCESSED_DATA_DIR,
+    BEST_MODEL_FILE,
+    MODEL_COMPARISON_FILE,
+    PREPROCESSOR_FILE,
 )
 from src.data.loader import load_reference_tables
-from src.data.feature_engineering import compute_gdd
+from src.data.encoder import SurveillanceDataPreprocessor
+from src.ml.explain import explain_single_prediction
 from api.schemas import (
     PredictionRequest,
     PredictionResponse,
@@ -34,6 +41,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Load trained ML model and preprocessor if available
+def load_ml_assets():
+    model = None
+    prep = None
+    meta = {}
+
+    if BEST_MODEL_FILE.exists():
+        try:
+            model = joblib.load(BEST_MODEL_FILE)
+        except Exception:
+            model = None
+
+    if PREPROCESSOR_FILE.exists():
+        try:
+            prep = SurveillanceDataPreprocessor.load(PREPROCESSOR_FILE)
+        except Exception:
+            prep = None
+
+    if MODEL_COMPARISON_FILE.exists():
+        try:
+            with open(MODEL_COMPARISON_FILE, "r") as f:
+                meta = json.load(f)
+        except Exception:
+            meta = {}
+
+    return model, prep, meta
+
+
+champion_model, ml_preprocessor, model_benchmark_meta = load_ml_assets()
+
 
 @app.get("/", tags=["Root"])
 def root():
@@ -41,6 +78,7 @@ def root():
         "service": "Intelligent Pest Outbreak Prediction & Early Warning Framework",
         "status": "online",
         "version": "1.0.0",
+        "champion_model": model_benchmark_meta.get("champion_model", "Trained ML Model"),
         "docs_url": "/docs",
     }
 
@@ -53,7 +91,6 @@ def health_check():
 
     if exists:
         try:
-            # Quick row count check without loading full memory
             with open(processed_file, "r") as f:
                 row_count = sum(1 for _ in f) - 1
         except Exception:
@@ -98,67 +135,141 @@ def get_advisory_tables():
         )
 
 
+@app.get("/api/v1/models/benchmark", tags=["Machine Learning"])
+def get_model_benchmarks():
+    """Returns comparative validation metrics across all trained ML models."""
+    if not model_benchmark_meta:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Model benchmark report not found. Run 'python3 -m src.ml.pipeline' first.",
+        )
+    return model_benchmark_meta
+
+
 @app.post("/api/v1/predictions/evaluate", response_model=PredictionResponse, tags=["Predictions"])
 def evaluate_risk(payload: PredictionRequest):
     """
-    Evaluates micro-meteorological observations against bio-climatic indices (GDD,
-    humidity persistence, ETL ratios) to compute an early-warning risk level.
+    Evaluates micro-meteorological observations and field scouting data against the
+    champion Machine Learning model and bio-climatic indices to compute an early-warning risk level.
     """
     w = payload.weather
     t_mean = (w.temp_max + w.temp_min) / 2.0
     t_base = BASE_TEMPERATURES.get(payload.pest_name, BASE_TEMPERATURES["default"])
     gdd = max(t_mean - t_base, 0.0)
+    dtr = max(w.temp_max - w.temp_min, 0.0)
     rh_diff = w.rh_morning - w.rh_evening
     rh_mean = (w.rh_morning + w.rh_evening) / 2.0
     etl = ECONOMIC_THRESHOLD_LEVELS.get(payload.pest_name, ECONOMIC_THRESHOLD_LEVELS["default"])
+    is_outbreak_now = int(payload.current_pest_count >= etl) if payload.current_pest_count else 0
 
-    # Bio-climatic risk heuristic scoring (calibrated against historical ICAR surveillance)
-    risk_factors = []
-    raw_score = 0.10  # Baseline ambient probability
+    # Vapor pressure deficit approximation
+    sat_vp = 0.61078 * np.exp((17.27 * t_mean) / (t_mean + 237.3))
+    actual_vp = sat_vp * (rh_mean / 100.0)
+    vpd_kpa = round(max(sat_vp - actual_vp, 0.0), 3)
 
-    # 1. Thermal factor: prolonged favorable temperature band (24-32 deg C)
-    if 24.0 <= t_mean <= 33.0:
-        raw_score += 0.25
-        risk_factors.append(ContributingFactor(
-            feature="Mean Temperature",
-            impact="Positive (+25%)",
-            description=f"Optimal reproductive temperature for {payload.pest_name} ({t_mean:.1f}°C)."
-        ))
+    # Cyclical meteorological week
+    week_sin = round(np.sin(2 * np.pi * payload.standard_week / 52.0), 4)
+    week_cos = round(np.cos(2 * np.pi * payload.standard_week / 52.0), 4)
+    humidity_persist = int(w.rh_morning >= 85.0 and w.rh_evening >= 60.0)
 
-    # 2. Moisture factor: high morning humidity (>85%) with humid canopy
-    if w.rh_morning >= 85.0:
-        raw_score += 0.25
-        risk_factors.append(ContributingFactor(
-            feature="Canopy Humidity",
-            impact="Positive (+25%)",
-            description=f"High morning humidity ({w.rh_morning:.1f}%) creates favorable micro-climate."
-        ))
+    risk_factors: List[ContributingFactor] = []
+    final_score = 0.50
+    model_version_tag = "v1.0-rules-engine"
 
-    # 3. Rainfall / Intermittent showers
-    if 10.0 <= w.rainfall <= 80.0:
-        raw_score += 0.15
-        risk_factors.append(ContributingFactor(
-            feature="Rainfall",
-            impact="Positive (+15%)",
-            description=f"Intermittent precipitation ({w.rainfall:.1f} mm) elevates vegetative moisture."
-        ))
+    # 1. Run Machine Learning Model Inference if available
+    if champion_model is not None and ml_preprocessor is not None:
+        try:
+            # Construct tabular row matching preprocessor feature expectations
+            input_dict = {
+                "crop": payload.crop,
+                "pest_name": payload.pest_name,
+                "location": payload.location,
+                "life_stage": "Adult",
+                "collection_type": "Number/Light trap" if payload.crop.lower() == "rice" else "Number/ 3 leaves",
+                "temp_max": w.temp_max,
+                "temp_min": w.temp_min,
+                "temp_mean": t_mean,
+                "diurnal_temp_range": dtr,
+                "rh_morning": w.rh_morning,
+                "rh_evening": w.rh_evening,
+                "rh_mean": rh_mean,
+                "rh_differential": rh_diff,
+                "high_humidity_persistence": humidity_persist,
+                "rainfall": w.rainfall,
+                "wind_speed": w.wind_speed or 3.0,
+                "sunshine_hours": w.sunshine_hours or 7.0,
+                "evaporation": w.evaporation or 3.0,
+                "vpd_kpa": vpd_kpa,
+                "gdd": gdd,
+                "standard_week": payload.standard_week,
+                "week_sin": week_sin,
+                "week_cos": week_cos,
+                "pest_count": payload.current_pest_count or 0.0,
+                "outbreak_current": is_outbreak_now,
+                "temp_mean_lag1": t_mean,
+                "temp_mean_lag2": t_mean,
+                "rh_mean_lag1": rh_mean,
+                "rh_mean_lag2": rh_mean,
+                "rainfall_lag1": w.rainfall,
+                "rainfall_lag2": w.rainfall,
+                "gdd_lag1": gdd,
+                "gdd_lag2": gdd,
+                "pest_count_lag1": payload.current_pest_count or 0.0,
+                "pest_count_lag2": payload.current_pest_count or 0.0,
+            }
+            row_df = pd.DataFrame([input_dict])
+            X_encoded = ml_preprocessor.transform(row_df, return_df=True)
 
-    # 4. Scout count vs ETL ratio
-    if payload.current_pest_count > 0:
-        count_ratio = payload.current_pest_count / max(etl, 0.1)
-        if count_ratio >= 0.7:
-            bump = min(0.35 * count_ratio, 0.35)
-            raw_score += bump
+            # Predict probability with champion model
+            proba = float(champion_model.predict_proba(X_encoded)[0, 1])
+            final_score = round(min(max(proba, 0.02), 0.99), 2)
+            champ_name = model_benchmark_meta.get("champion_model", "Random Forest")
+            model_version_tag = f"v2.0-ml-{champ_name.lower().replace(' ', '-')}"
+
+            # Compute local feature attributions
+            explanations = explain_single_prediction(
+                champion_model,
+                X_encoded,
+                ml_preprocessor.feature_names_,
+                top_k=4,
+            )
+            for exp in explanations:
+                risk_factors.append(ContributingFactor(
+                    feature=exp["feature"],
+                    impact=exp["impact"],
+                    description=exp["description"],
+                ))
+        except Exception:
+            # Fall back to heuristic rule scoring if exception
+            final_score = 0.50
+
+    # 2. Heuristic fallback if ML attribution list is empty
+    if not risk_factors:
+        raw_score = 0.15
+        if 24.0 <= t_mean <= 33.0:
+            raw_score += 0.25
+            risk_factors.append(ContributingFactor(
+                feature="Mean Temperature",
+                impact="Elevating (+25%)",
+                description=f"Optimal reproductive temperature for {payload.pest_name} ({t_mean:.1f}°C)."
+            ))
+        if w.rh_morning >= 85.0:
+            raw_score += 0.25
+            risk_factors.append(ContributingFactor(
+                feature="Canopy Humidity",
+                impact="Elevating (+25%)",
+                description=f"High morning humidity ({w.rh_morning:.1f}%) creates favorable micro-climate."
+            ))
+        if is_outbreak_now:
+            raw_score += 0.35
             risk_factors.append(ContributingFactor(
                 feature="Current Field Population",
-                impact=f"Positive (+{int(bump*100)}%)",
+                impact="High Threat (+35%)",
                 description=f"Current count ({payload.current_pest_count}) is approaching/exceeding ETL ({etl})."
             ))
+        final_score = round(min(max(raw_score, 0.05), 0.98), 2)
 
-    # Bound probability to [0.05, 0.98]
-    final_score = round(min(max(raw_score, 0.05), 0.98), 2)
-
-    # Determine risk level
+    # 3. Determine Risk Severity Level
     if final_score < RISK_LEVELS["LOW"]["max"]:
         level = "LOW"
     elif final_score < RISK_LEVELS["MODERATE"]["max"]:
@@ -172,7 +283,8 @@ def evaluate_risk(payload: PredictionRequest):
     full_advisory = (
         f"Status: {level}. {advisory_action}. "
         f"Target ETL threshold for {payload.pest_name} is {etl}. "
-        f"Accumulated degree-days: {gdd:.1f} GDD."
+        f"Accumulated degree-days: {gdd:.1f} GDD. "
+        f"VPD: {vpd_kpa:.2f} kPa."
     )
 
     return PredictionResponse(
@@ -187,5 +299,5 @@ def evaluate_risk(payload: PredictionRequest):
         rh_differential=round(rh_diff, 2),
         top_factors=risk_factors,
         advisory=full_advisory,
-        model_version="v1.0-rules-engine"
+        model_version=model_version_tag,
     )
