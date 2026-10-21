@@ -5,7 +5,7 @@ import numpy as np
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, VotingClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 
@@ -17,8 +17,58 @@ log = get_logger("ml.train")
 def get_candidate_models(random_state: int = 42) -> Dict[str, Any]:
     """
     Initializes a justified set of machine learning algorithms for agricultural
-    pest outbreak early-warning classification.
+    pest outbreak early-warning classification, including high-capacity ensembles.
     """
+    rf = RandomForestClassifier(
+        n_estimators=200,
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        class_weight="balanced_subsample",
+        n_jobs=-1,
+        random_state=random_state,
+    )
+    et = ExtraTreesClassifier(
+        n_estimators=200,
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        class_weight="balanced",
+        n_jobs=-1,
+        random_state=random_state,
+    )
+    lgb = LGBMClassifier(
+        n_estimators=250,
+        learning_rate=0.04,
+        max_depth=12,
+        num_leaves=63,
+        class_weight="balanced",
+        n_jobs=-1,
+        random_state=random_state,
+        verbose=-1,
+    )
+    xgb = XGBClassifier(
+        n_estimators=250,
+        learning_rate=0.04,
+        max_depth=10,
+        subsample=0.85,
+        colsample_bytree=0.85,
+        eval_metric="logloss",
+        random_state=random_state,
+        n_jobs=-1,
+    )
+
+    ensemble = VotingClassifier(
+        estimators=[
+            ("rf", rf),
+            ("et", et),
+            ("lgb", lgb),
+            ("xgb", xgb),
+        ],
+        voting="soft",
+        n_jobs=-1,
+    )
+
     return {
         "Logistic Regression": LogisticRegression(
             max_iter=1000,
@@ -33,35 +83,11 @@ def get_candidate_models(random_state: int = 42) -> Dict[str, Any]:
             class_weight="balanced",
             random_state=random_state,
         ),
-        "Random Forest": RandomForestClassifier(
-            n_estimators=100,
-            max_depth=14,
-            min_samples_split=10,
-            min_samples_leaf=5,
-            class_weight="balanced",
-            n_jobs=-1,
-            random_state=random_state,
-        ),
-        "LightGBM": LGBMClassifier(
-            n_estimators=150,
-            learning_rate=0.05,
-            max_depth=8,
-            num_leaves=31,
-            class_weight="balanced",
-            n_jobs=-1,
-            random_state=random_state,
-            verbose=-1,
-        ),
-        "XGBoost": XGBClassifier(
-            n_estimators=150,
-            learning_rate=0.05,
-            max_depth=6,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            eval_metric="logloss",
-            random_state=random_state,
-            n_jobs=-1,
-        ),
+        "Random Forest": rf,
+        "ExtraTrees": et,
+        "LightGBM": lgb,
+        "XGBoost": xgb,
+        "Quad-Ensemble": ensemble,
     }
 
 

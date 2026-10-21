@@ -63,6 +63,11 @@ class SurveillanceDataPreprocessor:
         "gdd_lag2",
         "pest_count_lag1",
         "pest_count_lag2",
+        "pest_velocity",
+        "pest_acceleration",
+        "temp_rh_interaction",
+        "humid_heat_index",
+        "cumulative_gdd_3w",
     ]
 
     TARGET_COLUMNS = [

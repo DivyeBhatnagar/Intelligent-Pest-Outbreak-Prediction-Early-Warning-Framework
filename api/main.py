@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import numpy as np
@@ -80,8 +81,18 @@ def root():
         "status": "online",
         "version": "1.0.0",
         "champion_model": model_benchmark_meta.get("champion_model", "Trained ML Model"),
+        "dashboard_url": "/dashboard",
         "docs_url": "/docs",
     }
+
+
+@app.get("/dashboard", response_class=HTMLResponse, tags=["Dashboard"])
+def get_dashboard():
+    """Serves the interactive Visual Dashboard UI."""
+    dashboard_path = Path(__file__).parent / "dashboard.html"
+    if dashboard_path.exists():
+        return HTMLResponse(content=dashboard_path.read_text(), status_code=200)
+    return HTMLResponse(content="<h1>Dashboard file not found</h1>", status_code=404)
 
 
 @app.get("/api/v1/health", response_model=HealthCheckResponse, tags=["Health"])
@@ -247,6 +258,11 @@ def evaluate_risk(payload: PredictionRequest):
                 "gdd_lag2": gdd,
                 "pest_count_lag1": payload.current_pest_count or 0.0,
                 "pest_count_lag2": payload.current_pest_count or 0.0,
+                "pest_velocity": 0.0,
+                "pest_acceleration": 0.0,
+                "temp_rh_interaction": round(t_mean * rh_mean, 2),
+                "humid_heat_index": round(w.temp_max * (w.rh_morning / 100.0), 2),
+                "cumulative_gdd_3w": round(gdd * 3.0, 2),
             }
             row_df = pd.DataFrame([input_dict])
             X_encoded = ml_preprocessor.transform(row_df, return_df=True)

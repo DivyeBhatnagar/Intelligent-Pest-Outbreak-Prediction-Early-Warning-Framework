@@ -179,7 +179,31 @@ def build_surveillance_features(df: pd.DataFrame) -> pd.DataFrame:
     group_keys = [c for c in ["location", "crop", "pest_name"] if c in feat_df.columns]
     feat_df = generate_temporal_lags(feat_df, feature_cols=lag_candidates, lags=[1, 2], group_cols=group_keys)
 
-    # 5. Outbreak and risk ground truth labels
+    # 5. Advanced Bio-Climatic & Dynamic Trajectory Features (v2.0)
+    if "pest_count" in feat_df.columns and "pest_count_lag1" in feat_df.columns:
+        # Pest velocity (rate of change week-over-week)
+        feat_df["pest_velocity"] = (feat_df["pest_count"] - feat_df["pest_count_lag1"]).round(2)
+        if "pest_count_lag2" in feat_df.columns:
+            # Pest acceleration (second derivative / infestation momentum)
+            feat_df["pest_acceleration"] = (
+                feat_df["pest_velocity"] - (feat_df["pest_count_lag1"] - feat_df["pest_count_lag2"])
+            ).round(2)
+        else:
+            feat_df["pest_acceleration"] = 0.0
+
+    if "temp_mean" in feat_df.columns and "rh_mean" in feat_df.columns:
+        # Canopy micro-climate thermal-humidity interaction index
+        feat_df["temp_rh_interaction"] = (feat_df["temp_mean"] * feat_df["rh_mean"]).round(2)
+
+    if "temp_max" in feat_df.columns and "rh_morning" in feat_df.columns:
+        # Humid-heat canopy stress index
+        feat_df["humid_heat_index"] = (feat_df["temp_max"] * (feat_df["rh_morning"] / 100.0)).round(2)
+
+    if "gdd" in feat_df.columns and "gdd_lag1" in feat_df.columns and "gdd_lag2" in feat_df.columns:
+        # Cumulative 3-week thermal sum accelerating pest instar transitions
+        feat_df["cumulative_gdd_3w"] = (feat_df["gdd"] + feat_df["gdd_lag1"] + feat_df["gdd_lag2"]).round(2)
+
+    # 6. Outbreak and risk ground truth labels
     feat_df = assign_outbreak_labels(feat_df)
 
     log.info(f"Feature engineering complete. Total feature columns: {len(feat_df.columns)}")

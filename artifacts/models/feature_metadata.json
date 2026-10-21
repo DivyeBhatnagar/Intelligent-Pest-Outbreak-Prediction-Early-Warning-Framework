@@ -1,5 +1,5 @@
 {
-  "total_features": 92,
+  "total_features": 97,
   "numerical_columns": [
     "temp_max",
     "temp_min",
@@ -30,7 +30,12 @@
     "gdd_lag1",
     "gdd_lag2",
     "pest_count_lag1",
-    "pest_count_lag2"
+    "pest_count_lag2",
+    "pest_velocity",
+    "pest_acceleration",
+    "temp_rh_interaction",
+    "humid_heat_index",
+    "cumulative_gdd_3w"
   ],
   "categorical_columns": [
     "crop",
@@ -144,6 +149,11 @@
     "gdd_lag2",
     "pest_count_lag1",
     "pest_count_lag2",
+    "pest_velocity",
+    "pest_acceleration",
+    "temp_rh_interaction",
+    "humid_heat_index",
+    "cumulative_gdd_3w",
     "crop_Cotton",
     "crop_Rice",
     "pest_name_Alternaria Leaf Blight",
