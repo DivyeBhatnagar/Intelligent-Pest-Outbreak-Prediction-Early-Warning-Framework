@@ -12,6 +12,7 @@ from src.config import (
     ECONOMIC_THRESHOLD_LEVELS,
     RISK_LEVELS,
     PROCESSED_DATA_DIR,
+    MODELS_DIR,
     BEST_MODEL_FILE,
     MODEL_COMPARISON_FILE,
     PREPROCESSOR_FILE,
@@ -137,13 +138,43 @@ def get_advisory_tables():
 
 @app.get("/api/v1/models/benchmark", tags=["Machine Learning"])
 def get_model_benchmarks():
-    """Returns comparative validation metrics across all trained ML models."""
+    """Returns comparative validation metrics across all trained ML models evaluated on holdout test seasons."""
     if not model_benchmark_meta:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Model benchmark report not found. Run 'python3 -m src.ml.pipeline' first.",
         )
     return model_benchmark_meta
+
+
+@app.get("/api/v1/models/benchmark/full", tags=["Machine Learning"])
+def get_full_dataset_benchmark():
+    """Returns champion model performance evaluated across the entire 35,499 records dataset."""
+    full_eval_file = MODELS_DIR / "full_dataset_evaluation.json"
+    if not full_eval_file.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Full dataset evaluation not found.",
+        )
+    with open(full_eval_file, "r") as f:
+        return json.load(f)
+
+
+@app.get("/api/v1/models/auxiliary", tags=["Machine Learning"])
+def get_auxiliary_models_metrics():
+    """Returns performance reports for Multi-Pest Weather and Regional Severity models."""
+    res = {}
+    mp_file = MODELS_DIR / "multi_pest_weather_metrics.json"
+    reg_file = MODELS_DIR / "regional_severity_metrics.json"
+
+    if mp_file.exists():
+        with open(mp_file, "r") as f:
+            res["multi_pest_weather"] = json.load(f)
+    if reg_file.exists():
+        with open(reg_file, "r") as f:
+            res["regional_severity"] = json.load(f)
+
+    return res
 
 
 @app.post("/api/v1/predictions/evaluate", response_model=PredictionResponse, tags=["Predictions"])

@@ -238,7 +238,9 @@ Exposes versioned REST endpoints under `/api/v1`:
 * **`GET /api/v1/health`**: Health diagnostic reporting dataset readiness and processed record counts.
 * **`GET /api/v1/reference/pests`**: Returns all 23 monitored pest species with their respective $T_{base}$ and ETL thresholds.
 * **`GET /api/v1/reference/advisories`**: Returns official TNAU & IPM guidelines for in-field interventions.
-* **`GET /api/v1/models/benchmark`**: Returns live benchmark evaluation metrics across all 5 candidate ML models.
+* **`GET /api/v1/models/benchmark`**: Returns live benchmark evaluation metrics across all 5 candidate ML models on the holdout test set.
+* **`GET /api/v1/models/benchmark/full`**: Returns evaluation metrics for the champion model evaluated on the entire combined dataset ($35,499$ records).
+* **`GET /api/v1/models/auxiliary`**: Returns model metadata and performance metrics for the dedicated auxiliary models (Micro-Climate Multi-Pest Classifier and Macro-Regional Infestation Classifier).
 * **`POST /api/v1/predictions/evaluate`**: Real-time bio-climatic risk scoring using the champion Machine Learning model (`Random Forest`), computing degree-days, VPD, and local feature attributions.
 
 ---
@@ -291,10 +293,53 @@ XGBoost                | 0.9033    | 0.9043   | 0.9058     | 0.9051    | 0.9603 
   5. *Vapor Pressure Deficit (VPD)* & *Morning Humidity* — Canopy micro-climatic moisture persistence.
 - **Local Single-Prediction Explainer:** Dynamically computes top positive threat factors and dampening factors for individual API requests.
 
-### 10.4 Machine Learning CLI Orchestrator (`src/ml/pipeline.py`)
+### 10.4 Full Dataset Evaluation Benchmark (`artifacts/models/full_dataset_evaluation.json`)
+In addition to the forward-looking temporal holdout test split ($8,060$ records), the champion **Random Forest** model was evaluated across the **entire $35,499$ surveillance observation dataset** to assess full systemic consistency, coverage, and generalization:
+
+```text
+============================================================================================
+🌐 FULL SURVEILLANCE DATASET (35,499 RECORDS) — CHAMPION MODEL BENCHMARK
+============================================================================================
+Metric                      | Holdout Test Split (8,060) | Full Dataset (35,499)
+--------------------------------------------------------------------------------------------
+Accuracy                    | 90.30%                     | 93.48%
+Recall (True Positive Rate) | 91.28%                     | 93.81%
+Precision                   | 89.84%                     | 92.25%
+F1-Score                    | 0.9055                     | 0.9302
+ROC-AUC Score               | 0.9571                     | 0.9873
+False Negative Rate (FNR)   | 8.72%                      | 6.19% (1,018 / 16,434 missed)
+============================================================================================
+Confusion Matrix (Full Dataset):
+  • True Negatives (No Outbreak Correctly Identified) : 17,769
+  • False Positives (False Alarms)                     : 1,296
+  • False Negatives (Undetected Outbreaks)             : 1,018
+  • True Positives (Outbreaks Correctly Warned)        : 15,416
+============================================================================================
+```
+
+### 10.5 Dedicated Auxiliary ML Models (`src/ml/auxiliary.py`)
+To utilize all secondary surveillance and agro-climatic datasets in the project, dedicated auxiliary models were trained and serialized:
+
+1. **Micro-Climate Multi-Pest Classifier (`multi_pest_weather_model.joblib`):**
+   - **Task:** Predicts which of the 8 pest species (`Brown Planthopper`, `Caseworm`, `Gall Midge`, `Green Leafhopper`, `Leaf Folder`, `Mirid Bug`, `White Backed Planthopper`, `Yellow Stem Borer`) will emerge given only pure micro-climatic weather readings without temporal lags.
+   - **Dataset:** `Multi_Pest_Weather_Surveillance.csv` (1,196 observations, 80/20 train/test split).
+   - **Performance:** **48.75% Accuracy** and **0.4883 Weighted F1** on an 8-class balanced problem (outperforming the random guessing baseline of $12.5\%$ by nearly $4\times$).
+   - **Top Weather Drivers:** Diurnal Temperature Range ($13.8\%$), Evaporation ($12.8\%$), Wind Speed ($12.2\%$), and Minimum Temperature ($9.7\%$).
+
+2. **Macro-Regional Infestation Severity Classifier (`regional_severity_model.joblib`):**
+   - **Task:** 3-tier severity classification (Low / Medium / High) from macro-level regional surveys across states, seasons, and crop stages.
+   - **Dataset:** `Historical_Regional_Pest_Infestation.csv` (1,000 observations, 80/20 train/test split).
+   - **Performance:** **33.50% Accuracy** and **0.3346 Weighted F1**, reflecting macro-regional historical variance in the absence of localized micro-weather.
+   - **Top Drivers:** Observation Month ($21.0\%$), State ($18.8\%$), Pest Type ($18.5\%$), and Affected Crop ($18.2\%$).
+
+### 10.6 Machine Learning CLI Orchestrator (`src/ml/pipeline.py`)
 Run the full ML training, evaluation, champion selection, and SHAP generation with one command:
 ```bash
+# Main surveillance model suite
 python3 -m src.ml.pipeline --metric f1_score --shap-samples 500
+
+# Train and serialize auxiliary models
+python3 -m src.ml.auxiliary
 ```
 
 ---

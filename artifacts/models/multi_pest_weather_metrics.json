@@ -1,0 +1,31 @@
+{
+  "task": "Micro-Climate to Pest Species Prediction",
+  "model": "Random Forest Classifier",
+  "accuracy": 0.4875,
+  "f1_weighted": 0.4883,
+  "classes": [
+    "Brown Planthopper",
+    "Caseworm",
+    "Gall Midge",
+    "Green Leafhopper",
+    "Leaf Folder",
+    "Mirid Bug",
+    "White Backed Planthopper",
+    "Yellow Stem Borer"
+  ],
+  "feature_importances": {
+    "temp_max": 0.0824,
+    "temp_min": 0.0972,
+    "temp_mean": 0.0874,
+    "diurnal_temp_range": 0.1383,
+    "rh_morning": 0.0561,
+    "rh_evening": 0.0634,
+    "rh_mean": 0.0505,
+    "rh_differential": 0.0509,
+    "rainfall": 0.0436,
+    "wind_speed": 0.1216,
+    "sunshine_hours": 0.0384,
+    "evaporation": 0.1279,
+    "vpd_kpa": 0.0423
+  }
+}

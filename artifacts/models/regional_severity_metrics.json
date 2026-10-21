@@ -1,0 +1,19 @@
+{
+  "task": "Macro-Regional Infestation Severity (Low/Medium/High)",
+  "model": "Random Forest Classifier",
+  "accuracy": 0.335,
+  "f1_weighted": 0.3346,
+  "severity_levels": [
+    "Low (0)",
+    "Medium (1)",
+    "High (2)"
+  ],
+  "feature_importances": {
+    "month": 0.2104,
+    "pest_code": 0.1846,
+    "life_cycle_stage_code": 0.1624,
+    "crop_affected_code": 0.182,
+    "state_code": 0.1876,
+    "season_code": 0.0731
+  }
+}
