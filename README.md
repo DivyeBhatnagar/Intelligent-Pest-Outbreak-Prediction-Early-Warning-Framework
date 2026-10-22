@@ -560,22 +560,30 @@ python3 -m src.pipeline --crop all --split-method temporal
 python3 -m src.ml.pipeline
 ```
 
-### 4. Launch the Surveillance Web Dashboard & REST API
+### 4. Launch the Surveillance Backend & Web Dashboard
 ```bash
 # Start FastAPI server on port 8000 with auto-reload
 uvicorn api.main:app --reload --port 8000
 ```
-- 🌐 **Interactive Web Dashboard:** [http://localhost:8000/dashboard](http://localhost:8000/dashboard) — Live 11-station Leaflet map, Open-Meteo real-time weather integration, ML risk prediction, field scouting CRUD logs, and alert lifecycle management.
+- 🌐 **HTML Dashboard (Standalone):** [http://localhost:8000/dashboard](http://localhost:8000/dashboard)
 - 📑 **Interactive OpenAPI Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - 📊 **ReDoc Alternative:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-### 5. Run the Automated Verification Suite
+### 5. Launch the React + TypeScript Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- ⚛️ **Modern React Dashboard:** [http://localhost:5173](http://localhost:5173) — Full-featured React 19 SPA with TypeScript, Tailwind CSS, Recharts analytics, React-Leaflet maps, observation CRUD modals, and alert lifecycle operations.
+
+### 6. Run the Automated Verification Suite
 ```bash
 # Run all 40 unit, integration, and E2E tests
 PYTHONPATH=. pytest tests/test_framework.py -v
 ```
 
-### 6. Explore the Detailed Documentation
+### 7. Explore the Detailed Documentation
 All project specifications, engineering logs, and technical requirements are centralized in the [`docs/`](./docs) directory:
 - 📘 **API Documentation:** [REST API Specification & Examples](./docs/API_DOCUMENTATION.md)
 - 🔬 **Architecture & Evaluation:** [Mathematical Foundations & Benchmarks](./docs/ARCHITECTURE_AND_EVALUATION.md)
