@@ -719,11 +719,11 @@
       "Palampur": { lat: 32.1109, lon: 76.5363, name: "CSK HPKV, Palampur (Himachal Pradesh)" }
     };
 
-    // Initialize Map with Dark Tile Layer
+    // Initialize Map with 100% Free OpenStreetMap Standard Tile Layer (Zero API Key Required)
     const map = L.map('map').setView([21.5, 79.0], 5);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap, &copy; CARTO',
-      maxZoom: 18
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+      maxZoom: 19
     }).addTo(map);
 
     let markers = {};
