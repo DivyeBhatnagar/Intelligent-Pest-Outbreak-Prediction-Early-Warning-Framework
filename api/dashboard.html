@@ -627,11 +627,32 @@
       <!-- Map & Explainability Breakdown -->
       <div class="viz-grid">
         <!-- Interactive India Station Leaflet Map -->
-        <div class="card">
+        <div class="card" style="display: flex; flex-direction: column;">
           <div class="card-title">
             <span>Geographic Station Network</span>
-            <span class="highlight">12 Centers</span>
+            <span class="highlight" id="map-station-badge">📡 NRRI Cuttack (Live Active)</span>
           </div>
+          
+          <!-- Live Station Telemetry Bar -->
+          <div id="live-station-telemetry" style="background: rgba(10, 18, 26, 0.85); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.65rem; font-size: 0.8rem;">
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Current Weather</div>
+              <div id="live-cond" style="font-weight: 700; color: #60a5fa; margin-top: 2px;">🌤️ Loading...</div>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Temp & RH</div>
+              <div id="live-temp-rh" style="font-weight: 700; color: var(--text-main); margin-top: 2px;">--°C | --%</div>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Agri Season</div>
+              <div id="live-season" style="font-weight: 700; color: #34d399; margin-top: 2px;">--</div>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Live Date & Time</div>
+              <div id="live-datetime" style="font-weight: 700; color: #fbbf24; font-family: var(--font-mono); font-size: 0.75rem; margin-top: 2px;">--</div>
+            </div>
+          </div>
+
           <div id="map"></div>
         </div>
 
@@ -716,31 +737,96 @@
         fillOpacity: 0.8
       }).addTo(map);
       marker.bindPopup(`<strong>${key}</strong><br>${val.name}`);
+      marker.on('click', () => {
+        document.getElementById('location').value = key;
+        syncLiveStationWeather(key);
+      });
       markers[key] = marker;
     }
 
-    // Auto-Fetch Real-Time Weather from Open-Meteo via backend
-    const btnWeather = document.getElementById('btn-fetch-live-weather');
-    btnWeather.addEventListener('click', async () => {
-      const loc = document.getElementById('location').value;
-      btnWeather.innerText = '⏳ Fetching...';
+    // Function to fetch and update live station weather, season, and time
+    async function syncLiveStationWeather(loc) {
+      const badge = document.getElementById('map-station-badge');
+      const condEl = document.getElementById('live-cond');
+      const tempRhEl = document.getElementById('live-temp-rh');
+      const seasonEl = document.getElementById('live-season');
+      const dtEl = document.getElementById('live-datetime');
+
+      badge.innerHTML = `📡 ${loc} (Fetching Live...)`;
       try {
         const res = await fetch(`/api/v1/weather/live/${loc}`);
-        if (!res.ok) throw new Error('Failed to fetch weather');
+        if (!res.ok) throw new Error('Live weather API error');
         const data = await res.json();
+
+        // Update form inputs automatically
         document.getElementById('temp_max').value = data.temp_max;
         document.getElementById('temp_min').value = data.temp_min;
         document.getElementById('rh_morning').value = data.rh_morning;
         document.getElementById('rh_evening').value = data.rh_evening;
         document.getElementById('rainfall').value = data.rainfall;
         document.getElementById('wind_speed').value = data.wind_speed;
-        btnWeather.innerText = '✅ Live Weather Synced!';
-        setTimeout(() => { btnWeather.innerText = '🌐 Auto-Fetch Live Weather'; }, 2500);
+        if (data.standard_week) {
+          document.getElementById('standard_week').value = data.standard_week;
+        }
+
+        // Update live station telemetry card
+        badge.innerHTML = `📡 ${loc} (Live Synced)`;
+        condEl.innerHTML = `🌤️ ${data.condition || 'Clear'}`;
+        tempRhEl.innerHTML = `${data.current_temp || data.temp_max}°C | ${data.rh_current || data.rh_morning}% RH`;
+        seasonEl.innerHTML = `🌾 ${data.season} (SMW ${data.standard_week})`;
+        dtEl.innerHTML = `🕒 ${data.time} <br><span style="color:#94a3b8; font-size:0.7rem;">${data.date}</span>`;
+
+        // Update map marker popup with full live details
+        if (markers[loc]) {
+          markers[loc].setPopupContent(`
+            <div style="font-family: sans-serif; min-width: 170px;">
+              <strong style="color: #059669; font-size: 1rem;">${loc}</strong><br>
+              <span style="font-size: 0.75rem; color: #64748b;">${STATIONS[loc].name}</span>
+              <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
+              <div><strong>Condition:</strong> ${data.condition}</div>
+              <div><strong>Temp:</strong> ${data.current_temp || data.temp_max}°C (Max ${data.temp_max} / Min ${data.temp_min})</div>
+              <div><strong>Humidity:</strong> ${data.rh_current || data.rh_morning}% RH</div>
+              <div><strong>Season:</strong> ${data.season}</div>
+              <div><strong>Week:</strong> SMW ${data.standard_week}</div>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;">🕒 ${data.time}</div>
+            </div>
+          `);
+        }
       } catch (err) {
-        console.error(err);
-        btnWeather.innerText = '⚠️ Fallback Used';
-        setTimeout(() => { btnWeather.innerText = '🌐 Auto-Fetch Live Weather'; }, 2500);
+        console.error('Failed to sync weather:', err);
+        badge.innerHTML = `📡 ${loc} (Offline Baseline)`;
+        condEl.innerHTML = `🌤️ Seasonal Baseline`;
+        tempRhEl.innerHTML = `28.5°C | 78% RH`;
+        seasonEl.innerHTML = `🌾 Kharif / Rabi`;
+        dtEl.innerHTML = `🕒 ${new Date().toLocaleTimeString()} IST`;
       }
+    }
+
+    // Auto-sync whenever user changes the location dropdown
+    document.getElementById('location').addEventListener('change', (e) => {
+      const loc = e.target.value;
+      if (STATIONS[loc]) {
+        map.flyTo([STATIONS[loc].lat, STATIONS[loc].lon], 7, { duration: 1.0 });
+        markers[loc].openPopup();
+      }
+      syncLiveStationWeather(loc);
+    });
+
+    // Auto-Fetch Button click handler
+    const btnWeather = document.getElementById('btn-fetch-live-weather');
+    btnWeather.addEventListener('click', async () => {
+      const loc = document.getElementById('location').value;
+      btnWeather.innerText = '⏳ Syncing...';
+      await syncLiveStationWeather(loc);
+      btnWeather.innerText = '✅ Live Weather Synced!';
+      setTimeout(() => { btnWeather.innerText = '🌐 Auto-Fetch Live Weather'; }, 2500);
+    });
+
+    // Initial sync on page load for default center (Cuttack)
+    window.addEventListener('DOMContentLoaded', () => {
+      syncLiveStationWeather('Cuttack');
+      // Trigger live map render sizing
+      setTimeout(() => { map.invalidateSize(); }, 300);
     });
 
     // Handle Form Submission & Live Prediction API Call

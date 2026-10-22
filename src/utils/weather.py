@@ -74,39 +74,85 @@ class LiveWeatherService:
                     rainfall = daily.get("precipitation_sum", [current.get("precipitation", 0.0)])[0]
                     wind_speed = current.get("wind_speed_10m", 3.5)
 
+                    # Indian Agricultural Season computation
+                    now_ist = datetime.now()
+                    month = now_ist.month
+                    if 6 <= month <= 10:
+                        season = "Kharif (Monsoon Season)"
+                    elif 11 <= month or month <= 3:
+                        season = "Rabi (Winter Season)"
+                    else:
+                        season = "Zaid (Summer Season)"
+
+                    # ISO week is approximately the Standard Meteorological Week (SMW)
+                    smw = int(now_ist.strftime("%V"))
+
+                    # Weather condition description
+                    weather_code = current.get("weather_code", 0)
+                    temp_curr = current.get("temperature_2m", (temp_max + temp_min) / 2.0)
+
+                    condition = "Clear / Sunny"
+                    if rainfall > 5.0:
+                        condition = "Heavy Rainfall"
+                    elif rainfall > 0.1:
+                        condition = "Light Rain / Drizzle"
+                    elif rh_now > 85.0:
+                        condition = "Humid & Overcast"
+                    elif temp_curr > 35.0:
+                        condition = "Hot & Dry"
+
                     return {
                         "location": location_name,
                         "state": coords["state"],
                         "source": "Open-Meteo Live API",
                         "status": "success",
+                        "condition": condition,
+                        "season": season,
+                        "standard_week": smw,
+                        "current_temp": float(temp_curr),
                         "temp_max": float(temp_max),
                         "temp_min": float(temp_min),
                         "rh_morning": float(rh_morning),
                         "rh_evening": float(rh_evening),
+                        "rh_current": float(rh_now),
                         "rainfall": float(rainfall),
                         "wind_speed": float(wind_speed),
                         "sunshine_hours": 7.0,
                         "evaporation": 3.8,
-                        "timestamp": datetime.utcnow().isoformat(),
+                        "date": now_ist.strftime("%A, %d %B %Y"),
+                        "time": now_ist.strftime("%I:%M:%S %p IST"),
+                        "timestamp": now_ist.isoformat(),
                     }
         except Exception as e:
             log.warning(f"Live weather API request failed for {location_name}: {e}. Returning seasonal default.")
 
         # Baseline fallback for offline / disconnected environments
+        now_ist = datetime.now()
+        month = now_ist.month
+        season = "Kharif (Monsoon Season)" if 6 <= month <= 10 else ("Rabi (Winter Season)" if 11 <= month or month <= 3 else "Zaid (Summer Season)")
+        smw = int(now_ist.strftime("%V"))
+
         return {
             "location": location_name,
             "state": coords["state"],
             "source": "Agro-Climatic Seasonal Baseline (Offline Fallback)",
             "status": "fallback",
+            "condition": "Seasonal Climate Normal",
+            "season": season,
+            "standard_week": smw,
+            "current_temp": 28.5,
             "temp_max": 31.5,
             "temp_min": 24.5,
             "rh_morning": 88.0,
             "rh_evening": 70.0,
+            "rh_current": 78.0,
             "rainfall": 12.0,
             "wind_speed": 3.2,
             "sunshine_hours": 6.5,
             "evaporation": 3.5,
-            "timestamp": datetime.utcnow().isoformat(),
+            "date": now_ist.strftime("%A, %d %B %Y"),
+            "time": now_ist.strftime("%I:%M:%S %p IST"),
+            "timestamp": now_ist.isoformat(),
         }
 
 
