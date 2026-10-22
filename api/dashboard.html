@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intelligent Pest Outbreak Early Warning System</title>
+  <title>Intelligent Pest Outbreak Early Warning System — ICAR & TNAU</title>
+  <meta name="description" content="Bio-climatic pest outbreak prediction and early warning dashboard for Indian agricultural surveillance stations. Powered by ICAR, TNAU, Open-Meteo, and ML models." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg-dark: #080d12;
-      --bg-card: rgba(16, 26, 36, 0.75);
-      --bg-card-hover: rgba(22, 36, 50, 0.9);
+      --bg-dark: #060b10;
+      --bg-card: rgba(14, 22, 32, 0.80);
+      --bg-card-hover: rgba(20, 32, 46, 0.92);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-glow: rgba(34, 197, 94, 0.3);
       --primary: #10b981;
@@ -22,23 +23,22 @@
       --accent: #3b82f6;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --text-main: #f8fafc;
+      --purple: #8b5cf6;
+      --text-main: #f1f5f9;
       --text-muted: #94a3b8;
       --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+      --radius-card: 18px;
+      --radius-btn: 12px;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.08) 0%, transparent 45%);
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(ellipse at 10% 5%, rgba(16,185,129,0.09) 0%, transparent 45%),
+        radial-gradient(ellipse at 88% 90%, rgba(59,130,246,0.08) 0%, transparent 45%),
+        radial-gradient(ellipse at 55% 50%, rgba(139,92,246,0.04) 0%, transparent 60%);
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
@@ -47,452 +47,294 @@
       overflow-x: hidden;
     }
 
+    /* ── Header ─────────────────────────────────── */
     header {
-      padding: 1.25rem 2rem;
+      padding: 1rem 2rem;
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(8, 13, 18, 0.85);
-      backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: rgba(6, 11, 16, 0.90);
+      backdrop-filter: blur(16px);
+      position: sticky; top: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      flex-wrap: wrap;
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-    }
-
+    .brand { display: flex; align-items: center; gap: 0.8rem; }
     .brand-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+      width: 40px; height: 40px; border-radius: 11px;
       background: linear-gradient(135deg, #10b981, #059669);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      box-shadow: 0 0 24px rgba(16, 185, 129, 0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 20px rgba(16,185,129,0.4);
     }
-
-    .brand-text h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-text p {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .header-badges {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
+    .brand-text h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand-text p { font-size: 0.72rem; color: var(--text-muted); }
+    .header-right { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      padding: 0.35rem 0.75rem;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-subtle);
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.72rem; font-family: var(--font-mono);
+      padding: 0.3rem 0.7rem; border-radius: 9999px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);
       color: var(--text-muted);
     }
-
     .badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 8px var(--primary);
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--primary); box-shadow: 0 0 6px var(--primary);
       animation: pulse 2s infinite;
     }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.5;transform:scale(.88);} }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.9); }
+    /* ── Navigation Tabs ─────────────────────────── */
+    .nav-tabs {
+      display: flex; gap: 0.25rem; padding: 0 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(6,11,16,0.75); backdrop-filter: blur(8px);
+      overflow-x: auto; scrollbar-width: none;
     }
-
-    main {
-      flex: 1;
-      padding: 2rem;
-      max-width: 1600px;
-      margin: 0 auto;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 1.75rem;
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .nav-tab {
+      padding: 0.75rem 1.1rem; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
     }
+    .nav-tab.active { color: var(--primary-light); border-bottom-color: var(--primary); }
+    .nav-tab:hover:not(.active) { color: var(--text-main); }
 
-    @media (max-width: 1100px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-    }
+    /* ── Tab Panels ─────────────────────────────── */
+    .tab-panel { display: none; padding: 2rem; max-width: 1700px; margin: 0 auto; width: 100%; }
+    .tab-panel.active { display: block; }
 
+    /* ── Cards ──────────────────────────────────── */
     .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 18px;
-      padding: 1.5rem;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-card); padding: 1.4rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.32);
+      transition: border-color .2s, box-shadow .2s;
     }
-
-    .card:hover {
-      border-color: rgba(255, 255, 255, 0.14);
-    }
-
+    .card:hover { border-color: rgba(255,255,255,0.13); }
     .card-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      font-size: 0.88rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 1.1rem;
+      display: flex; align-items: center; justify-content: space-between;
     }
+    .card-title .highlight { color: var(--primary-light); font-size: 0.8rem; text-transform: none; }
 
-    .card-title span.highlight {
-      color: var(--primary-light);
-    }
+    /* ── Grid helpers ────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .grid-main { display: grid; grid-template-columns: 400px 1fr; gap: 1.5rem; }
+    @media (max-width:1200px) { .grid-main, .grid-2 { grid-template-columns:1fr; } .grid-3 { grid-template-columns:1fr 1fr; } }
+    @media (max-width:800px) { .grid-3, .grid-4 { grid-template-columns:1fr; } header { flex-direction: column; align-items: flex-start; } }
 
-    /* Left Control Panel */
-    .controls-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .form-group label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #cbd5e1;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    select, input {
-      background: rgba(10, 18, 26, 0.9);
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      font-size: 0.88rem;
-      padding: 0.65rem 0.85rem;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      width: 100%;
-    }
-
-    select:focus, input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-    }
-
-    .btn-submit {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 0.9rem;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: transform 0.15s ease, box-shadow 0.2s ease;
-      margin-top: 0.5rem;
-      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
-    }
-
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
-    }
-
-    .btn-submit:active {
-      transform: translateY(0);
-    }
-
-    /* Right Main Dashboard */
-    .dashboard-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-
+    /* ── Stat Cards ──────────────────────────────── */
     .stat-card {
-      background: rgba(16, 26, 36, 0.65);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 1.15rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      position: relative;
-      overflow: hidden;
+      background: rgba(14,22,32,0.65); border: 1px solid var(--border-subtle);
+      border-radius: 14px; padding: 1.1rem 1.1rem 1rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+      position: relative; overflow: hidden;
     }
-
     .stat-card::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 3px;
-      height: 100%;
-      background: var(--primary);
+      content:''; position:absolute; top:0; left:0;
+      width:3px; height:100%; background:var(--primary);
     }
+    .stat-card.danger::after { background: var(--danger); }
+    .stat-card.warning::after { background: var(--warning); }
+    .stat-card.accent::after { background: var(--accent); }
+    .stat-card.purple::after { background: var(--purple); }
+    .stat-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; }
+    .stat-val { font-size: 1.55rem; font-weight: 800; font-family: var(--font-mono); }
+    .stat-sub { font-size: 0.7rem; color: var(--text-muted); }
 
-    .stat-label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-    }
-
-    .stat-val {
-      font-size: 1.6rem;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      color: var(--text-main);
-    }
-
-    .stat-sub {
-      font-size: 0.72rem;
-      color: #94a3b8;
-    }
-
-    /* Alert Banner */
+    /* ── Alert Banner ────────────────────────────── */
     .alert-banner {
-      border-radius: 16px;
-      padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      position: relative;
-      border: 1px solid transparent;
-      animation: fadeIn 0.4s ease;
+      border-radius: 16px; padding: 1.4rem;
+      display: flex; align-items: center; gap: 1.4rem;
+      border: 1px solid transparent; animation: fadeUp .4s ease;
     }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+    .alert-banner.CRITICAL { background:linear-gradient(135deg,rgba(239,68,68,.18),rgba(239,68,68,.04)); border-color:rgba(239,68,68,.4); }
+    .alert-banner.HIGH { background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.04)); border-color:rgba(245,158,11,.4); }
+    .alert-banner.MODERATE { background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(59,130,246,.04)); border-color:rgba(59,130,246,.4); }
+    .alert-banner.LOW { background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.04)); border-color:rgba(16,185,129,.4); }
+    .alert-gauge-ring { width:88px;height:88px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .gauge-score { font-family:var(--font-mono);font-size:1.4rem;font-weight:800;position:absolute; }
+    .alert-content h2 { font-size:1.25rem;font-weight:800;margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem; }
+    .alert-content p { color:#cbd5e1;font-size:.88rem;line-height:1.45; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* ── Map ─────────────────────────────────────── */
+    #map { height:360px;border-radius:14px;border:1px solid var(--border-subtle);z-index:10; }
+    .leaflet-popup-content-wrapper { background: #0f1d2b; border: 1px solid rgba(16,185,129,0.3); border-radius:12px; color: #f1f5f9; }
+    .leaflet-popup-tip { background: #0f1d2b; }
 
-    .alert-banner.CRITICAL {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(239, 68, 68, 0.04));
-      border-color: rgba(239, 68, 68, 0.4);
-    }
-
-    .alert-banner.HIGH {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(245, 158, 11, 0.04));
-      border-color: rgba(245, 158, 11, 0.4);
-    }
-
-    .alert-banner.MODERATE {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(59, 130, 246, 0.04));
-      border-color: rgba(59, 130, 246, 0.4);
-    }
-
-    .alert-banner.LOW {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(16, 185, 129, 0.04));
-      border-color: rgba(16, 185, 129, 0.4);
-    }
-
-    .alert-gauge-ring {
-      width: 90px;
-      height: 90px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .gauge-score {
-      font-family: var(--font-mono);
-      font-size: 1.45rem;
-      font-weight: 800;
-    }
-
-    .alert-content h2 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      margin-bottom: 0.35rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .alert-content p {
-      color: #cbd5e1;
-      font-size: 0.9rem;
-      line-height: 1.45;
-    }
-
-    /* Map & Analytics Grid */
-    .viz-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    @media (max-width: 900px) {
-      .viz-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    #map {
-      height: 380px;
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
-      z-index: 10;
-    }
-
-    .factors-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
+    /* ── SHAP Factors ────────────────────────────── */
+    .factors-list { display:flex;flex-direction:column;gap:.65rem; }
     .factor-item {
-      background: rgba(10, 18, 26, 0.6);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 0.85rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.2s ease;
+      background:rgba(8,16,26,.65); border:1px solid var(--border-subtle);
+      border-radius:12px; padding:.8rem 1rem;
+      display:flex; justify-content:space-between; align-items:center;
+      transition: background .2s;
     }
+    .factor-item:hover { background:rgba(16,28,42,.8); }
+    .factor-title { font-weight:600;font-size:.86rem; }
+    .factor-desc { font-size:.73rem;color:var(--text-muted);margin-top:.15rem; }
+    .factor-badge { font-size:.7rem;font-weight:700;font-family:var(--font-mono);padding:.22rem .6rem;border-radius:6px;white-space:nowrap; }
+    .factor-badge.elevating { background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3); }
+    .factor-badge.moderating { background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3); }
 
-    .factor-item:hover {
-      background: rgba(18, 30, 42, 0.8);
+    /* ── Forms ───────────────────────────────────── */
+    .form-group { display:flex;flex-direction:column;gap:.35rem;margin-bottom:.75rem; }
+    .form-group label { font-size:.78rem;font-weight:600;color:#cbd5e1; }
+    .form-row { display:grid;grid-template-columns:1fr 1fr;gap:.7rem; }
+    select, input[type="number"], input[type="text"], input[type="date"], textarea {
+      background: rgba(8,15,24,.92); border: 1px solid var(--border-subtle);
+      border-radius: 10px; color: var(--text-main);
+      font-family: var(--font-sans); font-size: .86rem;
+      padding: .62rem .82rem; outline: none; width: 100%;
+      transition: border-color .2s, box-shadow .2s;
     }
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+    }
+    textarea { resize: vertical; min-height: 72px; }
+    .btn { border:none;border-radius:var(--radius-btn);padding:.7rem 1.2rem;font-size:.86rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem; }
+    .btn-primary { background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,.3); }
+    .btn-primary:hover { transform:translateY(-2px);box-shadow:0 6px 22px rgba(16,185,129,.45); }
+    .btn-secondary { background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.35); }
+    .btn-secondary:hover { background:rgba(59,130,246,.25); }
+    .btn-danger { background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3); }
+    .btn-danger:hover { background:rgba(239,68,68,.25); }
+    .btn-sm { padding:.38rem .75rem;font-size:.75rem;border-radius:8px; }
+    .btn-submit { width:100%;justify-content:center;font-size:.95rem;padding:.88rem;margin-top:.5rem;box-shadow:0 4px 18px rgba(16,185,129,.35); }
+    .btn-submit:hover { transform:translateY(-2px);box-shadow:0 6px 24px rgba(16,185,129,.5); }
+    .btn-submit:active { transform:translateY(0); }
 
-    .factor-title {
-      font-weight: 600;
-      font-size: 0.88rem;
-    }
+    /* ── Tables ──────────────────────────────────── */
+    .table-wrap { overflow-x:auto;border-radius:12px;border:1px solid var(--border-subtle); }
+    table { width:100%;border-collapse:collapse;font-size:.82rem; }
+    thead th { background:rgba(10,18,28,.85);padding:.65rem 1rem;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border-subtle); }
+    tbody tr { border-bottom:1px solid rgba(255,255,255,.04); }
+    tbody tr:last-child { border-bottom:none; }
+    tbody td { padding:.65rem 1rem;color:var(--text-main); }
+    tbody tr:hover td { background:rgba(16,185,129,.04); }
 
-    .factor-desc {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.2rem;
-    }
+    /* ── Risk Pills ──────────────────────────────── */
+    .risk-pill { display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:9999px; }
+    .risk-CRITICAL { background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3); }
+    .risk-HIGH { background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3); }
+    .risk-MODERATE { background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3); }
+    .risk-LOW { background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3); }
 
-    .factor-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      padding: 0.25rem 0.6rem;
-      border-radius: 6px;
+    /* ── Live Telemetry Bar ──────────────────────── */
+    #live-station-bar {
+      background:rgba(8,16,26,.88);border:1px solid var(--border-subtle);
+      border-radius:12px;padding:.8rem 1rem;margin-bottom:.85rem;
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;font-size:.78rem;
     }
+    .telem-item .telem-label { color:var(--text-muted);font-size:.68rem;text-transform:uppercase;margin-bottom:2px; }
+    .telem-item .telem-val { font-weight:700; }
 
-    .factor-badge.elevating {
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
+    /* ── Loading / Empty States ─────────────────── */
+    .loading-skeleton { background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 100%);background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:8px;height:1.2em; }
+    @keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+    .empty-state { text-align:center;padding:2.5rem 1rem;color:var(--text-muted); }
+    .empty-state .empty-icon { font-size:2.5rem;margin-bottom:.75rem; }
+    .error-msg { background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:.75rem 1rem;font-size:.82rem;color:#f87171; }
 
-    .factor-badge.moderating {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+    /* ── Pagination ──────────────────────────────── */
+    .pagination { display:flex;align-items:center;gap:.5rem;margin-top:1rem;justify-content:flex-end; }
+    .page-info { font-size:.78rem;color:var(--text-muted);font-family:var(--font-mono); }
+
+    /* ── Model comparison table special ─────────── */
+    .metric-bar { height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:2px; }
+    .metric-fill { height:100%;border-radius:3px;background:var(--primary); }
+    .champion-row td { background:rgba(16,185,129,.06); }
+
+    /* ── Section titles ──────────────────────────── */
+    .section-header { margin-bottom:1.25rem; }
+    .section-header h2 { font-size:1.2rem;font-weight:800;margin-bottom:.2rem; }
+    .section-header p { font-size:.82rem;color:var(--text-muted); }
+
+    /* ── Chart container ─────────────────────────── */
+    .chart-box { position:relative;height:260px; }
+    .chart-box-tall { position:relative;height:320px; }
+
+    /* ── Alert card ──────────────────────────────── */
+    .alert-card-item {
+      background:rgba(8,16,26,.7);border:1px solid var(--border-subtle);
+      border-radius:14px;padding:1rem 1.2rem;
+      display:flex;justify-content:space-between;align-items:flex-start;
+      gap:1rem;margin-bottom:.75rem;
     }
+    .alert-card-item.CRITICAL { border-left:3px solid var(--danger); }
+    .alert-card-item.HIGH { border-left:3px solid var(--warning); }
+    .alert-card-item.MODERATE { border-left:3px solid var(--accent); }
+    .alert-card-item.LOW { border-left:3px solid var(--primary); }
 
     footer {
-      padding: 1.25rem 2rem;
-      border-top: 1px solid var(--border-subtle);
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: auto;
+      padding:1.2rem 2rem;border-top:1px solid var(--border-subtle);
+      text-align:center;font-size:.75rem;color:var(--text-muted);margin-top:auto;
     }
+
+    /* ── Scrollbar ───────────────────────────────── */
+    ::-webkit-scrollbar { width:6px;height:6px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="brand">
-      <div class="brand-icon">🌾</div>
-      <div class="brand-text">
-        <h1>Intelligent Pest Outbreak Early Warning System</h1>
-        <p>ICAR & TNAU Bio-Climatic Micro-Surveillance Engine</p>
-      </div>
+<!-- ══════════════════════════════════ HEADER ══════════════════════════════════ -->
+<header>
+  <div class="brand">
+    <div class="brand-icon">🌾</div>
+    <div class="brand-text">
+      <h1>Intelligent Pest Outbreak Early Warning System</h1>
+      <p>ICAR & TNAU Bio-Climatic Micro-Surveillance Engine</p>
     </div>
-    <div class="header-badges">
-      <div class="badge">
-        <span class="badge-dot"></span>
-        <span id="system-status">ML Pipeline Active</span>
-      </div>
-      <div class="badge">
-        <span>Records: <strong>35,499</strong></span>
-      </div>
-      <div class="badge">
-        <span>Full Accuracy: <strong style="color: #34d399;">97.8%</strong></span>
-      </div>
-    </div>
-  </header>
+  </div>
+  <div class="header-right">
+    <div class="badge"><span class="badge-dot"></span><span id="system-status">ML Pipeline Active</span></div>
+    <div class="badge">Records: <strong>35,499</strong></div>
+    <div class="badge" id="active-alerts-badge">Alerts: <strong id="hdr-alert-count">—</strong></div>
+    <div class="badge" id="hdr-clock" style="font-family:var(--font-mono);color:#fbbf24;">—</div>
+  </div>
+</header>
 
-  <!-- Main Content Layout -->
-  <main>
-    <!-- Left Configuration & Weather Simulator Panel -->
-    <section class="controls-panel">
+<!-- ══════════════════════════════════ NAV TABS ════════════════════════════════ -->
+<nav class="nav-tabs" role="tablist">
+  <button class="nav-tab active" id="tab-overview"   onclick="switchTab('overview')"     role="tab">🏠 Overview</button>
+  <button class="nav-tab"        id="tab-map"        onclick="switchTab('map')"           role="tab">🗺️ Risk Map</button>
+  <button class="nav-tab"        id="tab-obs"        onclick="switchTab('obs')"           role="tab">📋 Field Observations</button>
+  <button class="nav-tab"        id="tab-history"    onclick="switchTab('history')"       role="tab">📈 Risk History</button>
+  <button class="nav-tab"        id="tab-alerts"     onclick="switchTab('alerts')"        role="tab">🚨 Alerts & Advisories</button>
+  <button class="nav-tab"        id="tab-model"      onclick="switchTab('model')"         role="tab">🤖 Model Performance</button>
+  <button class="nav-tab"        id="tab-system"     onclick="switchTab('system')"        role="tab">⚙️ System Health</button>
+</nav>
+
+<!-- ══════════════════════════════════ TAB 1: OVERVIEW ════════════════════════ -->
+<div class="tab-panel active" id="panel-overview">
+  <div class="grid-main">
+
+    <!-- LEFT: Control Form -->
+    <section>
       <div class="card">
         <div class="card-title">
           <span>Field Observation Scout</span>
           <span class="highlight">Input Telemetry</span>
         </div>
-
         <form id="prediction-form">
           <div class="form-row">
             <div class="form-group">
               <label for="crop">Crop Species</label>
-              <select id="crop" required>
+              <select id="crop" required onchange="updatePestList()">
                 <option value="Rice" selected>Rice (Oryza sativa)</option>
                 <option value="Cotton">Cotton (Gossypium)</option>
               </select>
             </div>
             <div class="form-group">
               <label for="location">ICAR Center</label>
-              <select id="location" required>
+              <select id="location" required onchange="onLocationChange(this.value)">
                 <option value="Cuttack" selected>Cuttack (CRRI/NRRI)</option>
                 <option value="Maruteru">Maruteru</option>
                 <option value="Lam">Lam (Guntur)</option>
@@ -509,36 +351,25 @@
           </div>
 
           <div class="form-group">
-            <label for="pest_name">Target Pest Insect</label>
-            <select id="pest_name" required>
-              <option value="Brown Planthopper" selected>Brown Planthopper (Nilaparvata lugens)</option>
-              <option value="Yellow Stem Borer">Yellow Stem Borer (Scirpophaga incertulas)</option>
-              <option value="Leaf Folder">Leaf Folder (Cnaphalocrocis medinalis)</option>
-              <option value="Gall Midge">Gall Midge (Orseolia oryzae)</option>
-              <option value="Green Leafhopper">Green Leafhopper (Nephotettix virescens)</option>
-              <option value="American Bollworm">American Bollworm (Helicoverpa armigera)</option>
-              <option value="Pink Bollworm">Pink Bollworm (Pectinophora gossypiella)</option>
-              <option value="Whitefly">Whitefly (Bemisia tabaci)</option>
-              <option value="Aphid">Cotton Aphid (Aphis gossypii)</option>
-              <option value="Jassid">Leafhopper / Jassid (Amrasca biguttula)</option>
-            </select>
+            <label for="pest_name">Target Pest</label>
+            <select id="pest_name" required></select>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="standard_week">Standard Week (1-52)</label>
+              <label for="standard_week">Standard Meteorological Week</label>
               <input type="number" id="standard_week" min="1" max="52" value="32" required />
             </div>
             <div class="form-group">
-              <label for="current_pest_count">Scouted Pest Count</label>
+              <label for="current_pest_count">Scouted Count (per hill/trap)</label>
               <input type="number" id="current_pest_count" min="0" step="0.1" value="6.5" required />
             </div>
           </div>
 
-          <div class="card-title" style="margin-top: 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+          <div class="card-title" style="margin-top:.75rem;margin-bottom:.6rem;">
             <span>Weather Station Readings</span>
-            <button type="button" id="btn-fetch-live-weather" style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.75rem; cursor: pointer;">
-              🌐 Auto-Fetch Live Weather
+            <button type="button" id="btn-fetch-weather" class="btn btn-secondary btn-sm" onclick="fetchLiveWeather()">
+              🌐 Auto-Fetch Live
             </button>
           </div>
 
@@ -552,7 +383,6 @@
               <input type="number" id="temp_min" step="0.1" value="25.0" required />
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label for="rh_morning">Morning RH (%)</label>
@@ -563,7 +393,6 @@
               <input type="number" id="rh_evening" min="0" max="100" step="0.5" value="75.0" required />
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label for="rainfall">Rainfall (mm)</label>
@@ -575,402 +404,1250 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-submit" id="btn-predict">
-            <span>⚡ Run Risk Evaluation Engine</span>
+          <div id="weather-source-tag" style="font-size:.7rem;color:var(--text-muted);margin-bottom:.5rem;">Source: Manual entry</div>
+
+          <button type="submit" class="btn btn-primary btn-submit" id="btn-predict">
+            ⚡ Run Risk Evaluation Engine
           </button>
         </form>
       </div>
     </section>
 
-    <!-- Right Analytics & Early Warning Output Panel -->
-    <section class="dashboard-grid">
+    <!-- RIGHT: Dashboard Output -->
+    <section style="display:flex;flex-direction:column;gap:1.4rem;">
 
-      <!-- Dynamic Early Warning Banner -->
+      <!-- Alert Banner -->
       <div class="alert-banner CRITICAL" id="alert-card">
         <div class="alert-gauge-ring">
-          <svg viewBox="0 0 36 36" style="width: 100%; height: 100%;">
+          <svg viewBox="0 0 36 36" style="width:100%;height:100%;">
             <path stroke="rgba(255,255,255,0.1)" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-            <path id="gauge-circle" stroke="#ef4444" stroke-dasharray="94, 100" stroke-width="3.2" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path id="gauge-circle" stroke="#ef4444" stroke-dasharray="94,100" stroke-width="3.2" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
           </svg>
-          <div class="gauge-score" id="gauge-score-text" style="position: absolute;">0.94</div>
+          <div class="gauge-score" id="gauge-score-text">0.94</div>
         </div>
         <div class="alert-content">
           <h2 id="alert-title">⚠️ CRITICAL OUTBREAK WARNING</h2>
-          <p id="alert-advisory">High bio-climatic suitability detected for rapid insect multiplication within 7 days. Initiate immediate targeted IPM intervention in accordance with ICAR/TNAU protocol.</p>
+          <p id="alert-advisory">High bio-climatic suitability detected. Initiate immediate targeted IPM intervention per ICAR/TNAU protocol. <em style="font-size:.8em;color:#94a3b8;">Forecast horizon: next 7 days.</em></p>
         </div>
       </div>
 
-      <!-- Quick Telemetry & Degree-Day KPI Strip -->
-      <div class="stats-row">
+      <!-- KPI Strip -->
+      <div class="grid-4">
         <div class="stat-card">
-          <div class="stat-label">Growing Degree-Days (GDD)</div>
-          <div class="stat-val" id="kpi-gdd">16.25 <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">°C-d</span></div>
-          <div class="stat-sub">Thermal threshold accumulation</div>
+          <div class="stat-label">Growing Degree-Days</div>
+          <div class="stat-val" id="kpi-gdd">—</div>
+          <div class="stat-sub">GDD = T_mean − T_base (°C-days)</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Vapor Pressure Deficit (VPD)</div>
-          <div class="stat-val" id="kpi-vpd">0.65 <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">kPa</span></div>
-          <div class="stat-sub">High canopy humidity persistence</div>
+        <div class="stat-card warning">
+          <div class="stat-label">Vapor Pressure Deficit</div>
+          <div class="stat-val" id="kpi-vpd">—</div>
+          <div class="stat-sub">Canopy stress index (kPa)</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Diurnal Temp Differential</div>
-          <div class="stat-val" id="kpi-dtr">7.5 <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">°C</span></div>
-          <div class="stat-sub">Day / Night micro-temperature swing</div>
+        <div class="stat-card accent">
+          <div class="stat-label">Diurnal Temp Range</div>
+          <div class="stat-val" id="kpi-dtr">—</div>
+          <div class="stat-sub">Day/night micro-swing (°C)</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Model Engine</div>
-          <div class="stat-val" style="font-size: 1.15rem; color: #34d399;" id="kpi-model">Quad-Ensemble</div>
-          <div class="stat-sub">Accuracy: 97.8% | ROC-AUC: 0.996</div>
+        <div class="stat-card purple">
+          <div class="stat-label">Champion Model</div>
+          <div class="stat-val" id="kpi-model" style="font-size:1rem;color:#a78bfa;">Random Forest</div>
+          <div class="stat-sub" id="kpi-model-sub">F1: 0.9067 | ROC-AUC: 0.956</div>
         </div>
       </div>
 
-      <!-- Map & Explainability Breakdown -->
-      <div class="viz-grid">
-        <!-- Interactive India Station Leaflet Map -->
-        <div class="card" style="display: flex; flex-direction: column;">
+      <!-- Map + SHAP -->
+      <div class="grid-2">
+        <div class="card" style="display:flex;flex-direction:column;">
           <div class="card-title">
             <span>Geographic Station Network</span>
-            <span class="highlight" id="map-station-badge">📡 NRRI Cuttack (Live Active)</span>
+            <span class="highlight" id="map-station-badge">📡 NRRI Cuttack</span>
           </div>
-          
-          <!-- Live Station Telemetry Bar -->
-          <div id="live-station-telemetry" style="background: rgba(10, 18, 26, 0.85); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 0.85rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.65rem; font-size: 0.8rem;">
-            <div>
-              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Current Weather</div>
-              <div id="live-cond" style="font-weight: 700; color: #60a5fa; margin-top: 2px;">🌤️ Loading...</div>
-            </div>
-            <div>
-              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Temp & RH</div>
-              <div id="live-temp-rh" style="font-weight: 700; color: var(--text-main); margin-top: 2px;">--°C | --%</div>
-            </div>
-            <div>
-              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Agri Season</div>
-              <div id="live-season" style="font-weight: 700; color: #34d399; margin-top: 2px;">--</div>
-            </div>
-            <div>
-              <div style="color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;">Live Date & Time</div>
-              <div id="live-datetime" style="font-weight: 700; color: #fbbf24; font-family: var(--font-mono); font-size: 0.75rem; margin-top: 2px;">--</div>
-            </div>
+          <div id="live-station-bar">
+            <div class="telem-item"><div class="telem-label">Condition</div><div class="telem-val" id="telem-cond" style="color:#60a5fa;">🌤️ Loading…</div></div>
+            <div class="telem-item"><div class="telem-label">Temp / RH</div><div class="telem-val" id="telem-temp">—</div></div>
+            <div class="telem-item"><div class="telem-label">Agri Season</div><div class="telem-val" id="telem-season" style="color:#34d399;">—</div></div>
+            <div class="telem-item"><div class="telem-label">Date & Time</div><div class="telem-val" id="telem-datetime" style="color:#fbbf24;font-family:var(--font-mono);font-size:.72rem;">—</div></div>
           </div>
-
           <div id="map"></div>
         </div>
 
-        <!-- SHAP Local Factors Breakdown -->
         <div class="card">
           <div class="card-title">
             <span>Bio-Climatic Risk Drivers</span>
-            <span class="highlight">SHAP Feature Attribution</span>
+            <span class="highlight">SHAP Attribution</span>
           </div>
+          <p style="font-size:.72rem;color:var(--text-muted);margin-bottom:.85rem;">SHAP values indicate model feature contribution, not proof of biological causation. Run evaluation to update.</p>
           <div class="factors-list" id="factors-container">
-            <div class="factor-item">
-              <div>
-                <div class="factor-title">Outbreak Current (t)</div>
-                <div class="factor-desc">Current in-field population exceeds economic threshold level</div>
-              </div>
-              <span class="factor-badge elevating">+ Elevating Risk</span>
-            </div>
-            <div class="factor-item">
-              <div>
-                <div class="factor-title">Thermal-Humidity Canopy Interaction</div>
-                <div class="factor-desc">Mean Temp (28.8°C) × Mean RH (83.5%) accelerates nymph survival</div>
-              </div>
-              <span class="factor-badge elevating">+ Elevating Risk</span>
-            </div>
-            <div class="factor-item">
-              <div>
-                <div class="factor-title">Previous Week Pest Activity (t-1)</div>
-                <div class="factor-desc">Autoregressive population momentum detected</div>
-              </div>
-              <span class="factor-badge elevating">+ Elevating Risk</span>
-            </div>
-            <div class="factor-item">
-              <div>
-                <div class="factor-title">Diurnal Temp Range</div>
-                <div class="factor-desc">Controlled 7.5°C temperature fluctuation provides optimal incubation</div>
-              </div>
-              <span class="factor-badge moderating">~ Moderating</span>
-            </div>
+            <div class="empty-state"><div class="empty-icon">🔬</div><div>Submit a prediction to see risk drivers</div></div>
           </div>
         </div>
       </div>
 
     </section>
-  </main>
+  </div>
+</div>
 
-  <!-- Footer -->
-  <footer>
-    <p>🌾 Intelligent Pest Outbreak Prediction & Early Warning Framework — Powered by ICAR & TNAU Agrometeorological Surveillance Data</p>
-  </footer>
+<!-- ══════════════════════════════════ TAB 2: RISK MAP ════════════════════════ -->
+<div class="tab-panel" id="panel-map">
+  <div class="section-header">
+    <h2>Regional Surveillance Map</h2>
+    <p>Live ICAR station risk levels. Click any marker to view station details and live weather. Risk colours reflect the latest prediction for that station.</p>
+  </div>
 
-  <script>
-    // Geographic Coordinates of ICAR Surveillance Stations across India
-    const STATIONS = {
-      "Cuttack": { lat: 20.4625, lon: 85.8828, name: "NRRI / CRRI, Cuttack (Odisha)" },
-      "Maruteru": { lat: 16.6318, lon: 81.7408, name: "Agricultural Research Station, Maruteru (AP)" },
-      "Lam": { lat: 16.3533, lon: 80.4447, name: "Regional Agricultural Research Station, Lam (Guntur, AP)" },
-      "Akola": { lat: 20.7002, lon: 77.0082, name: "Dr. PDKV, Akola (Maharashtra)" },
-      "Nagpur": { lat: 21.1458, lon: 79.0882, name: "Central Institute for Cotton Research (CICR), Nagpur" },
-      "Ludhiana": { lat: 30.9010, lon: 75.8573, name: "Punjab Agricultural University (PAU), Ludhiana" },
-      "Raipur": { lat: 21.2514, lon: 81.6296, name: "Indira Gandhi Krishi Vishwavidyalaya, Raipur (CG)" },
-      "Rajendranagar": { lat: 17.3204, lon: 78.4069, name: "PJTSAU, Rajendranagar (Hyderabad, Telangana)" },
-      "Sirsa": { lat: 29.5349, lon: 75.0298, name: "CICR Regional Station, Sirsa (Haryana)" },
-      "Pharbhani": { lat: 19.2612, lon: 76.7766, name: "VNMKV, Parbhani (Maharashtra)" },
-      "Palampur": { lat: 32.1109, lon: 76.5363, name: "CSK HPKV, Palampur (Himachal Pradesh)" }
-    };
+  <div class="grid-2" style="margin-bottom:1.4rem;">
+    <div class="card">
+      <div class="card-title">Map Filters</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Filter by Crop</label>
+          <select id="map-filter-crop" onchange="refreshMapMarkers()">
+            <option value="">All Crops</option>
+            <option value="Rice">Rice</option>
+            <option value="Cotton">Cotton</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter by Severity</label>
+          <select id="map-filter-severity" onchange="refreshMapMarkers()">
+            <option value="">All Levels</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="HIGH">High</option>
+            <option value="MODERATE">Moderate</option>
+            <option value="LOW">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Search Station</label>
+        <input type="text" id="map-search" placeholder="Type station name…" oninput="mapSearch(this.value)" />
+      </div>
+    </div>
+    <div class="card" id="station-detail-panel">
+      <div class="card-title">Station Detail</div>
+      <div class="empty-state" style="padding:1.5rem 0;">
+        <div class="empty-icon">📍</div>
+        <div>Click a station marker to view details</div>
+      </div>
+    </div>
+  </div>
 
-    // Initialize Map with 100% Free OpenStreetMap Standard Tile Layer (Zero API Key Required)
-    const map = L.map('map').setView([21.5, 79.0], 5);
+  <div class="card">
+    <div class="card-title">
+      <span>India ICAR Network — Live Risk Overlay</span>
+      <div style="display:flex;gap:.75rem;align-items:center;font-size:.72rem;font-family:var(--font-mono);">
+        <span style="color:#ef4444;">● Critical</span>
+        <span style="color:#f59e0b;">● High</span>
+        <span style="color:#3b82f6;">● Moderate</span>
+        <span style="color:#10b981;">● Low / No data</span>
+      </div>
+    </div>
+    <div id="map2" style="height:480px;border-radius:14px;border:1px solid var(--border-subtle);z-index:10;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ TAB 3: FIELD OBSERVATIONS ═════════════ -->
+<div class="tab-panel" id="panel-obs">
+  <div class="section-header">
+    <h2>Field Observation Management</h2>
+    <p>Record and manage in-field pest scouting entries. All observations are distinct from model predictions.</p>
+  </div>
+
+  <div class="grid-2" style="align-items:start;">
+    <!-- Observation Form -->
+    <div class="card">
+      <div class="card-title"><span>New Observation Entry</span><span class="highlight">Required fields marked *</span></div>
+      <form id="obs-form" onsubmit="submitObservation(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Crop *</label>
+            <select id="obs-crop" required>
+              <option value="Rice">Rice</option>
+              <option value="Cotton">Cotton</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Location *</label>
+            <select id="obs-location" required>
+              <option value="Cuttack">Cuttack</option>
+              <option value="Maruteru">Maruteru</option>
+              <option value="Lam">Lam</option>
+              <option value="Akola">Akola</option>
+              <option value="Nagpur">Nagpur</option>
+              <option value="Ludhiana">Ludhiana</option>
+              <option value="Raipur">Raipur</option>
+              <option value="Rajendranagar">Rajendranagar</option>
+              <option value="Sirsa">Sirsa</option>
+              <option value="Pharbhani">Pharbhani</option>
+              <option value="Palampur">Palampur</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Pest Name *</label>
+          <select id="obs-pest" required>
+            <option value="Brown Planthopper">Brown Planthopper</option>
+            <option value="Yellow Stem Borer">Yellow Stem Borer</option>
+            <option value="Leaf Folder">Leaf Folder</option>
+            <option value="Gall Midge">Gall Midge</option>
+            <option value="Green Leafhopper">Green Leafhopper</option>
+            <option value="American Bollworm">American Bollworm</option>
+            <option value="Pink Bollworm">Pink Bollworm</option>
+            <option value="Whitefly">Whitefly</option>
+            <option value="Aphid">Aphid</option>
+            <option value="Jassid">Jassid</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Observation Date *</label>
+            <input type="date" id="obs-date" required />
+          </div>
+          <div class="form-group">
+            <label>Standard Week *</label>
+            <input type="number" id="obs-week" min="1" max="52" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pest Count *</label>
+            <input type="number" id="obs-count" min="0" step="0.1" required />
+          </div>
+          <div class="form-group">
+            <label>Count Unit</label>
+            <select id="obs-unit">
+              <option value="per hill">per hill</option>
+              <option value="per trap">per trap / night</option>
+              <option value="per leaf">per leaf</option>
+              <option value="per plant">per plant</option>
+              <option value="% incidence">% incidence</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Life Stage</label>
+            <select id="obs-stage">
+              <option value="Mixed">Mixed</option>
+              <option value="Egg">Egg</option>
+              <option value="Nymph">Nymph</option>
+              <option value="Adult">Adult</option>
+              <option value="Larva">Larva</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Collection Method</label>
+            <select id="obs-method">
+              <option value="Visual count">Visual count</option>
+              <option value="Light trap">Light trap</option>
+              <option value="Pheromone trap">Pheromone trap</option>
+              <option value="Sweep net">Sweep net</option>
+              <option value="Yellow sticky trap">Yellow sticky trap</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Max Temp (°C)</label>
+            <input type="number" id="obs-tmax" step="0.1" placeholder="Optional" />
+          </div>
+          <div class="form-group">
+            <label>Min Temp (°C)</label>
+            <input type="number" id="obs-tmin" step="0.1" placeholder="Optional" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Observer ID</label>
+            <input type="text" id="obs-observer" placeholder="Field Agent" />
+          </div>
+          <div class="form-group">
+            <label>Verification Status</label>
+            <select id="obs-status">
+              <option value="pending">Pending</option>
+              <option value="verified">Verified</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="obs-notes" placeholder="Any additional field observations…"></textarea>
+        </div>
+        <div id="obs-form-msg" style="font-size:.8rem;margin-bottom:.5rem;"></div>
+        <button type="submit" class="btn btn-primary btn-submit">📋 Submit Observation</button>
+      </form>
+    </div>
+
+    <!-- Observation History -->
+    <div class="card">
+      <div class="card-title">
+        <span>Observation History</span>
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="exportObsCSV()">⬇ Export CSV</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadObservations()">🔄 Refresh</button>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:.75rem;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Filter Crop</label>
+          <select id="obs-filter-crop" onchange="loadObservations()">
+            <option value="">All</option>
+            <option value="Rice">Rice</option>
+            <option value="Cotton">Cotton</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Filter Location</label>
+          <select id="obs-filter-loc" onchange="loadObservations()">
+            <option value="">All</option>
+            <option value="Cuttack">Cuttack</option>
+            <option value="Maruteru">Maruteru</option>
+            <option value="Lam">Lam</option>
+            <option value="Akola">Akola</option>
+            <option value="Nagpur">Nagpur</option>
+            <option value="Ludhiana">Ludhiana</option>
+            <option value="Raipur">Raipur</option>
+            <option value="Rajendranagar">Rajendranagar</option>
+            <option value="Sirsa">Sirsa</option>
+            <option value="Pharbhani">Pharbhani</option>
+            <option value="Palampur">Palampur</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Date</th><th>Location</th><th>Pest</th><th>Count</th><th>Unit</th><th>Status</th><th>Observer</th></tr>
+          </thead>
+          <tbody id="obs-table-body">
+            <tr><td colspan="8"><div class="loading-skeleton" style="height:2rem;margin:.5rem 0;"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn btn-secondary btn-sm" id="obs-prev" onclick="obsPage(-1)" disabled>← Prev</button>
+        <span class="page-info" id="obs-page-info">Page 1</span>
+        <button class="btn btn-secondary btn-sm" id="obs-next" onclick="obsPage(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ TAB 4: RISK HISTORY ════════════════════ -->
+<div class="tab-panel" id="panel-history">
+  <div class="section-header">
+    <h2>Forecast & Risk History</h2>
+    <p>Historical risk scores from next-week outbreak predictions. Charts show trend over prediction events. Future values are not fabricated — only recorded predictions are shown.</p>
+  </div>
+
+  <div style="display:flex;gap:.75rem;margin-bottom:1.4rem;flex-wrap:wrap;align-items:flex-end;">
+    <div class="form-group" style="margin-bottom:0;min-width:160px;">
+      <label>Crop</label>
+      <select id="hist-crop" onchange="loadRiskHistory()">
+        <option value="">All</option>
+        <option value="Rice">Rice</option>
+        <option value="Cotton">Cotton</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0;min-width:200px;">
+      <label>Location</label>
+      <select id="hist-loc" onchange="loadRiskHistory()">
+        <option value="">All Stations</option>
+        <option value="Cuttack">Cuttack</option>
+        <option value="Maruteru">Maruteru</option>
+        <option value="Lam">Lam</option>
+        <option value="Akola">Akola</option>
+        <option value="Nagpur">Nagpur</option>
+        <option value="Ludhiana">Ludhiana</option>
+        <option value="Raipur">Raipur</option>
+        <option value="Rajendranagar">Rajendranagar</option>
+        <option value="Sirsa">Sirsa</option>
+        <option value="Pharbhani">Pharbhani</option>
+        <option value="Palampur">Palampur</option>
+      </select>
+    </div>
+    <button class="btn btn-secondary" onclick="loadRiskHistory()">🔄 Refresh</button>
+    <button class="btn btn-secondary" onclick="exportHistCSV()">⬇ Export CSV</button>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:1.4rem;">
+    <div class="card">
+      <div class="card-title">Risk Score Over Time</div>
+      <div class="chart-box-tall"><canvas id="chartRiskTrend"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Risk Level Distribution</div>
+      <div class="chart-box-tall"><canvas id="chartRiskDist"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>Prediction History Table</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Timestamp</th><th>Location</th><th>Crop</th><th>Pest</th><th>Risk Score</th><th>Level</th><th>GDD</th><th>VPD</th></tr>
+        </thead>
+        <tbody id="hist-table-body">
+          <tr><td colspan="9"><div class="loading-skeleton" style="height:2rem;margin:.5rem 0;"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ TAB 5: ALERTS ═════════════════════════ -->
+<div class="tab-panel" id="panel-alerts">
+  <div class="section-header">
+    <h2>Alerts & IPM Advisories</h2>
+    <p>Active and historical early-warning alerts. Alerts are automatically created for HIGH/CRITICAL predictions. Deduplication prevents multiple alerts for the same station/pest event.</p>
+  </div>
+
+  <div style="display:flex;gap:.75rem;margin-bottom:1.4rem;flex-wrap:wrap;align-items:flex-end;">
+    <div class="form-group" style="margin-bottom:0;min-width:140px;">
+      <label>Status</label>
+      <select id="alert-filter-status" onchange="loadAlerts()">
+        <option value="">All</option>
+        <option value="active">Active</option>
+        <option value="acknowledged">Acknowledged</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0;min-width:140px;">
+      <label>Severity</label>
+      <select id="alert-filter-severity" onchange="loadAlerts()">
+        <option value="">All</option>
+        <option value="CRITICAL">Critical</option>
+        <option value="HIGH">High</option>
+        <option value="MODERATE">Moderate</option>
+        <option value="LOW">Low</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:0;min-width:160px;">
+      <label>Location</label>
+      <select id="alert-filter-loc" onchange="loadAlerts()">
+        <option value="">All Stations</option>
+        <option value="Cuttack">Cuttack</option>
+        <option value="Maruteru">Maruteru</option>
+        <option value="Nagpur">Nagpur</option>
+        <option value="Ludhiana">Ludhiana</option>
+      </select>
+    </div>
+    <button class="btn btn-secondary" onclick="loadAlerts()">🔄 Refresh</button>
+    <button class="btn btn-secondary" onclick="exportAlertsCSV()">⬇ Export CSV</button>
+  </div>
+
+  <div id="alerts-container">
+    <div class="empty-state card"><div class="empty-icon">🔔</div><div>Loading alerts…</div></div>
+  </div>
+  <div class="pagination">
+    <button class="btn btn-secondary btn-sm" id="alert-prev" onclick="alertPage(-1)" disabled>← Prev</button>
+    <span class="page-info" id="alert-page-info">Page 1</span>
+    <button class="btn btn-secondary btn-sm" id="alert-next" onclick="alertPage(1)">Next →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ TAB 6: MODEL PERFORMANCE ═══════════════ -->
+<div class="tab-panel" id="panel-model">
+  <div class="section-header">
+    <h2>Model Performance & Evaluation</h2>
+    <p>Verified evaluation results from temporal holdout test set (years 2007–2011). <strong style="color:#f87171;">Full-dataset metrics (97.83%) are NOT a measure of generalization</strong> — use holdout figures for scientific comparison.</p>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:1.4rem;" id="model-kpi-strip">
+    <div class="stat-card"><div class="stat-label">Champion Model</div><div class="stat-val" id="model-champion" style="font-size:1rem;color:#a78bfa;">—</div><div class="stat-sub">Highest F1 on holdout</div></div>
+    <div class="stat-card"><div class="stat-label">Test Accuracy</div><div class="stat-val" id="model-accuracy">—</div><div class="stat-sub">Temporal holdout 2007–2011</div></div>
+    <div class="stat-card"><div class="stat-label">ROC-AUC</div><div class="stat-val" id="model-roc">—</div><div class="stat-sub">Holdout discriminative power</div></div>
+    <div class="stat-card"><div class="stat-label">F1-Score</div><div class="stat-val" id="model-f1">—</div><div class="stat-sub">Holdout balanced F1</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:1.4rem;">
+    <div class="card">
+      <div class="card-title">Model Comparison — Holdout Test Set (2007–2011)</div>
+      <div class="chart-box-tall"><canvas id="chartModelComp"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">ROC-AUC Comparison</div>
+      <div class="chart-box-tall"><canvas id="chartROC"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.4rem;">
+    <div class="card-title"><span>Detailed Model Benchmarks</span><span class="highlight">Temporal Holdout · 8,060 test records</span></div>
+    <div class="table-wrap">
+      <table id="model-table">
+        <thead>
+          <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>ROC-AUC</th><th>FNR</th><th>TN</th><th>FP</th><th>FN</th><th>TP</th></tr>
+        </thead>
+        <tbody id="model-table-body">
+          <tr><td colspan="11"><div class="loading-skeleton" style="height:2rem;margin:.5rem 0;"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">SHAP Feature Importance Summary</div>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;">Global feature importance from the saved SHAP summary artifact. SHAP values show average impact magnitude on model output probability.</p>
+      <img id="shap-img" src="/artifacts/models/shap_summary.png" alt="SHAP Summary Plot"
+           style="width:100%;border-radius:10px;border:1px solid var(--border-subtle);"
+           onerror="this.style.display='none';document.getElementById('shap-fallback').style.display='block';" />
+      <div id="shap-fallback" class="empty-state" style="display:none;">
+        <div class="empty-icon">📊</div>
+        <div>SHAP summary image not available. Run src/ml/explain.py to regenerate.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Confusion Matrix — Champion Model</div>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.85rem;">Random Forest holdout performance. Rows = actual, Columns = predicted. Values from verified evaluation artifact.</p>
+      <img id="cm-img" src="/artifacts/models/confusion_matrix.png" alt="Confusion Matrix"
+           style="width:100%;border-radius:10px;border:1px solid var(--border-subtle);"
+           onerror="this.style.display='none';document.getElementById('cm-fallback').style.display='block';" />
+      <div id="cm-fallback" class="empty-state" style="display:none;">
+        <div class="empty-icon">📉</div>
+        <div>Confusion matrix image not available.</div>
+      </div>
+      <div id="model-cm-numbers" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ TAB 7: SYSTEM HEALTH ══════════════════ -->
+<div class="tab-panel" id="panel-system">
+  <div class="section-header">
+    <h2>Data Sources & System Health</h2>
+    <p>Service status, data provenance, and known limitations.</p>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:1.4rem;">
+    <div class="card">
+      <div class="card-title">API Health</div>
+      <div id="health-display">
+        <div class="loading-skeleton" style="height:5rem;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Data Sources</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem;font-size:.82rem;">
+        <li>🌾 <strong>ICAR Surveillance Dataset</strong> — 35,499 records, 12 centres, 23 pests, 1992–2011</li>
+        <li>🌦️ <strong>Weather</strong> — Open-Meteo Live API (free, no key required); fallback to seasonal baseline</li>
+        <li>🗺️ <strong>Map Tiles</strong> — © OpenStreetMap contributors (free, no API key)</li>
+        <li>📚 <strong>ETL Thresholds</strong> — TNAU Crop Pest Threshold & Control guidelines</li>
+        <li>💾 <strong>Database</strong> — SQLite (WAL mode), <code>artifacts/pest_framework.db</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:#f87171;">⚠️ Known Limitations</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem;font-size:.8rem;color:var(--text-muted);">
+        <li>• Primary model predicts <strong>next-week outbreak occurrence</strong>, not daily or seasonal forecasts.</li>
+        <li>• Auxiliary models have low accuracy (multi-pest: 48.75%, severity: 33.50%) and should be used for exploratory analysis only.</li>
+        <li>• Full-dataset accuracy (97.83%) reflects training-set coverage, not generalization ability.</li>
+        <li>• Weather data is fetched from Open-Meteo; fallback to seasonal baseline when offline.</li>
+        <li>• SHAP values show model contribution, not causal agricultural evidence.</li>
+        <li>• No image-based pest classification is implemented or planned.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Auxiliary Model Information</div>
+    <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;">These models are separate from the primary outbreak predictor and serve exploratory analysis only.</p>
+    <div id="aux-model-display">
+      <div class="loading-skeleton" style="height:4rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ FOOTER ═════════════════════════════════ -->
+<footer>
+  <p>🌾 Intelligent Pest Outbreak Prediction &amp; Early Warning Framework — Powered by ICAR &amp; TNAU Agrometeorological Surveillance Data · Open-Meteo · OpenStreetMap</p>
+  <p style="margin-top:.25rem;">B.Tech Major Project · Model: Random Forest Champion (F1=0.9067, ROC-AUC=0.956) · Temporal holdout: 2007–2011</p>
+</footer>
+
+<!-- ══════════════════════════════════ JAVASCRIPT ════════════════════════════ -->
+<script>
+  // ── Station metadata ─────────────────────────────────────────────────────────
+  const STATIONS = {
+    "Cuttack":        { lat: 20.4625, lon: 85.8828, name: "NRRI / CRRI, Cuttack (Odisha)" },
+    "Maruteru":       { lat: 16.6318, lon: 81.7408, name: "Agricultural Research Station, Maruteru (AP)" },
+    "Lam":            { lat: 16.3533, lon: 80.4447, name: "Regional ARS, Lam, Guntur (AP)" },
+    "Akola":          { lat: 20.7002, lon: 77.0082, name: "Dr. PDKV, Akola (Maharashtra)" },
+    "Nagpur":         { lat: 21.1458, lon: 79.0882, name: "CICR, Nagpur (Maharashtra)" },
+    "Ludhiana":       { lat: 30.9010, lon: 75.8573, name: "Punjab Agricultural University, Ludhiana" },
+    "Raipur":         { lat: 21.2514, lon: 81.6296, name: "IGKV, Raipur (Chhattisgarh)" },
+    "Rajendranagar":  { lat: 17.3204, lon: 78.4069, name: "PJTSAU, Rajendranagar (Telangana)" },
+    "Sirsa":          { lat: 29.5349, lon: 75.0298, name: "CICR Regional Station, Sirsa (Haryana)" },
+    "Pharbhani":      { lat: 19.2612, lon: 76.7766, name: "VNMKV, Parbhani (Maharashtra)" },
+    "Palampur":       { lat: 32.1109, lon: 76.5363, name: "CSK HPKV, Palampur (Himachal Pradesh)" }
+  };
+
+  const PESTS = {
+    Rice: ["Brown Planthopper","Yellow Stem Borer","Leaf Folder","Gall Midge","Green Leafhopper","White Backed Planthopper","Caseworm","Zigzag Leafhopper","Leaf Blast","Neck Blast"],
+    Cotton: ["American Bollworm","Pink Bollworm","Spotted Bollworm","Whitefly","Jassid","Aphid","Thrips","Spodoptera","Mealybug","Mirid Bug"]
+  };
+
+  // ── State ────────────────────────────────────────────────────────────────────
+  let map1, map2, markers1 = {}, markers2 = {};
+  let stationRiskData = {};
+  let obsCurrentPage = 0; const obsPageSize = 10;
+  let alertCurrentPage = 0; const alertPageSize = 8;
+  let histData = [];
+  let chartRiskTrend, chartRiskDist, chartModelComp, chartROC;
+
+  // ── Tab switching ─────────────────────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'map' && !map2) initMap2();
+    if (name === 'obs') loadObservations();
+    if (name === 'history') loadRiskHistory();
+    if (name === 'alerts') loadAlerts();
+    if (name === 'model') loadModelPerformance();
+    if (name === 'system') loadSystemHealth();
+    if (name === 'map' && map2) setTimeout(() => map2.invalidateSize(), 200);
+  }
+
+  // ── Live Clock ────────────────────────────────────────────────────────────────
+  function updateClock() {
+    const now = new Date();
+    const opts = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
+    const t = now.toLocaleTimeString('en-IN', opts);
+    document.getElementById('hdr-clock').textContent = `🕒 ${t} IST`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ── Pest list ─────────────────────────────────────────────────────────────────
+  function updatePestList() {
+    const crop = document.getElementById('crop').value;
+    const sel = document.getElementById('pest_name');
+    sel.innerHTML = '';
+    (PESTS[crop] || PESTS.Rice).forEach(p => {
+      const o = document.createElement('option');
+      o.value = p; o.textContent = p;
+      sel.appendChild(o);
+    });
+  }
+  updatePestList();
+
+  // Set today's date as default for obs form
+  document.getElementById('obs-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('obs-week').value = getISOWeek(new Date());
+
+  function getISOWeek(d) {
+    const date = new Date(d);
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate()+3-(date.getDay()+6)%7);
+    const week1 = new Date(date.getFullYear(),0,4);
+    return 1+Math.round(((date.getTime()-week1.getTime())/86400000-3+(week1.getDay()+6)%7)/7);
+  }
+
+  // ── Map 1 (Overview) ──────────────────────────────────────────────────────────
+  function initMap1() {
+    map1 = L.map('map').setView([21.5, 79.0], 5);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
       maxZoom: 19
-    }).addTo(map);
-
-    let markers = {};
+    }).addTo(map1);
     for (const [key, val] of Object.entries(STATIONS)) {
-      const marker = L.circleMarker([val.lat, val.lon], {
-        radius: 8,
-        fillColor: '#10b981',
-        color: '#ffffff',
-        weight: 1.5,
-        opacity: 0.9,
-        fillOpacity: 0.8
-      }).addTo(map);
-      marker.bindPopup(`<strong>${key}</strong><br>${val.name}`);
-      marker.on('click', () => {
-        document.getElementById('location').value = key;
-        syncLiveStationWeather(key);
+      const m = L.circleMarker([val.lat, val.lon], markerStyle('LOW'))
+        .addTo(map1)
+        .bindPopup(`<strong style="color:#10b981">${key}</strong><br><small>${val.name}</small>`);
+      m.on('click', () => { document.getElementById('location').value = key; syncWeather(key); });
+      markers1[key] = m;
+    }
+    setTimeout(() => map1.invalidateSize(), 300);
+    syncWeather('Cuttack');
+  }
+
+  // ── Map 2 (Risk Map tab) ──────────────────────────────────────────────────────
+  function initMap2() {
+    map2 = L.map('map2').setView([21.5, 79.0], 5);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    }).addTo(map2);
+    for (const [key, val] of Object.entries(STATIONS)) {
+      const rsk = stationRiskData[key] || {};
+      const m = L.circleMarker([val.lat, val.lon], markerStyle(rsk.risk_level || 'LOW'))
+        .addTo(map2)
+        .bindPopup(buildStationPopup(key, val, rsk));
+      m.on('click', () => showStationDetail(key, val, rsk));
+      markers2[key] = m;
+    }
+  }
+
+  function markerStyle(level) {
+    const cols = { CRITICAL: '#ef4444', HIGH: '#f59e0b', MODERATE: '#3b82f6', LOW: '#10b981' };
+    return { radius: 9, fillColor: cols[level] || '#10b981', color: '#fff', weight: 2, opacity: .9, fillOpacity: .85 };
+  }
+
+  function buildStationPopup(key, val, rsk) {
+    return `<div style="font-family:sans-serif;min-width:180px;font-size:13px;">
+      <strong style="color:#10b981;font-size:14px;">${key}</strong><br>
+      <span style="color:#64748b;font-size:11px;">${val.name}</span>
+      <hr style="margin:6px 0;border:none;border-top:1px solid #334155;">
+      ${rsk.risk_level ? `<div><b>Risk:</b> <span class="risk-pill risk-${rsk.risk_level}">${rsk.risk_level}</span></div>
+      <div><b>Score:</b> ${(rsk.risk_score*100).toFixed(0)}%</div>
+      <div><b>Pest:</b> ${rsk.pest_name || '—'}</div>
+      <div><b>Crop:</b> ${rsk.crop || '—'}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px;">${rsk.created_at ? '🕒 ' + rsk.created_at.split('.')[0] : ''}</div>`
+      : '<div style="color:#94a3b8;">No prediction data yet</div>'}
+    </div>`;
+  }
+
+  function showStationDetail(key, val, rsk) {
+    const panel = document.getElementById('station-detail-panel');
+    panel.innerHTML = `<div class="card-title">${key}<span class="highlight">${rsk.risk_level ? `<span class="risk-pill risk-${rsk.risk_level}">${rsk.risk_level}</span>` : 'No data'}</span></div>
+    <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:.6rem;">${val.name}</p>
+    ${rsk.risk_level ? `
+    <div class="grid-2" style="gap:.5rem;font-size:.82rem;">
+      <div><span style="color:var(--text-muted);">Risk Score</span><br><strong>${(rsk.risk_score*100).toFixed(1)}%</strong></div>
+      <div><span style="color:var(--text-muted);">Pest</span><br><strong>${rsk.pest_name || '—'}</strong></div>
+      <div><span style="color:var(--text-muted);">Crop</span><br><strong>${rsk.crop || '—'}</strong></div>
+      <div><span style="color:var(--text-muted);">Last Update</span><br><strong style="font-size:.75rem;">${rsk.created_at ? rsk.created_at.split('.')[0] : '—'}</strong></div>
+    </div>` : '<div class="empty-state" style="padding:1rem 0;"><div class="empty-icon">📍</div><div>No prediction data for this station yet</div></div>'}`;
+  }
+
+  function refreshMapMarkers() {
+    const crop = document.getElementById('map-filter-crop').value;
+    const sev = document.getElementById('map-filter-severity').value;
+    if (!markers2) return;
+    for (const [key, m] of Object.entries(markers2)) {
+      const rsk = stationRiskData[key] || {};
+      const cropMatch = !crop || rsk.crop === crop;
+      const sevMatch = !sev || rsk.risk_level === sev;
+      if (cropMatch && sevMatch) { if (!map2.hasLayer(m)) m.addTo(map2); }
+      else map2.removeLayer(m);
+    }
+  }
+
+  function mapSearch(q) {
+    if (!q) return refreshMapMarkers();
+    const lower = q.toLowerCase();
+    for (const [key, m] of Object.entries(markers2)) {
+      if (key.toLowerCase().includes(lower)) { if (!map2.hasLayer(m)) m.addTo(map2); }
+      else map2.removeLayer(m);
+    }
+  }
+
+  // ── Live Weather Sync ─────────────────────────────────────────────────────────
+  async function syncWeather(loc) {
+    document.getElementById('map-station-badge').innerHTML = `📡 ${loc} (Fetching…)`;
+    document.getElementById('telem-cond').textContent = '⏳ Loading…';
+    try {
+      const res = await fetch(`/api/v1/weather/live/${loc}`);
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      // Update form
+      document.getElementById('temp_max').value = d.temp_max;
+      document.getElementById('temp_min').value = d.temp_min;
+      document.getElementById('rh_morning').value = d.rh_morning;
+      document.getElementById('rh_evening').value = d.rh_evening;
+      document.getElementById('rainfall').value = d.rainfall;
+      document.getElementById('wind_speed').value = d.wind_speed;
+      if (d.standard_week) document.getElementById('standard_week').value = d.standard_week;
+      document.getElementById('weather-source-tag').textContent = `Source: ${d.source}${d.status === 'fallback' ? ' (offline baseline)' : ' — live'}`;
+      // Update telemetry bar
+      document.getElementById('map-station-badge').innerHTML = `📡 ${loc} (${d.status === 'success' ? 'Live Synced' : 'Offline Baseline'})`;
+      document.getElementById('telem-cond').textContent = '🌤️ ' + (d.condition || 'Clear');
+      document.getElementById('telem-temp').textContent = `${d.current_temp}°C | ${d.rh_current}% RH`;
+      document.getElementById('telem-season').textContent = `🌾 ${d.season} (SMW ${d.standard_week})`;
+      document.getElementById('telem-datetime').innerHTML = `🕒 ${d.time}<br><span style="color:#94a3b8;font-size:.68rem;">${d.date}</span>`;
+      // Map popup update
+      if (markers1[loc]) markers1[loc].setPopupContent(
+        `<div style="font-family:sans-serif;min-width:170px;">
+          <strong style="color:#10b981;font-size:14px;">${loc}</strong><br>
+          <small style="color:#64748b;">${STATIONS[loc].name}</small>
+          <hr style="margin:5px 0;border:none;border-top:1px solid #334155;">
+          <div><b>Condition:</b> ${d.condition}</div>
+          <div><b>Temp:</b> ${d.current_temp}°C (Max ${d.temp_max} / Min ${d.temp_min})</div>
+          <div><b>RH:</b> ${d.rh_current}%</div>
+          <div><b>Season:</b> ${d.season}</div>
+          <div><b>SMW:</b> ${d.standard_week}</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:3px;">🕒 ${d.time}</div>
+        </div>`
+      );
+    } catch {
+      document.getElementById('map-station-badge').innerHTML = `📡 ${loc} (Offline Baseline)`;
+      document.getElementById('telem-cond').textContent = '🌤️ Seasonal baseline';
+      document.getElementById('weather-source-tag').textContent = 'Source: Agro-climatic baseline (offline)';
+    }
+  }
+
+  async function fetchLiveWeather() {
+    const btn = document.getElementById('btn-fetch-weather');
+    btn.textContent = '⏳ Syncing…';
+    await syncWeather(document.getElementById('location').value);
+    btn.textContent = '✅ Synced!';
+    setTimeout(() => { btn.textContent = '🌐 Auto-Fetch Live'; }, 2500);
+  }
+
+  function onLocationChange(loc) {
+    if (markers1[loc] && map1) {
+      map1.flyTo([STATIONS[loc].lat, STATIONS[loc].lon], 7, { duration: 1 });
+      markers1[loc].openPopup();
+    }
+    syncWeather(loc);
+  }
+
+  // ── Prediction Form ───────────────────────────────────────────────────────────
+  document.getElementById('prediction-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-predict');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Evaluating…';
+
+    const crop = document.getElementById('crop').value;
+    const loc = document.getElementById('location').value;
+    const pest = document.getElementById('pest_name').value;
+    const week = parseInt(document.getElementById('standard_week').value);
+    const count = parseFloat(document.getElementById('current_pest_count').value);
+    const tmax = parseFloat(document.getElementById('temp_max').value);
+    const tmin = parseFloat(document.getElementById('temp_min').value);
+    const rhm = parseFloat(document.getElementById('rh_morning').value);
+    const rhe = parseFloat(document.getElementById('rh_evening').value);
+    const rf = parseFloat(document.getElementById('rainfall').value);
+    const ws = parseFloat(document.getElementById('wind_speed').value);
+
+    if (markers1[loc] && map1) {
+      map1.flyTo([STATIONS[loc].lat, STATIONS[loc].lon], 7, { duration: 1.2 });
+      markers1[loc].openPopup();
+    }
+
+    try {
+      const res = await fetch('/api/v1/predictions/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          crop, pest_name: pest, location: loc, standard_week: week,
+          current_pest_count: count,
+          weather: { temp_max: tmax, temp_min: tmin, rh_morning: rhm, rh_evening: rhe, rainfall: rf, wind_speed: ws, sunshine_hours: 6.5, evaporation: 4.0 }
+        })
       });
-      markers[key] = marker;
+      if (!res.ok) throw new Error('API ' + res.status);
+      const d = await res.json();
+      updateDashboard(d, tmax, tmin, rhm, rhe);
+      // Refresh alert badge
+      fetchAlertCount();
+    } catch(err) {
+      console.error(err);
+      // Heuristic fallback (labelled explicitly)
+      const tmean = (tmax + tmin) / 2;
+      const gdd = Math.max(tmean - 12, 0);
+      updateDashboard({
+        risk_score: 0.5, risk_level: 'MODERATE', is_warning: false,
+        gdd_accumulated: gdd.toFixed(2), rh_differential: (rhm - rhe).toFixed(1),
+        top_factors: [{ feature: 'API Unavailable', impact: 'Unknown', description: 'Could not reach prediction API. Check server.' }],
+        advisory: 'API request failed. Verify server is running at localhost:8000.',
+        model_version: 'n/a'
+      }, tmax, tmin, rhm, rhe);
+    } finally {
+      btn.disabled = false; btn.innerHTML = '⚡ Run Risk Evaluation Engine';
     }
+  });
 
-    // Function to fetch and update live station weather, season, and time
-    async function syncLiveStationWeather(loc) {
-      const badge = document.getElementById('map-station-badge');
-      const condEl = document.getElementById('live-cond');
-      const tempRhEl = document.getElementById('live-temp-rh');
-      const seasonEl = document.getElementById('live-season');
-      const dtEl = document.getElementById('live-datetime');
+  function updateDashboard(d, tmax, tmin, rhm, rhe) {
+    const score = d.risk_score;
+    document.getElementById('gauge-score-text').textContent = score.toFixed(2);
+    document.getElementById('gauge-circle').setAttribute('stroke-dasharray', `${Math.round(score*100)},100`);
+    const banner = document.getElementById('alert-card');
+    banner.className = 'alert-banner ' + d.risk_level;
+    const cols = { CRITICAL: '#ef4444', HIGH: '#f59e0b', MODERATE: '#3b82f6', LOW: '#10b981' };
+    document.getElementById('gauge-circle').setAttribute('stroke', cols[d.risk_level] || '#10b981');
+    const icons = { CRITICAL: '🚨', HIGH: '⚠️', MODERATE: 'ℹ️', LOW: '✅' };
+    document.getElementById('alert-title').innerHTML = `${icons[d.risk_level]} ${d.risk_level} — ${d.risk_level === 'CRITICAL' ? 'OUTBREAK WARNING' : d.risk_level === 'HIGH' ? 'HIGH RISK' : d.risk_level === 'MODERATE' ? 'MODERATE RISK' : 'LOW ACTIVITY'}`;
+    document.getElementById('alert-advisory').innerHTML = d.advisory + ` <em style="font-size:.8em;color:#94a3b8;">(${d.model_version})</em>`;
 
-      badge.innerHTML = `📡 ${loc} (Fetching Live...)`;
-      try {
-        const res = await fetch(`/api/v1/weather/live/${loc}`);
-        if (!res.ok) throw new Error('Live weather API error');
-        const data = await res.json();
+    // KPIs
+    const tmean = (tmax + tmin) / 2;
+    document.getElementById('kpi-gdd').innerHTML = `${d.gdd_accumulated} <span style="font-size:.9rem;color:#94a3b8;">°C-d</span>`;
+    const satvp = 0.61078 * Math.exp((17.27 * tmean) / (tmean + 237.3));
+    const vpd = (satvp * (1 - ((rhm + rhe) / 2) / 100)).toFixed(2);
+    document.getElementById('kpi-vpd').innerHTML = `${vpd} <span style="font-size:.9rem;color:#94a3b8;">kPa</span>`;
+    document.getElementById('kpi-dtr').innerHTML = `${(tmax - tmin).toFixed(1)} <span style="font-size:.9rem;color:#94a3b8;">°C</span>`;
+    document.getElementById('kpi-model').textContent = d.model_version.replace('v2.0-ml-', '').replace(/-/g, ' ');
 
-        // Update form inputs automatically
-        document.getElementById('temp_max').value = data.temp_max;
-        document.getElementById('temp_min').value = data.temp_min;
-        document.getElementById('rh_morning').value = data.rh_morning;
-        document.getElementById('rh_evening').value = data.rh_evening;
-        document.getElementById('rainfall').value = data.rainfall;
-        document.getElementById('wind_speed').value = data.wind_speed;
-        if (data.standard_week) {
-          document.getElementById('standard_week').value = data.standard_week;
+    // SHAP Factors
+    const fc = document.getElementById('factors-container');
+    fc.innerHTML = '';
+    if (d.top_factors && d.top_factors.length) {
+      d.top_factors.forEach(f => {
+        const up = f.impact.toLowerCase().includes('elevat') || f.impact.toLowerCase().includes('+');
+        fc.innerHTML += `<div class="factor-item">
+          <div><div class="factor-title">${f.feature}</div><div class="factor-desc">${f.description}</div></div>
+          <span class="factor-badge ${up ? 'elevating' : 'moderating'}">${up ? '+ Elevating' : '~ Moderating'}</span>
+        </div>`;
+      });
+    } else {
+      fc.innerHTML = '<div class="empty-state"><div class="empty-icon">🔬</div><div>No SHAP factors returned.</div></div>';
+    }
+  }
+
+  // ── Alert Count ───────────────────────────────────────────────────────────────
+  async function fetchAlertCount() {
+    try {
+      const r = await fetch('/api/v1/health');
+      const d = await r.json();
+      const cnt = d.active_alerts || 0;
+      document.getElementById('hdr-alert-count').textContent = cnt;
+      if (cnt > 0) document.getElementById('active-alerts-badge').style.color = '#f87171';
+    } catch {}
+  }
+
+  // ── Observations ──────────────────────────────────────────────────────────────
+  async function submitObservation(e) {
+    e.preventDefault();
+    const msg = document.getElementById('obs-form-msg');
+    msg.textContent = '⏳ Submitting…';
+    msg.style.color = '#94a3b8';
+    const payload = {
+      observation_date: document.getElementById('obs-date').value,
+      crop: document.getElementById('obs-crop').value,
+      pest_name: document.getElementById('obs-pest').value,
+      location: document.getElementById('obs-location').value,
+      standard_week: parseInt(document.getElementById('obs-week').value),
+      pest_count: parseFloat(document.getElementById('obs-count').value),
+      count_unit: document.getElementById('obs-unit').value,
+      life_stage: document.getElementById('obs-stage').value,
+      collection_method: document.getElementById('obs-method').value,
+      temp_max: document.getElementById('obs-tmax').value ? parseFloat(document.getElementById('obs-tmax').value) : null,
+      temp_min: document.getElementById('obs-tmin').value ? parseFloat(document.getElementById('obs-tmin').value) : null,
+      observer_id: document.getElementById('obs-observer').value || 'Field Agent',
+      notes: document.getElementById('obs-notes').value,
+      verification_status: document.getElementById('obs-status').value,
+      weather_source: 'Manual entry',
+    };
+    try {
+      const r = await fetch('/api/observations', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if (!r.ok) throw new Error();
+      const d = await r.json();
+      msg.textContent = `✅ Observation #${d.observation_id} submitted successfully.`;
+      msg.style.color = '#34d399';
+      loadObservations();
+    } catch {
+      msg.textContent = '❌ Failed to submit. Check required fields and API server.';
+      msg.style.color = '#f87171';
+    }
+  }
+
+  let obsData = [];
+  async function loadObservations() {
+    const crop = document.getElementById('obs-filter-crop').value;
+    const loc = document.getElementById('obs-filter-loc').value;
+    const offset = obsCurrentPage * obsPageSize;
+    let url = `/api/observations?limit=${obsPageSize}&offset=${offset}`;
+    if (crop) url += `&crop=${encodeURIComponent(crop)}`;
+    if (loc) url += `&location=${encodeURIComponent(loc)}`;
+    try {
+      const r = await fetch(url);
+      const d = await r.json();
+      obsData = d.items || [];
+      renderObsTable(obsData, d.total || 0);
+    } catch {
+      document.getElementById('obs-table-body').innerHTML = '<tr><td colspan="8"><div class="error-msg">Failed to load observations.</div></td></tr>';
+    }
+  }
+
+  function renderObsTable(rows, total) {
+    const tb = document.getElementById('obs-table-body');
+    if (!rows.length) { tb.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📋</div><div>No observations found.</div></div></td></tr>'; return; }
+    tb.innerHTML = rows.map(r => `<tr>
+      <td style="font-family:var(--font-mono);font-size:.75rem;">#${r.id}</td>
+      <td>${r.observation_date || '—'}</td>
+      <td>${r.location}</td>
+      <td>${r.pest_name}</td>
+      <td style="font-family:var(--font-mono);">${r.pest_count}</td>
+      <td style="font-size:.75rem;color:var(--text-muted);">${r.count_unit}</td>
+      <td><span class="risk-pill ${r.verification_status === 'verified' ? 'risk-LOW' : r.verification_status === 'rejected' ? 'risk-CRITICAL' : 'risk-MODERATE'}">${r.verification_status}</span></td>
+      <td style="font-size:.78rem;color:var(--text-muted);">${r.observer_id}</td>
+    </tr>`).join('');
+    document.getElementById('obs-page-info').textContent = `Page ${obsCurrentPage + 1} · ${total} total`;
+    document.getElementById('obs-prev').disabled = obsCurrentPage === 0;
+    document.getElementById('obs-next').disabled = (obsCurrentPage + 1) * obsPageSize >= total;
+  }
+
+  function obsPage(dir) { obsCurrentPage = Math.max(0, obsCurrentPage + dir); loadObservations(); }
+
+  function exportObsCSV() {
+    if (!obsData.length) return;
+    const keys = ['id','observation_date','crop','pest_name','location','standard_week','pest_count','count_unit','life_stage','observer_id','verification_status'];
+    const csv = [keys.join(','), ...obsData.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
+    downloadCSV(csv, 'observations_export.csv');
+  }
+
+  // ── Risk History ──────────────────────────────────────────────────────────────
+  async function loadRiskHistory() {
+    const crop = document.getElementById('hist-crop').value;
+    const loc = document.getElementById('hist-loc').value;
+    let url = `/api/risk-history?limit=100`;
+    if (crop) url += `&crop=${encodeURIComponent(crop)}`;
+    if (loc) url += `&location=${encodeURIComponent(loc)}`;
+    try {
+      const r = await fetch(url);
+      const d = await r.json();
+      histData = (d.items || []).reverse();
+      renderHistTable(histData);
+      renderHistCharts(histData);
+    } catch {
+      document.getElementById('hist-table-body').innerHTML = '<tr><td colspan="9"><div class="error-msg">Failed to load history.</div></td></tr>';
+    }
+  }
+
+  function renderHistTable(rows) {
+    const tb = document.getElementById('hist-table-body');
+    if (!rows.length) { tb.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📈</div><div>No prediction history yet. Run predictions from the Overview tab.</div></div></td></tr>'; return; }
+    tb.innerHTML = rows.slice(-50).reverse().map(r => `<tr>
+      <td style="font-family:var(--font-mono);font-size:.75rem;">#${r.id}</td>
+      <td style="font-size:.75rem;">${(r.created_at||'').split('.')[0]}</td>
+      <td>${r.location}</td>
+      <td>${r.crop}</td>
+      <td>${r.pest_name}</td>
+      <td style="font-family:var(--font-mono);">${(r.risk_score*100).toFixed(1)}%</td>
+      <td><span class="risk-pill risk-${r.risk_level}">${r.risk_level}</span></td>
+      <td style="font-family:var(--font-mono);">${r.gdd_accumulated ? r.gdd_accumulated.toFixed(1) : '—'}</td>
+      <td style="font-family:var(--font-mono);">${r.vpd_kpa ? r.vpd_kpa.toFixed(3) : '—'}</td>
+    </tr>`).join('');
+  }
+
+  function renderHistCharts(rows) {
+    const labels = rows.map((r, i) => `#${r.id}`);
+    const scores = rows.map(r => +(r.risk_score * 100).toFixed(1));
+    const lvlCounts = { LOW: 0, MODERATE: 0, HIGH: 0, CRITICAL: 0 };
+    rows.forEach(r => { if (lvlCounts[r.risk_level] !== undefined) lvlCounts[r.risk_level]++; });
+
+    if (chartRiskTrend) chartRiskTrend.destroy();
+    chartRiskTrend = new Chart(document.getElementById('chartRiskTrend').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{ label: 'Risk Score (%)', data: scores, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)', borderWidth: 2, pointRadius: 3, fill: true, tension: .4 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b', maxTicksLimit: 12 }, grid: { color: 'rgba(255,255,255,.04)' } }, y: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,.04)' } } } }
+    });
+
+    if (chartRiskDist) chartRiskDist.destroy();
+    chartRiskDist = new Chart(document.getElementById('chartRiskDist').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Low', 'Moderate', 'High', 'Critical'],
+        datasets: [{ data: [lvlCounts.LOW, lvlCounts.MODERATE, lvlCounts.HIGH, lvlCounts.CRITICAL], backgroundColor: ['rgba(16,185,129,.7)', 'rgba(59,130,246,.7)', 'rgba(245,158,11,.7)', 'rgba(239,68,68,.7)'], borderWidth: 1, borderColor: '#0f1d2b' }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 16 } } } }
+    });
+  }
+
+  function exportHistCSV() {
+    if (!histData.length) return;
+    const keys = ['id','created_at','location','crop','pest_name','risk_score','risk_level','gdd_accumulated','vpd_kpa'];
+    const csv = [keys.join(','), ...histData.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
+    downloadCSV(csv, 'risk_history_export.csv');
+  }
+
+  // ── Alerts ────────────────────────────────────────────────────────────────────
+  let alertsData = [];
+  async function loadAlerts() {
+    const status = document.getElementById('alert-filter-status').value;
+    const severity = document.getElementById('alert-filter-severity').value;
+    const loc = document.getElementById('alert-filter-loc').value;
+    const offset = alertCurrentPage * alertPageSize;
+    let url = `/api/alerts?limit=${alertPageSize}&offset=${offset}`;
+    if (status) url += `&status=${status}`;
+    if (severity) url += `&severity=${severity}`;
+    if (loc) url += `&location=${encodeURIComponent(loc)}`;
+    try {
+      const r = await fetch(url);
+      const d = await r.json();
+      alertsData = d.items || [];
+      renderAlerts(alertsData, d.total || 0);
+    } catch {
+      document.getElementById('alerts-container').innerHTML = '<div class="error-msg">Failed to load alerts.</div>';
+    }
+  }
+
+  function renderAlerts(rows, total) {
+    const cont = document.getElementById('alerts-container');
+    if (!rows.length) {
+      cont.innerHTML = '<div class="card empty-state"><div class="empty-icon">✅</div><div>No alerts matching your filters. HIGH/CRITICAL predictions auto-create alerts.</div></div>';
+      return;
+    }
+    cont.innerHTML = rows.map(a => `
+      <div class="alert-card-item ${a.severity}">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem;">
+            <span class="risk-pill risk-${a.severity}">${a.severity}</span>
+            <span style="font-weight:700;">${a.pest_name}</span>
+            <span style="color:var(--text-muted);">·</span>
+            <span>${a.location}</span>
+            <span style="color:var(--text-muted);">·</span>
+            <span style="font-family:var(--font-mono);font-size:.78rem;">${(a.risk_score*100).toFixed(0)}% risk</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:.35rem;">${a.explanation_summary || 'Auto-generated alert from model prediction'}</div>
+          <div style="font-size:.72rem;color:#64748b;">Crop: ${a.crop} · Horizon: ${a.predicted_horizon} · Created: ${(a.created_at||'').split('.')[0]}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.4rem;align-items:flex-end;">
+          <span class="risk-pill ${a.status === 'active' ? 'risk-HIGH' : a.status === 'acknowledged' ? 'risk-MODERATE' : 'risk-LOW'}">${a.status}</span>
+          ${a.status === 'active' ? `<button class="btn btn-secondary btn-sm" onclick="updateAlertStatus(${a.id},'acknowledged')">Acknowledge</button>` : ''}
+          ${a.status !== 'resolved' ? `<button class="btn btn-danger btn-sm" onclick="updateAlertStatus(${a.id},'resolved')">Resolve</button>` : ''}
+        </div>
+      </div>`).join('');
+    document.getElementById('alert-page-info').textContent = `Page ${alertCurrentPage + 1} · ${total} total`;
+    document.getElementById('alert-prev').disabled = alertCurrentPage === 0;
+    document.getElementById('alert-next').disabled = (alertCurrentPage + 1) * alertPageSize >= total;
+  }
+
+  async function updateAlertStatus(id, newStatus) {
+    try {
+      await fetch(`/api/alerts/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) });
+      loadAlerts(); fetchAlertCount();
+    } catch { alert('Failed to update alert status.'); }
+  }
+
+  function alertPage(dir) { alertCurrentPage = Math.max(0, alertCurrentPage + dir); loadAlerts(); }
+
+  function exportAlertsCSV() {
+    if (!alertsData.length) return;
+    const keys = ['id','created_at','severity','location','pest_name','crop','risk_score','status','explanation_summary'];
+    const csv = [keys.join(','), ...alertsData.map(r => keys.map(k => JSON.stringify(r[k] ?? '')).join(','))].join('\n');
+    downloadCSV(csv, 'alerts_export.csv');
+  }
+
+  // ── Model Performance ─────────────────────────────────────────────────────────
+  async function loadModelPerformance() {
+    try {
+      const r = await fetch('/api/model-comparison');
+      const d = await r.json();
+      const champion = d.champion;
+      const models = d.models || [];
+
+      document.getElementById('model-champion').textContent = champion || '—';
+
+      const champ = models.find(m => m.model === champion);
+      if (champ) {
+        document.getElementById('model-accuracy').textContent = (champ.accuracy * 100).toFixed(2) + '%';
+        document.getElementById('model-roc').textContent = champ.roc_auc.toFixed(4);
+        document.getElementById('model-f1').textContent = champ.f1_score.toFixed(4);
+        // Confusion matrix numbers
+        const cm = champ.confusion_matrix;
+        if (cm) {
+          document.getElementById('model-cm-numbers').innerHTML = `
+            <div style="font-size:.8rem;margin-top:.75rem;">
+              <div style="font-weight:700;margin-bottom:.4rem;color:var(--text-muted);">Confusion Matrix (${champion})</div>
+              <div class="grid-2" style="gap:.4rem;font-family:var(--font-mono);font-size:.78rem;">
+                <div style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.5rem;text-align:center;"><div style="font-size:.65rem;color:var(--text-muted);">True Negative</div><div style="font-size:1.1rem;font-weight:800;color:#34d399;">${cm.true_negative}</div></div>
+                <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.5rem;text-align:center;"><div style="font-size:.65rem;color:var(--text-muted);">False Positive</div><div style="font-size:1.1rem;font-weight:800;color:#f87171;">${cm.false_positive}</div></div>
+                <div style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:.5rem;text-align:center;"><div style="font-size:.65rem;color:var(--text-muted);">False Negative</div><div style="font-size:1.1rem;font-weight:800;color:#fbbf24;">${cm.false_negative}</div></div>
+                <div style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.5rem;text-align:center;"><div style="font-size:.65rem;color:var(--text-muted);">True Positive</div><div style="font-size:1.1rem;font-weight:800;color:#34d399;">${cm.true_positive}</div></div>
+              </div>
+            </div>`;
         }
-
-        // Update live station telemetry card
-        badge.innerHTML = `📡 ${loc} (Live Synced)`;
-        condEl.innerHTML = `🌤️ ${data.condition || 'Clear'}`;
-        tempRhEl.innerHTML = `${data.current_temp || data.temp_max}°C | ${data.rh_current || data.rh_morning}% RH`;
-        seasonEl.innerHTML = `🌾 ${data.season} (SMW ${data.standard_week})`;
-        dtEl.innerHTML = `🕒 ${data.time} <br><span style="color:#94a3b8; font-size:0.7rem;">${data.date}</span>`;
-
-        // Update map marker popup with full live details
-        if (markers[loc]) {
-          markers[loc].setPopupContent(`
-            <div style="font-family: sans-serif; min-width: 170px;">
-              <strong style="color: #059669; font-size: 1rem;">${loc}</strong><br>
-              <span style="font-size: 0.75rem; color: #64748b;">${STATIONS[loc].name}</span>
-              <hr style="margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;">
-              <div><strong>Condition:</strong> ${data.condition}</div>
-              <div><strong>Temp:</strong> ${data.current_temp || data.temp_max}°C (Max ${data.temp_max} / Min ${data.temp_min})</div>
-              <div><strong>Humidity:</strong> ${data.rh_current || data.rh_morning}% RH</div>
-              <div><strong>Season:</strong> ${data.season}</div>
-              <div><strong>Week:</strong> SMW ${data.standard_week}</div>
-              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;">🕒 ${data.time}</div>
-            </div>
-          `);
-        }
-      } catch (err) {
-        console.error('Failed to sync weather:', err);
-        badge.innerHTML = `📡 ${loc} (Offline Baseline)`;
-        condEl.innerHTML = `🌤️ Seasonal Baseline`;
-        tempRhEl.innerHTML = `28.5°C | 78% RH`;
-        seasonEl.innerHTML = `🌾 Kharif / Rabi`;
-        dtEl.innerHTML = `🕒 ${new Date().toLocaleTimeString()} IST`;
       }
+
+      // Model comparison table
+      const tb = document.getElementById('model-table-body');
+      tb.innerHTML = models.map(m => `<tr class="${m.model === champion ? 'champion-row' : ''}">
+        <td><strong>${m.model}</strong> ${m.model === champion ? '👑' : ''}</td>
+        <td style="font-family:var(--font-mono);">${(m.accuracy*100).toFixed(2)}%</td>
+        <td style="font-family:var(--font-mono);">${(m.precision*100).toFixed(2)}%</td>
+        <td style="font-family:var(--font-mono);">${(m.recall*100).toFixed(2)}%</td>
+        <td style="font-family:var(--font-mono);">${m.f1_score.toFixed(4)}</td>
+        <td style="font-family:var(--font-mono);">${m.roc_auc.toFixed(4)}</td>
+        <td style="font-family:var(--font-mono);">${(m.false_negative_rate*100).toFixed(2)}%</td>
+        <td style="font-family:var(--font-mono);">${m.confusion_matrix?.true_negative ?? '—'}</td>
+        <td style="font-family:var(--font-mono);">${m.confusion_matrix?.false_positive ?? '—'}</td>
+        <td style="font-family:var(--font-mono);">${m.confusion_matrix?.false_negative ?? '—'}</td>
+        <td style="font-family:var(--font-mono);">${m.confusion_matrix?.true_positive ?? '—'}</td>
+      </tr>`).join('');
+
+      // Charts
+      const modelNames = models.map(m => m.model);
+      const f1Scores = models.map(m => +(m.f1_score * 100).toFixed(2));
+      const rocScores = models.map(m => +(m.roc_auc * 100).toFixed(2));
+      const bgs = models.map(m => m.model === champion ? 'rgba(16,185,129,.75)' : 'rgba(59,130,246,.4)');
+
+      if (chartModelComp) chartModelComp.destroy();
+      chartModelComp = new Chart(document.getElementById('chartModelComp').getContext('2d'), {
+        type: 'bar',
+        data: { labels: modelNames, datasets: [{ label: 'F1-Score (%)', data: f1Scores, backgroundColor: bgs, borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,.04)' } }, y: { min: 85, ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,.04)' } } } }
+      });
+
+      if (chartROC) chartROC.destroy();
+      chartROC = new Chart(document.getElementById('chartROC').getContext('2d'), {
+        type: 'bar',
+        data: { labels: modelNames, datasets: [{ label: 'ROC-AUC (%)', data: rocScores, backgroundColor: bgs.map(c => c.replace('185,129', '130,246').replace('130,246', '92,246')), borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,.04)' } }, y: { min: 90, ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,.04)' } } } }
+      });
+    } catch(e) {
+      document.getElementById('model-kpi-strip').innerHTML = '<div class="error-msg">Failed to load model metrics.</div>';
     }
+  }
 
-    // Auto-sync whenever user changes the location dropdown
-    document.getElementById('location').addEventListener('change', (e) => {
-      const loc = e.target.value;
-      if (STATIONS[loc]) {
-        map.flyTo([STATIONS[loc].lat, STATIONS[loc].lon], 7, { duration: 1.0 });
-        markers[loc].openPopup();
-      }
-      syncLiveStationWeather(loc);
-    });
+  // ── System Health ─────────────────────────────────────────────────────────────
+  async function loadSystemHealth() {
+    try {
+      const [healthR, auxR] = await Promise.all([fetch('/api/v1/health'), fetch('/api/v1/models/auxiliary')]);
+      const h = await healthR.json();
+      const aux = await auxR.json();
 
-    // Auto-Fetch Button click handler
-    const btnWeather = document.getElementById('btn-fetch-live-weather');
-    btnWeather.addEventListener('click', async () => {
-      const loc = document.getElementById('location').value;
-      btnWeather.innerText = '⏳ Syncing...';
-      await syncLiveStationWeather(loc);
-      btnWeather.innerText = '✅ Live Weather Synced!';
-      setTimeout(() => { btnWeather.innerText = '🌐 Auto-Fetch Live Weather'; }, 2500);
-    });
+      document.getElementById('health-display').innerHTML = `
+        <div class="grid-2" style="gap:.75rem;font-size:.82rem;">
+          <div><span style="color:var(--text-muted);">Status</span><br><strong style="color:#34d399;">${h.status}</strong></div>
+          <div><span style="color:var(--text-muted);">API Version</span><br><strong>${h.version}</strong></div>
+          <div><span style="color:var(--text-muted);">Dataset Ready</span><br><strong>${h.datasets_ready ? '✅ Yes' : '❌ No'}</strong></div>
+          <div><span style="color:var(--text-muted);">Total Records</span><br><strong style="font-family:var(--font-mono);">${(h.total_surveillance_records || 0).toLocaleString()}</strong></div>
+          <div><span style="color:var(--text-muted);">Model Loaded</span><br><strong>${h.model_loaded ? '✅ Yes' : '⚠️ Not loaded'}</strong></div>
+          <div><span style="color:var(--text-muted);">Active Alerts</span><br><strong style="color:${h.active_alerts > 0 ? '#f87171' : '#34d399'}">${h.active_alerts}</strong></div>
+          <div><span style="color:var(--text-muted);">Weather Service</span><br><strong>${h.weather_service}</strong></div>
+        </div>`;
 
-    // Initial sync on page load for default center (Cuttack)
-    window.addEventListener('DOMContentLoaded', () => {
-      syncLiveStationWeather('Cuttack');
-      // Trigger live map render sizing
-      setTimeout(() => { map.invalidateSize(); }, 300);
-    });
-
-    // Handle Form Submission & Live Prediction API Call
-    const form = document.getElementById('prediction-form');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-predict');
-      btn.disabled = true;
-      btn.innerHTML = '<span>⏳ Evaluating Micro-Climatic Models...</span>';
-
-      const loc = document.getElementById('location').value;
-      const crop = document.getElementById('crop').value;
-      const pest_name = document.getElementById('pest_name').value;
-      const standard_week = parseInt(document.getElementById('standard_week').value);
-      const pest_count = parseFloat(document.getElementById('current_pest_count').value);
-
-      const temp_max = parseFloat(document.getElementById('temp_max').value);
-      const temp_min = parseFloat(document.getElementById('temp_min').value);
-      const rh_morning = parseFloat(document.getElementById('rh_morning').value);
-      const rh_evening = parseFloat(document.getElementById('rh_evening').value);
-      const rainfall = parseFloat(document.getElementById('rainfall').value);
-      const wind_speed = parseFloat(document.getElementById('wind_speed').value);
-
-      // Pan map to selected station
-      if (STATIONS[loc]) {
-        map.flyTo([STATIONS[loc].lat, STATIONS[loc].lon], 7, { duration: 1.2 });
-        markers[loc].openPopup();
-      }
-
-      try {
-        const res = await fetch('/api/v1/predictions/evaluate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            crop: crop,
-            pest_name: pest_name,
-            location: loc,
-            standard_week: standard_week,
-            current_pest_count: pest_count,
-            weather: {
-              temp_max: temp_max,
-              temp_min: temp_min,
-              rh_morning: rh_morning,
-              rh_evening: rh_evening,
-              rainfall: rainfall,
-              wind_speed: wind_speed,
-              sunshine_hours: 6.5,
-              evaporation: 4.0
-            }
-          })
-        });
-
-        if (!res.ok) throw new Error('API returned ' + res.status);
-        const data = await res.json();
-
-        // Update UI
-        updateDashboard(data, temp_max, temp_min, rh_morning, rh_evening);
-      } catch (err) {
-        console.error('Prediction call failed:', err);
-        // Fallback demo calculation
-        const t_mean = (temp_max + temp_min) / 2.0;
-        const gdd = Math.max(t_mean - 12.0, 0);
-        updateDashboard({
-          risk_score: 0.88,
-          risk_level: 'CRITICAL',
-          is_warning: true,
-          gdd_accumulated: gdd.toFixed(2),
-          rh_differential: (rh_morning - rh_evening).toFixed(1),
-          top_factors: [
-            { feature: 'Outbreak Current', impact: 'Elevating Risk', description: 'Observed pest count exceeds economic threshold' },
-            { feature: 'High Relative Humidity', impact: 'Elevating Risk', description: `Morning RH: ${rh_morning}% supports fungal/insect sporulation` },
-            { feature: 'Temperature Range', impact: 'Moderating', description: 'Thermal bounds remain inside physiological optimum' }
-          ],
-          advisory: `Status: CRITICAL. Scout fields immediately. Target threshold exceeded for ${pest_name}.`,
-          model_version: 'v2.0-ml-quad-ensemble'
-        }, temp_max, temp_min, rh_morning, rh_evening);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>⚡ Run Risk Evaluation Engine</span>';
-      }
-    });
-
-    function updateDashboard(data, t_max, t_min, rh_m, rh_e) {
-      const banner = document.getElementById('alert-card');
-      const title = document.getElementById('alert-title');
-      const advisory = document.getElementById('alert-advisory');
-      const gaugeText = document.getElementById('gauge-score-text');
-      const gaugeCircle = document.getElementById('gauge-circle');
-
-      const score = data.risk_score;
-      gaugeText.innerText = score.toFixed(2);
-      const dashVal = Math.round(score * 100);
-      gaugeCircle.setAttribute('stroke-dasharray', `${dashVal}, 100`);
-
-      banner.className = 'alert-banner ' + data.risk_level;
-
-      if (data.risk_level === 'CRITICAL') {
-        gaugeCircle.setAttribute('stroke', '#ef4444');
-        title.innerHTML = '🚨 CRITICAL OUTBREAK WARNING';
-      } else if (data.risk_level === 'HIGH') {
-        gaugeCircle.setAttribute('stroke', '#f59e0b');
-        title.innerHTML = '⚠️ HIGH OUTBREAK RISK';
-      } else if (data.risk_level === 'MODERATE') {
-        gaugeCircle.setAttribute('stroke', '#3b82f6');
-        title.innerHTML = 'ℹ️ MODERATE SURVEILLANCE RISK';
-      } else {
-        gaugeCircle.setAttribute('stroke', '#10b981');
-        title.innerHTML = '✅ LOW PEST ACTIVITY';
-      }
-
-      advisory.innerText = data.advisory;
-
-      // Update KPIs
-      document.getElementById('kpi-gdd').innerHTML = `${data.gdd_accumulated} <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">°C-d</span>`;
-      
-      const t_mean = (t_max + t_min) / 2.0;
-      const rh_mean = (rh_m + rh_e) / 2.0;
-      const sat_vp = 0.61078 * Math.exp((17.27 * t_mean) / (t_mean + 237.3));
-      const vpd = (sat_vp * (1 - rh_mean / 100.0)).toFixed(2);
-      document.getElementById('kpi-vpd').innerHTML = `${vpd} <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">kPa</span>`;
-      document.getElementById('kpi-dtr').innerHTML = `${(t_max - t_min).toFixed(1)} <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">°C</span>`;
-
-      // Update Factors
-      const container = document.getElementById('factors-container');
-      container.innerHTML = '';
-      if (data.top_factors && data.top_factors.length > 0) {
-        data.top_factors.forEach(f => {
-          const isElevating = f.impact.toLowerCase().includes('elevat');
-          const badgeClass = isElevating ? 'elevating' : 'moderating';
-          const badgeText = isElevating ? '+ Elevating Risk' : '~ Moderating';
-
-          const item = document.createElement('div');
-          item.className = 'factor-item';
-          item.innerHTML = `
-            <div>
-              <div class="factor-title">${f.feature}</div>
-              <div class="factor-desc">${f.description}</div>
-            </div>
-            <span class="factor-badge ${badgeClass}">${badgeText}</span>
-          `;
-          container.appendChild(item);
-        });
-      }
+      const mp = aux.multi_pest_weather || {};
+      const reg = aux.regional_severity || {};
+      document.getElementById('aux-model-display').innerHTML = `
+        <div class="grid-2" style="gap:1rem;font-size:.82rem;">
+          <div style="background:rgba(10,18,28,.5);border:1px solid var(--border-subtle);border-radius:12px;padding:1rem;">
+            <div style="font-weight:700;margin-bottom:.5rem;color:var(--text-muted);">Multi-Pest Weather Classifier</div>
+            <div>Accuracy: <strong style="font-family:var(--font-mono);">${mp.accuracy ? (mp.accuracy*100).toFixed(2)+'%' : '48.75%'}</strong></div>
+            <div style="color:#f87171;font-size:.75rem;margin-top:.35rem;">⚠️ Low accuracy — suitable for exploratory analysis only. Do not combine with primary model.</div>
+          </div>
+          <div style="background:rgba(10,18,28,.5);border:1px solid var(--border-subtle);border-radius:12px;padding:1rem;">
+            <div style="font-weight:700;margin-bottom:.5rem;color:var(--text-muted);">Regional Severity Classifier</div>
+            <div>Accuracy: <strong style="font-family:var(--font-mono);">${reg.accuracy ? (reg.accuracy*100).toFixed(2)+'%' : '33.50%'}</strong></div>
+            <div style="color:#f87171;font-size:.75rem;margin-top:.35rem;">⚠️ Low accuracy — for reference only. Not integrated into early-warning score.</div>
+          </div>
+        </div>`;
+    } catch {
+      document.getElementById('health-display').innerHTML = '<div class="error-msg">Failed to load health data. Is the API server running?</div>';
     }
-  </script>
+  }
+
+  // ── Station Risk Summary for Map ──────────────────────────────────────────────
+  async function fetchStationRiskSummary() {
+    try {
+      const r = await fetch('/api/v1/stations/summary');
+      const d = await r.json();
+      (d.stations || []).forEach(s => { stationRiskData[s.location] = s; });
+    } catch {}
+  }
+
+  // ── CSV Download Utility ──────────────────────────────────────────────────────
+  function downloadCSV(content, filename) {
+    const blob = new Blob([content], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Init on Load ──────────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', async () => {
+    initMap1();
+    await fetchStationRiskSummary();
+    fetchAlertCount();
+    document.getElementById('location').addEventListener('change', e => onLocationChange(e.target.value));
+  });
+</script>
 </body>
 </html>

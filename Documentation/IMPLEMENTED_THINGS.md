@@ -460,5 +460,35 @@ All 4 operational services have been implemented and fully tested:
 - **REST Endpoint:** Exposes `GET /api/v1/weather/live/{location}`.
 
 ### 13.4 Automated Test Suite & CI/CD Pipeline
-- **Unit & Integration Suite (`tests/test_framework.py`):** 10 automated test cases verifying GDD calculations, VPD equations, preprocessor schemas, weather fetching, alert formatting, database CRUD operations, and all FastAPI endpoints.
+- **Unit & Integration Suite (`tests/test_framework.py`):** 40 automated test cases verifying GDD calculations, VPD equations, preprocessor schemas, weather fetching, alert formatting, database CRUD operations, and all FastAPI endpoints.
 - **GitHub Actions Workflow (`.github/workflows/ci.yml`):** Automated CI pipeline running on pushes and pull requests to `main`.
+
+---
+
+## 14. Phase 5 Deliverables: Production Surveillance Platform & XAI Engine
+
+### 14.1 Full-Stack Surveillance Dashboard v2.0 (`api/dashboard.html`)
+- **Modern Tabbed Interface:** Engineered a 5-module responsive web interface using Vanilla CSS design tokens, dynamic Leaflet maps, and real-time asynchronous API polling:
+  1. **Overview & Station Network:** Interactive geospatial Leaflet map with 11 color-coded ICAR stations, live time/date/season clock, dynamic weather cards, and quick summary telemetry.
+  2. **Real-Time Risk Prediction:** Dynamic prediction form with auto-fetching Open-Meteo weather per station, ML inference, degree-days accumulation, vapor pressure deficit, interactive SHAP attribution waterfalls, and ICAR/TNAU agronomic treatment advisories.
+  3. **Field Surveillance & Scouting Logs:** Comprehensive CRUD observation interface for logging insect trap catches and nymph counts with live table filters by crop, pest, and risk tier.
+  4. **Early Warning Alert Management:** Dedicated alert center with state transition workflows (`PENDING` -> `ACKNOWLEDGED` -> `RESOLVED`), action logs, and severity filtration.
+  5. **Model Performance & Explainability:** Candidate model comparison table (Accuracy, ROC-AUC, PR-AUC, F1), interactive Confusion Matrix, ROC-AUC curve visualizer, and SHAP summary plots loaded via backend static asset mounts (`/artifacts/models/`).
+
+### 14.2 RESTful API Expansion (`api/main.py` & `api/schemas.py`)
+- Added comprehensive RESTful endpoints for observations, alerts, model benchmarks, and risk telemetry:
+  - `GET /api/observations`, `POST /api/observations`, `GET /api/observations/{id}`, `PUT /api/observations/{id}`
+  - `GET /api/alerts`, `POST /api/alerts`, `POST /api/alerts/{id}/ack`, `POST /api/alerts/{id}/resolve`
+  - `GET /api/risk/history`, `GET /api/station/{code}/summary`, `GET /api/models/comparison`
+  - Mounted `/artifacts` static route via `fastapi.staticfiles.StaticFiles`.
+
+### 14.3 Relational Persistence Layer (`src/utils/database.py`)
+- Extended SQLite persistence engine with new tables:
+  - `field_observations`: Stores timestamped scouting telemetry, trap catch counts, weather metrics, and risk tier.
+  - `early_warning_alerts`: Manages alert lifecycle states (`PENDING`, `ACKNOWLEDGED`, `RESOLVED`), officer tracking, and resolution notes.
+  - Implemented thread-safe connection pooling, automated table creation, and query filters.
+
+### 14.4 Configuration & Verification
+- **`.env.example`:** Complete template detailing all configuration options (Open-Meteo, Twilio SMS credentials, SMTP email credentials, database path).
+- **Comprehensive 40-Test Verification:** Extended `tests/test_framework.py` to 40 automated test cases with 100% pass rate (`40 passed in 7.70s`).
+

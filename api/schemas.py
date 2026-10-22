@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
+from datetime import date
 
 
 class WeatherObservation(BaseModel):
@@ -51,6 +52,9 @@ class HealthCheckResponse(BaseModel):
     version: str
     datasets_ready: bool
     total_surveillance_records: int
+    active_alerts: int = 0
+    model_loaded: bool = False
+    weather_service: str = "Open-Meteo"
 
 
 class AlertDispatchRequest(BaseModel):
@@ -74,3 +78,60 @@ class ScoutingReportRequest(BaseModel):
     rainfall: float = Field(default=0.0)
     scout_officer: Optional[str] = Field(default="Autonomous Field Agent")
 
+
+# ------------------------------------------------------------------
+# Field Observation Schemas
+# ------------------------------------------------------------------
+
+class ObservationCreate(BaseModel):
+    """Schema for creating a new field observation."""
+    observation_date: str = Field(default_factory=lambda: date.today().isoformat(), description="Date of observation (YYYY-MM-DD)")
+    crop: str = Field(..., description="Crop under surveillance (Rice / Cotton)")
+    pest_name: str = Field(..., description="Target pest species name")
+    location: str = Field(..., description="ICAR monitoring station name")
+    standard_week: int = Field(..., ge=1, le=53, description="Standard Meteorological Week")
+    pest_count: float = Field(..., ge=0.0, description="Observed pest count")
+    count_unit: str = Field(default="per hill", description="Unit of pest count (per hill, per trap, per leaf)")
+    life_stage: str = Field(default="Mixed", description="Life stage observed (Egg, Nymph, Adult, Mixed)")
+    collection_method: str = Field(default="Visual count", description="Scouting method used")
+    temp_max: Optional[float] = Field(default=None, description="Max temperature (°C)")
+    temp_min: Optional[float] = Field(default=None, description="Min temperature (°C)")
+    rh_morning: Optional[float] = Field(default=None, description="Morning RH (%)")
+    rh_evening: Optional[float] = Field(default=None, description="Evening RH (%)")
+    rainfall: Optional[float] = Field(default=0.0, description="Rainfall (mm)")
+    weather_source: str = Field(default="Manual entry", description="Source of weather data")
+    observer_id: str = Field(default="Field Agent", description="Observer or scout identifier")
+    notes: Optional[str] = Field(default="", description="Additional field notes")
+    verification_status: str = Field(default="pending", description="pending | verified | rejected")
+
+
+class ObservationUpdate(BaseModel):
+    """Partial update schema for a field observation."""
+    verification_status: Optional[str] = None
+    notes: Optional[str] = None
+    pest_count: Optional[float] = None
+    life_stage: Optional[str] = None
+    collection_method: Optional[str] = None
+    observer_id: Optional[str] = None
+
+
+# ------------------------------------------------------------------
+# Alert Schemas
+# ------------------------------------------------------------------
+
+class AlertCreate(BaseModel):
+    """Schema to manually create an alert from a verified prediction."""
+    severity: str = Field(..., description="CRITICAL | HIGH | MODERATE | LOW")
+    location: str
+    pest_name: str
+    crop: str
+    risk_score: float = Field(..., ge=0.0, le=1.0)
+    predicted_horizon: str = Field(default="Next 7 days")
+    explanation_summary: Optional[str] = Field(default="")
+    source_prediction_id: Optional[int] = None
+    source_observation_id: Optional[int] = None
+
+
+class AlertStatusUpdate(BaseModel):
+    """Schema to update alert status."""
+    status: str = Field(..., description="active | acknowledged | resolved")

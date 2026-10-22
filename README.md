@@ -538,23 +538,46 @@ git clone https://github.com/DivyeBhatnagar/Intelligent-Pest-Outbreak-Prediction
 cd Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework
 ```
 
-### 2. Python Environment Setup
+### 2. Python Environment Setup & Dependencies
 ```bash
 # Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install baseline dependencies
-pip install numpy pandas scikit-learn xgboost lightgbm shap fastapi uvicorn pydantic sqlalchemy psycopg2-binary
+# Install all dependencies
+pip install -r requirements.txt
 ```
 
-### 3. Explore the Documentation
-The comprehensive system design and technical requirements are indexed under [`Documentation/`](./Documentation):
-- 📘 **Overview:** [Project Overview](./Documentation/Overview.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
-- 📋 **PRD:** [Product Requirements Document](./Documentation/PRD%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
-- 📐 **Architecture:** [System Architecture](./Documentation/Architecture.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
-- 🔧 **TRD:** [Technical Requirements Document](./Documentation/TRD.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
-- 🗺️ **Roadmap:** [Implementation Plan v1.0](./Documentation/IMPLEMENTATION_PLAN_V1.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
+### 3. Pipeline Execution & Model Benchmark
+```bash
+# 1. Preprocess raw ICAR datasets & engineer bio-climatic features (GDD, VPD, lags)
+python3 -m src.pipeline --crop all --split-method temporal
+
+# 2. Train and evaluate candidate models (Random Forest, LightGBM, XGBoost, LogReg)
+python3 -m src.ml.pipeline
+```
+
+### 4. Launch the Surveillance Web Dashboard & REST API
+```bash
+# Start FastAPI server on port 8000 with auto-reload
+uvicorn api.main:app --reload --port 8000
+```
+- 🌐 **Interactive Web Dashboard:** [http://localhost:8000/dashboard](http://localhost:8000/dashboard) — Live 11-station Leaflet map, Open-Meteo real-time weather integration, ML risk prediction, field scouting CRUD logs, and alert lifecycle management.
+- 📑 **Interactive OpenAPI Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- 📊 **ReDoc Alternative:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+### 5. Run the Automated Verification Suite
+```bash
+# Run all 40 unit, integration, and E2E tests
+PYTHONPATH=. pytest tests/test_framework.py -v
+```
+
+### 6. Explore the Detailed Documentation
+The comprehensive system design and technical requirements are indexed under [`Documentation/`](./Documentation) and [`docs/`](./docs):
+- 📘 **API Documentation:** [REST API Specification & Examples](./docs/API_DOCUMENTATION.md)
+- 🔬 **Architecture & Evaluation:** [Mathematical Foundations & Benchmarks](./docs/ARCHITECTURE_AND_EVALUATION.md)
+- 📋 **Implementation Tracker:** [Implemented Things Log](./Documentation/IMPLEMENTED_THINGS.md)
+- 📐 **PRD & Architecture:** [Product Requirements Document](./Documentation/PRD%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md) | [System Architecture](./Documentation/Architecture.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
 
 ---
 
