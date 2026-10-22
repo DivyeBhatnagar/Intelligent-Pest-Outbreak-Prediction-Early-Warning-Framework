@@ -55,3 +55,9 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+
+# Databases & Test Artifacts
+*.db
+*.sqlite
+*.sqlite3
+.pytest_cache/

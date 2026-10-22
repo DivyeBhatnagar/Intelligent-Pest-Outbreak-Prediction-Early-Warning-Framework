@@ -51,3 +51,26 @@ class HealthCheckResponse(BaseModel):
     version: str
     datasets_ready: bool
     total_surveillance_records: int
+
+
+class AlertDispatchRequest(BaseModel):
+    """Payload to trigger email/SMS advisory dispatch."""
+    prediction_data: Dict[str, Any]
+    recipient_email: Optional[str] = Field(default=None, description="Recipient email address")
+    recipient_phone: Optional[str] = Field(default=None, description="Recipient phone number (e.g., +919876543210)")
+
+
+class ScoutingReportRequest(BaseModel):
+    """Payload to record an in-field scouting entry."""
+    crop: str = Field(default="Rice")
+    location: str = Field(default="Cuttack")
+    pest_name: str = Field(default="Brown Planthopper")
+    standard_week: int = Field(default=32, ge=1, le=53)
+    current_pest_count: float = Field(default=0.0, ge=0.0)
+    temp_max: float = Field(default=32.0)
+    temp_min: float = Field(default=24.0)
+    rh_morning: float = Field(default=85.0)
+    rh_evening: float = Field(default=65.0)
+    rainfall: float = Field(default=0.0)
+    scout_officer: Optional[str] = Field(default="Autonomous Field Agent")
+

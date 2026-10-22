@@ -21,11 +21,16 @@ from src.config import (
 from src.data.loader import load_reference_tables
 from src.data.encoder import SurveillanceDataPreprocessor
 from src.ml.explain import explain_single_prediction
+from src.utils.weather import weather_service
+from src.utils.alerts import alert_service
+from src.utils.database import db_service
 from api.schemas import (
     PredictionRequest,
     PredictionResponse,
     ContributingFactor,
     HealthCheckResponse,
+    AlertDispatchRequest,
+    ScoutingReportRequest,
 )
 
 app = FastAPI(
@@ -334,7 +339,7 @@ def evaluate_risk(payload: PredictionRequest):
         f"VPD: {vpd_kpa:.2f} kPa."
     )
 
-    return PredictionResponse(
+    resp = PredictionResponse(
         crop=payload.crop,
         pest_name=payload.pest_name,
         location=payload.location,
@@ -348,3 +353,70 @@ def evaluate_risk(payload: PredictionRequest):
         advisory=full_advisory,
         model_version=model_version_tag,
     )
+
+    # Automatically persist prediction audit record to SQLite
+    try:
+        db_service.log_prediction_audit({
+            "crop": payload.crop,
+            "location": payload.location,
+            "pest_name": payload.pest_name,
+            "risk_score": final_score,
+            "risk_level": level,
+            "is_warning": resp.is_warning,
+            "gdd_accumulated": resp.gdd_accumulated,
+            "vpd_kpa": vpd_kpa,
+            "top_factors": [f.model_dump() for f in risk_factors],
+            "advisory": full_advisory,
+            "model_version": model_version_tag,
+        })
+    except Exception:
+        pass
+
+    return resp
+
+
+# -------------------------------------------------------------------------
+# Live Weather & Agricultural Micro-Climate Endpoints
+# -------------------------------------------------------------------------
+
+@app.get("/api/v1/weather/live/{location}", tags=["Weather"])
+def get_live_station_weather(location: str):
+    """Fetches real-time weather observations for an ICAR research center using Open-Meteo."""
+    return weather_service.fetch_station_weather(location)
+
+
+# -------------------------------------------------------------------------
+# Automated Alert Notification & Dispatch Endpoints
+# -------------------------------------------------------------------------
+
+@app.post("/api/v1/alerts/dispatch", tags=["Alerts"])
+def dispatch_alert(payload: AlertDispatchRequest):
+    """Dispatches multi-channel early warning notification (Email / SMS)."""
+    return alert_service.send_alert(
+        alert_data=payload.prediction_data,
+        recipient_email=payload.recipient_email,
+        recipient_phone=payload.recipient_phone,
+    )
+
+
+# -------------------------------------------------------------------------
+# Telemetry, Field Scouting & Audit Trail Endpoints
+# -------------------------------------------------------------------------
+
+@app.post("/api/v1/scouting/report", tags=["Scouting"])
+def submit_scouting_report(payload: ScoutingReportRequest):
+    """Submits and persists an in-field pest scouting observation."""
+    entry_id = db_service.log_scouting_entry(payload.model_dump())
+    return {"status": "success", "entry_id": entry_id, "message": "Scouting report logged successfully."}
+
+
+@app.get("/api/v1/scouting/recent", tags=["Scouting"])
+def get_recent_scouting_logs(limit: int = 25):
+    """Returns recent in-field scouting records."""
+    return db_service.get_recent_scouting(limit=limit)
+
+
+@app.get("/api/v1/audit/predictions", tags=["Audit Trail"])
+def get_prediction_audit_trail(limit: int = 25):
+    """Returns historical prediction records with risk levels and SHAP factors."""
+    return db_service.get_recent_predictions(limit=limit)

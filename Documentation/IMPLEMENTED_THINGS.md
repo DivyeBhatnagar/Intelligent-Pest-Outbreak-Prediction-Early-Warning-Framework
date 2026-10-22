@@ -428,13 +428,37 @@ python3 -m src.ml.pipeline
 ```bash
 uvicorn api.main:app --reload --port 8000
 ```
-Open **[http://localhost:8000/docs](http://localhost:8000/docs)** to test the interactive OpenAPI Swagger UI in your browser.
+- Open **[http://localhost:8000/dashboard](http://localhost:8000/dashboard)** to interact with the visual Leaflet map, auto-fetch live weather, and run real-time risk predictions.
+- Open **[http://localhost:8000/docs](http://localhost:8000/docs)** to test the interactive OpenAPI Swagger UI.
+
+### 5. Run the Automated Test Suite
+```bash
+PYTHONPATH=. pytest tests/test_framework.py -v
+```
 
 ---
 
-## 13. Upcoming Roadmap Milestones
+## 13. Phase 4 Deliverables: Micro-Services & Ecosystem Layer
 
-With **Phase 2 (Data Engineering)** and **Phase 3 (Machine Learning Engine & SHAP Explainability)** complete, the next milestone is **Phase 4**:
-1. **Interactive Full-Stack Dashboard / Web UI:** An intuitive, responsive dashboard with dynamic maps of India, crop risk gauges, historical surveillance charts, and automated IPM alert generators.
-2. **Alert Notification Service:** Automated email / SMS / WhatsApp advisory dispatches when in-field sensors cross warning thresholds.
-3. **Database Integration:** SQLite / PostgreSQL persistence for real-time field scout telemetry and model prediction audit logs.
+All 4 operational services have been implemented and fully tested:
+
+### 13.1 Automated Alert & Notification Service (`src/utils/alerts.py`)
+- **Multi-Channel Dispatch:** Dispatches SMS (Twilio REST API) and formatted HTML emails (SMTP) when risk scores cross `HIGH` or `CRITICAL`.
+- **Agricultural Advisory Formatting:** Generates concise SMS notices under 160 characters and comprehensive HTML advisories outlining specific IPM chemical or biological treatments.
+- **REST Endpoint:** Exposes `POST /api/v1/alerts/dispatch`.
+
+### 13.2 Telemetry & Prediction Audit Database (`src/utils/database.py`)
+- **SQLite Engine:** Persists records to `artifacts/pest_framework.db`.
+- **Scouting Logs Table:** Stores in-field scout counts, crop type, location, weather readings, and scouting officer metadata.
+- **Prediction Audit Trail Table:** Automatically captures every evaluated risk score, risk level, accumulated GDD, VPD, and JSON-encoded SHAP feature attributions for accountability.
+- **REST Endpoints:** Exposes `POST /api/v1/scouting/report`, `GET /api/v1/scouting/recent`, and `GET /api/v1/audit/predictions`.
+
+### 13.3 Real-Time Weather Integration Service (`src/utils/weather.py`)
+- **Live Open-Meteo API Client:** Queries real-time meteorological observations for 11 primary Indian agricultural centers (Cuttack, Maruteru, Lam, Nagpur, Akola, Ludhiana, Raipur, Rajendranagar, Sirsa, Parbhani, Palampur).
+- **Offline Fault Tolerance:** Automatically falls back to regional agro-climatic seasonal baselines when disconnected.
+- **Interactive UI Integration:** The Leaflet Web Dashboard includes an **"Auto-Fetch Live Weather"** button to populate real-time station sensor telemetry with one click.
+- **REST Endpoint:** Exposes `GET /api/v1/weather/live/{location}`.
+
+### 13.4 Automated Test Suite & CI/CD Pipeline
+- **Unit & Integration Suite (`tests/test_framework.py`):** 10 automated test cases verifying GDD calculations, VPD equations, preprocessor schemas, weather fetching, alert formatting, database CRUD operations, and all FastAPI endpoints.
+- **GitHub Actions Workflow (`.github/workflows/ci.yml`):** Automated CI pipeline running on pushes and pull requests to `main`.

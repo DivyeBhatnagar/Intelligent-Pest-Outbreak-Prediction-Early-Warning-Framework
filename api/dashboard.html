@@ -535,8 +535,11 @@
             </div>
           </div>
 
-          <div class="card-title" style="margin-top: 1rem; margin-bottom: 0.75rem;">
+          <div class="card-title" style="margin-top: 1rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
             <span>Weather Station Readings</span>
+            <button type="button" id="btn-fetch-live-weather" style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.75rem; cursor: pointer;">
+              🌐 Auto-Fetch Live Weather
+            </button>
           </div>
 
           <div class="form-row">
@@ -715,6 +718,30 @@
       marker.bindPopup(`<strong>${key}</strong><br>${val.name}`);
       markers[key] = marker;
     }
+
+    // Auto-Fetch Real-Time Weather from Open-Meteo via backend
+    const btnWeather = document.getElementById('btn-fetch-live-weather');
+    btnWeather.addEventListener('click', async () => {
+      const loc = document.getElementById('location').value;
+      btnWeather.innerText = '⏳ Fetching...';
+      try {
+        const res = await fetch(`/api/v1/weather/live/${loc}`);
+        if (!res.ok) throw new Error('Failed to fetch weather');
+        const data = await res.json();
+        document.getElementById('temp_max').value = data.temp_max;
+        document.getElementById('temp_min').value = data.temp_min;
+        document.getElementById('rh_morning').value = data.rh_morning;
+        document.getElementById('rh_evening').value = data.rh_evening;
+        document.getElementById('rainfall').value = data.rainfall;
+        document.getElementById('wind_speed').value = data.wind_speed;
+        btnWeather.innerText = '✅ Live Weather Synced!';
+        setTimeout(() => { btnWeather.innerText = '🌐 Auto-Fetch Live Weather'; }, 2500);
+      } catch (err) {
+        console.error(err);
+        btnWeather.innerText = '⚠️ Fallback Used';
+        setTimeout(() => { btnWeather.innerText = '🌐 Auto-Fetch Live Weather'; }, 2500);
+      }
+    });
 
     // Handle Form Submission & Live Prediction API Call
     const form = document.getElementById('prediction-form');
