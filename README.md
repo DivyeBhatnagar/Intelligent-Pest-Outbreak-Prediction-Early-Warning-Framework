@@ -514,7 +514,10 @@ Intelligent-Pest-Outbreak-Prediction-Early-Warning-Framework/
 │   ├── Pestreport2020-21.pdf                  # Official National DPPQS / ICAR Surveillance Bulletin
 │   └── csv                                    # Mandi price and crop arrival records
 │
-└── Documentation/                             # Architectural specifications & requirements
+└── docs/                                      # Comprehensive project specifications & documentation
+    ├── API_DOCUMENTATION.md                   # REST API specification & request/response samples
+    ├── ARCHITECTURE_AND_EVALUATION.md         # Scientific formulas, benchmarks & architecture
+    ├── IMPLEMENTED_THINGS.md                  # Development progress & implemented features log
     ├── Overview.md — Intelligent Pest Outbreak Prediction & Early Warning Framework.md
     ├── PRD — Intelligent Pest Outbreak Prediction & Early Warning Framework.md
     ├── TRD.md — Intelligent Pest Outbreak Prediction & Early Warning Framework.md
@@ -573,11 +576,15 @@ PYTHONPATH=. pytest tests/test_framework.py -v
 ```
 
 ### 6. Explore the Detailed Documentation
-The comprehensive system design and technical requirements are indexed under [`Documentation/`](./Documentation) and [`docs/`](./docs):
+All project specifications, engineering logs, and technical requirements are centralized in the [`docs/`](./docs) directory:
 - 📘 **API Documentation:** [REST API Specification & Examples](./docs/API_DOCUMENTATION.md)
 - 🔬 **Architecture & Evaluation:** [Mathematical Foundations & Benchmarks](./docs/ARCHITECTURE_AND_EVALUATION.md)
-- 📋 **Implementation Tracker:** [Implemented Things Log](./Documentation/IMPLEMENTED_THINGS.md)
-- 📐 **PRD & Architecture:** [Product Requirements Document](./Documentation/PRD%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md) | [System Architecture](./Documentation/Architecture.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
+- 📋 **Implementation Tracker:** [Implemented Things Log](./docs/IMPLEMENTED_THINGS.md)
+- 📋 **PRD:** [Product Requirements Document](./docs/PRD%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
+- 📐 **Architecture:** [System Architecture](./docs/Architecture.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
+- 🔧 **TRD:** [Technical Requirements Document](./docs/TRD.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
+- 🗺️ **Roadmap:** [Implementation Plan v1.0](./docs/IMPLEMENTATION_PLAN_V1.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
+- 📘 **Overview:** [Project Overview](./docs/Overview.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)
 
 ---
 

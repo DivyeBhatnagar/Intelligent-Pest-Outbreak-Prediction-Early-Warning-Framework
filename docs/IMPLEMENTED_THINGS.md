@@ -26,7 +26,7 @@ This document tracks all foundational code, data engineering pipelines, configur
 
 ## 1. Overview of Implementation
 
-In accordance with the **[Implementation Plan v1.0](./Documentation/IMPLEMENTATION_PLAN_V1.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)**, Phase 1 (Research & Data Curation) and Phase 2 (Data Ingestion, Preprocessing & Feature Engineering) have been initialized with high modularity and human-written developer conventions:
+In accordance with the **[Implementation Plan v1.0](./IMPLEMENTATION_PLAN_V1.md%20—%20Intelligent%20Pest%20Outbreak%20Prediction%20&%20Early%20Warning%20Framework.md)**, Phase 1 (Research & Data Curation) and Phase 2 (Data Ingestion, Preprocessing & Feature Engineering) have been initialized with high modularity and human-written developer conventions:
 
 - **Multi-Crop Data Ingestion:** Unified pipeline consuming both **Rice ICAR surveillance records** and **Cotton ICAR surveillance records**, spanning **35,499 historical weekly field observations**.
 - **IoT & Multi-Pest Support:** Integrated automated electronic **smart-trap insect catch timeseries** and **8-pest agro-climatic observation** datasets.
