@@ -249,6 +249,7 @@ def get_auxiliary_models_metrics():
 
 
 @app.get("/api/model-comparison", tags=["Machine Learning"])
+@app.get("/api/models/comparison", tags=["Machine Learning"], include_in_schema=False)
 def get_model_comparison():
     """Returns the full model comparison table from verified evaluation artifacts."""
     if not model_benchmark_meta:
