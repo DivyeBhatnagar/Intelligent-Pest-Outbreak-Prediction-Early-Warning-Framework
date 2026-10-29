@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   BellRing,
-  AlertTriangle,
   CheckCircle,
-  Clock,
   Send,
-  ShieldCheck,
   RefreshCw,
   X,
   FileCheck2,
 } from 'lucide-react';
 import { apiService } from '../../services/api';
-import { AlertItem, RiskLevel } from '../../types/dashboard';
+import { AlertItem } from '../../types/dashboard';
 import { RISK_BADGES, STATIONS } from '../../constants/agroData';
 
 interface AlertsTabProps {
@@ -43,11 +40,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({ onAlertStatusChange }) => 
   const [dispatchStatus, setDispatchStatus] = useState<string>('');
   const [isDispatching, setIsDispatching] = useState<boolean>(false);
 
-  useEffect(() => {
-    loadAlerts();
-  }, [statusFilter, severityFilter]);
-
-  const loadAlerts = async () => {
+  const loadAlerts = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await apiService.getAlerts({
@@ -101,14 +94,18 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({ onAlertStatusChange }) => 
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [statusFilter, severityFilter]);
+
+  useEffect(() => {
+    loadAlerts();
+  }, [loadAlerts]);
 
   const handleAcknowledge = async (id: number) => {
     try {
       await apiService.acknowledgeAlert(id, 'Regional Field Officer');
       loadAlerts();
       if (onAlertStatusChange) onAlertStatusChange();
-    } catch (err) {
+    } catch {
       alert('Failed to acknowledge alert.');
     }
   };
@@ -123,7 +120,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({ onAlertStatusChange }) => 
       setResolutionNotes('');
       loadAlerts();
       if (onAlertStatusChange) onAlertStatusChange();
-    } catch (err) {
+    } catch {
       alert('Failed to resolve alert.');
     } finally {
       setIsResolving(false);

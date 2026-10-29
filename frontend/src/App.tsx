@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { Navigation, TabKey } from './components/Navigation';
 import { OverviewTab } from './components/tabs/OverviewTab';
@@ -24,7 +24,7 @@ export const App: React.FC = () => {
   const [health, setHealth] = useState<SystemHealthResponse | null>(null);
   const [activeAlertCount, setActiveAlertCount] = useState<number>(3);
 
-  const fetchHealthAndAlerts = async () => {
+  const fetchHealthAndAlerts = useCallback(async () => {
     try {
       const h = await apiService.getHealth();
       setHealth(h);
@@ -48,13 +48,13 @@ export const App: React.FC = () => {
       const alerts = await apiService.getAlerts({ status: 'PENDING' });
       setActiveAlertCount(alerts.length);
     } catch {}
-  };
+  }, []);
 
   useEffect(() => {
     fetchHealthAndAlerts();
     const interval = setInterval(fetchHealthAndAlerts, 30000); // 30s background poll
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchHealthAndAlerts]);
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, RefreshCw, MapPin, Wind, Droplets, Thermometer, ShieldAlert } from 'lucide-react';
-import { STATIONS, RISK_COLORS, RISK_BADGES } from '../../constants/agroData';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, RefreshCw, MapPin, Wind, Droplets, Thermometer, ShieldAlert } from 'lucide-react';
+import { STATIONS, RISK_BADGES } from '../../constants/agroData';
 import { apiService } from '../../services/api';
 import { StationMap } from '../common/StationMap';
 import { RiskLevel, WeatherTelemetry } from '../../types/dashboard';
@@ -10,12 +10,11 @@ export const RiskMapTab: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [cropFilter, setCropFilter] = useState<string>('ALL');
   const [riskFilter, setRiskFilter] = useState<string>('ALL');
-  const [stationSummary, setStationSummary] = useState<any>(null);
   const [weatherTelemetry, setWeatherTelemetry] = useState<WeatherTelemetry | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Station risk indicators
-  const [stationRisks, setStationRisks] = useState<Record<string, { risk_level: RiskLevel; risk_score: number; pest_name?: string }>>({
+  const [stationRisks] = useState<Record<string, { risk_level: RiskLevel; risk_score: number; pest_name?: string }>>({
     Cuttack: { risk_level: 'CRITICAL', risk_score: 0.94, pest_name: 'Brown Planthopper' },
     Maruteru: { risk_level: 'HIGH', risk_score: 0.78, pest_name: 'Yellow Stem Borer' },
     Lam: { risk_level: 'MODERATE', risk_score: 0.52, pest_name: 'American Bollworm' },
@@ -29,11 +28,7 @@ export const RiskMapTab: React.FC = () => {
     Palampur: { risk_level: 'LOW', risk_score: 0.12, pest_name: 'Stem Borer' },
   });
 
-  useEffect(() => {
-    loadStationDetails(selectedStation);
-  }, [selectedStation]);
-
-  const loadStationDetails = async (code: string) => {
+  const loadStationDetails = useCallback(async (code: string) => {
     setIsLoading(true);
     try {
       const weather = await apiService.getLiveWeather(code);
@@ -41,14 +36,17 @@ export const RiskMapTab: React.FC = () => {
     } catch {}
 
     try {
-      const summary = await apiService.getStationSummary(code);
-      setStationSummary(summary);
+      await apiService.getStationSummary(code);
     } catch {
-      setStationSummary(null);
+      // Offline fallback
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadStationDetails(selectedStation);
+  }, [selectedStation, loadStationDetails]);
 
   const currentStation = STATIONS[selectedStation] || STATIONS.Cuttack;
   const currentRisk = stationRisks[selectedStation] || { risk_level: 'LOW' as RiskLevel, risk_score: 0.15 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   BarChart,
   Bar,
@@ -9,20 +9,14 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Brain, Award, CheckCircle2, AlertOctagon, HelpCircle, Layers } from 'lucide-react';
+import { Brain, Award, AlertOctagon, Layers } from 'lucide-react';
 import { apiService } from '../../services/api';
-import { ModelComparisonResponse, ModelMetric } from '../../types/dashboard';
+import { ModelComparisonResponse } from '../../types/dashboard';
 
 export const ModelPerformanceTab: React.FC = () => {
   const [benchmarkData, setBenchmarkData] = useState<ModelComparisonResponse | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    loadBenchmarks();
-  }, []);
-
-  const loadBenchmarks = async () => {
-    setIsLoading(true);
+  const loadBenchmarks = useCallback(async () => {
     try {
       const data = await apiService.getModelComparison();
       setBenchmarkData(data);
@@ -46,10 +40,12 @@ export const ModelPerformanceTab: React.FC = () => {
           { model: 'ExtraTrees', accuracy: 0.8935, precision: 0.9105, recall: 0.8773, f1_score: 0.8936, roc_auc: 0.9475, false_negative_rate: 0.1227 },
         ],
       });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadBenchmarks();
+  }, [loadBenchmarks]);
 
   const models = benchmarkData?.models || [];
   const championModel = models.find((m) => m.model === (benchmarkData?.champion || 'Random Forest')) || models[0];

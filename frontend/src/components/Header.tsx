@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, CloudSun, BrainCircuit, Database, AlertTriangle } from 'lucide-react';
+import { CloudSun, BrainCircuit, Database, AlertTriangle } from 'lucide-react';
 import { SystemHealthResponse } from '../types/dashboard';
 
 interface HeaderProps {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Filter, RefreshCw, X, Check, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, RefreshCw, X, Check, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import { apiService } from '../../services/api';
 import { Observation, RiskLevel } from '../../types/dashboard';
 import { STATIONS, PESTS_BY_CROP, RISK_BADGES } from '../../constants/agroData';
@@ -25,7 +25,7 @@ export const ObservationsTab: React.FC = () => {
   const [newCrop, setNewCrop] = useState<string>('Rice');
   const [newPest, setNewPest] = useState<string>('Brown Planthopper');
   const [newLocation, setNewLocation] = useState<string>('CUTTACK');
-  const [newDate, setNewDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [newDate, setNewDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [newWeek, setNewWeek] = useState<number>(38);
   const [newCount, setNewCount] = useState<number>(6.5);
   const [newUnit, setNewUnit] = useState<string>('hoppers/hill');
@@ -35,11 +35,7 @@ export const ObservationsTab: React.FC = () => {
   const [newObserver, setNewObserver] = useState<string>('Field Officer - ICAR');
   const [newSeverity, setNewSeverity] = useState<RiskLevel>('MODERATE');
 
-  useEffect(() => {
-    loadObservations();
-  }, [page, cropFilter, locFilter, severityFilter]);
-
-  const loadObservations = async () => {
+  const loadObservations = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await apiService.getObservations({
@@ -56,7 +52,11 @@ export const ObservationsTab: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [page, pageSize, cropFilter, locFilter, severityFilter]);
+
+  useEffect(() => {
+    loadObservations();
+  }, [loadObservations]);
 
   const handleCreateObservation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +86,7 @@ export const ObservationsTab: React.FC = () => {
         setFormMsg(null);
         loadObservations();
       }, 1200);
-    } catch (err) {
+    } catch {
       setFormMsg({ text: 'Failed to save observation. Please check required values.', isError: true });
     } finally {
       setIsSubmitting(false);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   AreaChart,
   Area,
@@ -19,14 +19,8 @@ import { RISK_COLORS, RISK_BADGES } from '../../constants/agroData';
 export const RiskHistoryTab: React.FC = () => {
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState<number>(30);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    loadHistory();
-  }, [timeRange]);
-
-  const loadHistory = async () => {
-    setIsLoading(true);
+  const loadHistory = useCallback(async () => {
     try {
       const res = await apiService.getRiskHistory(timeRange);
       setHistoryData(Array.isArray(res) ? res : []);
@@ -41,10 +35,12 @@ export const RiskHistoryTab: React.FC = () => {
         { date: 'SMW 37', timestamp: '2026-09-14', risk_score: 0.94, risk_level: 'CRITICAL', station: 'Cuttack', crop: 'Rice', pest: 'Brown Planthopper', gdd: 19.5, vpd: 0.38 },
         { date: 'SMW 38', timestamp: '2026-09-21', risk_score: 0.88, risk_level: 'CRITICAL', station: 'Cuttack', crop: 'Rice', pest: 'Brown Planthopper', gdd: 18.9, vpd: 0.42 },
       ]);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
   // Pie chart calculation
   const distributionCounts = historyData.reduce((acc: Record<string, number>, item) => {

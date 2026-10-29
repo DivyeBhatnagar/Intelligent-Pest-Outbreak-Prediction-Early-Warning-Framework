@@ -8,7 +8,8 @@ import {
   SystemHealthResponse,
 } from '../types/dashboard';
 
-const API_BASE = ''; // Uses Vite proxy in development or relative path in production
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '') as string;
+const API_BASE = RAW_API_BASE.replace(/\/+$/, ''); // Uses Vite proxy in development or configured backend URL in production
 
 export const apiService = {
   // System Health

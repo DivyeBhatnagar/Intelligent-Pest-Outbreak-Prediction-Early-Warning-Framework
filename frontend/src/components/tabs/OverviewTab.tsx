@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Sparkles,
   CloudSun,
   Flame,
-  Droplets,
-  Wind,
-  Calendar,
   AlertCircle,
-  TrendingUp,
   Radio,
   CheckCircle2,
-  Clock,
-  Compass,
 } from 'lucide-react';
 import { STATIONS, PESTS_BY_CROP, RISK_BADGES, RISK_COLORS } from '../../constants/agroData';
 import { apiService } from '../../services/api';
@@ -56,14 +50,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ health, activeAlertCou
     if (!pests.includes(pestName)) {
       setPestName(pests[0]);
     }
-  }, [crop]);
+  }, [crop, pestName]);
 
-  // Initial weather fetch on mount
-  useEffect(() => {
-    handleSyncWeather(location);
-  }, [location]);
-
-  const handleSyncWeather = async (loc: string) => {
+  const handleSyncWeather = useCallback(async (loc: string) => {
     setIsFetchingWeather(true);
     setWeatherStatusMsg('Syncing telemetry…');
     try {
@@ -77,12 +66,17 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ health, activeAlertCou
       if (data.wind_speed !== undefined) setWindSpeed(data.wind_speed);
       if (data.standard_week) setStandardWeek(data.standard_week);
       setWeatherStatusMsg(`Source: ${data.source || 'Open-Meteo'} (${data.status === 'fallback' ? 'Offline baseline' : 'Live'})`);
-    } catch (err) {
+    } catch {
       setWeatherStatusMsg('Agro-climatic baseline (offline mode)');
     } finally {
       setIsFetchingWeather(false);
     }
-  };
+  }, []);
+
+  // Initial weather fetch on mount and location change
+  useEffect(() => {
+    handleSyncWeather(location);
+  }, [location, handleSyncWeather]);
 
   const handleEvaluate = async (e: React.FormEvent) => {
     e.preventDefault();

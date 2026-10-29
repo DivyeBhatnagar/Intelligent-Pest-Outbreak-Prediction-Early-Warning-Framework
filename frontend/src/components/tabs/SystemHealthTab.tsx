@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Cpu, CheckCircle2, AlertCircle, RefreshCw, Server, Database, CloudSun, BrainCircuit } from 'lucide-react';
-import { apiService } from '../../services/api';
+import React, { useState } from 'react';
+import { Cpu, CheckCircle2, RefreshCw, Server, Database, CloudSun, BrainCircuit } from 'lucide-react';
 import { SystemHealthResponse } from '../../types/dashboard';
 
 interface SystemHealthTabProps {
