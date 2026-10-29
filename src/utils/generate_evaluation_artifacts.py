@@ -577,3 +577,4 @@ for img_path in EVAL_DIR.glob("*.png"):
     shutil.copy(img_path, MODELS_DIR / img_path.name)
 
 print(f"\nAll 12 evaluation artifacts successfully created and synchronized!")
+

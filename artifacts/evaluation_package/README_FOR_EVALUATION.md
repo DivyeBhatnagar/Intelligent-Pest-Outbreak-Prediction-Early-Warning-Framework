@@ -31,3 +31,4 @@ This directory contains the **official high-resolution (300 DPI) evaluation plot
 - **Champion Model:** **Random Forest Classifier** with **90.67% F1-score**, **95.60% ROC-AUC**, and lowest Missed Outbreak Rate (**8.99%**).
 - **Bio-Climatic Features:** Growing Degree-Days (GDD), Vapor Pressure Deficit (VPD), Diurnal Temperature Range, and 1–2 week lagged pest velocity.
 - **Explainability:** TreeSHAP (`shap.TreeExplainer`) provides full interpretability for agricultural extension officers and agronomists.
+
