@@ -34,7 +34,14 @@ export const apiService = {
   },
 
   // Reference Pests
-  async getReferencePests(): Promise<{ supported_crops: Record<string, string[]>; count: number }> {
+  async getReferencePests(): Promise<{
+    count: number;
+    pests: Array<{
+      pest_name: string;
+      base_temperature_deg_c: number;
+      economic_threshold_level: number;
+    }>;
+  }> {
     const res = await fetch(`${API_BASE}/api/v1/reference/pests`);
     if (!res.ok) throw new Error('Failed to fetch reference pests');
     return res.json();
