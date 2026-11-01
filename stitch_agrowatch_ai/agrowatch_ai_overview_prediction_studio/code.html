@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroWatch AI - Farmer Agricultural Advisory Command</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-container": "#4e5f47",
+            "inverse-primary": "#00e296",
+            "tertiary-fixed": "#d5e8ca",
+            "tertiary-container": "#c6d8bb",
+            "secondary-fixed-dim": "#c6c6c6",
+            "secondary-container": "#e2e2e2",
+            "on-tertiary-fixed": "#111f0d",
+            "inverse-surface": "#28313b",
+            "on-secondary-fixed": "#1b1b1b",
+            "on-error": "#ffffff",
+            "on-background": "#131c26",
+            "risk-moderate": "#f59e0b",
+            "on-surface-variant": "#3b4a40",
+            "risk-critical": "#ef4444",
+            "border-hairline": "#e5e7eb",
+            "primary": "#006c46",
+            "on-tertiary": "#ffffff",
+            "surface-container": "#e5effc",
+            "surface": "#f7f9ff",
+            "risk-low": "#10b981",
+            "error-container": "#ffdad6",
+            "surface-variant": "#d9e3f1",
+            "canvas": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "risk-high": "#f97316",
+            "outline": "#6b7b70",
+            "surface-bright": "#f7f9ff",
+            "outline-variant": "#b9cbbe",
+            "error": "#ba1a1a",
+            "surface-container-high": "#dfe9f6",
+            "on-primary": "#ffffff",
+            "on-primary-fixed-variant": "#005234",
+            "secondary-fixed": "#e2e2e2",
+            "on-tertiary-fixed-variant": "#3b4b35",
+            "tertiary": "#52634b",
+            "on-secondary-fixed-variant": "#474747",
+            "surface-dim": "#d1dbe8",
+            "primary-fixed-dim": "#00e296",
+            "surface-soft": "#f2f4f5",
+            "surface-container-low": "#edf4ff",
+            "surface-tint": "#006c46",
+            "secondary": "#5e5e5e",
+            "primary-container": "#00f0a0",
+            "on-secondary-container": "#646464",
+            "on-primary-fixed": "#002112",
+            "tertiary-fixed-dim": "#baccaf",
+            "inverse-on-surface": "#e8f2ff",
+            "on-error-container": "#93000a",
+            "background": "#f7f9ff",
+            "on-primary-container": "#006843",
+            "surface-container-highest": "#d9e3f1",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#4dffb2",
+            "on-surface": "#131c26"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-sm": "1rem",
+            "space-section": "6rem",
+            "gutter": "1.5rem",
+            "space-xl": "2rem",
+            "margin-sm": "1rem",
+            "space-xxl": "3rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem",
+            "margin": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Space Grotesk", "sans-serif"],
+            "headline-sm": ["Space Grotesk", "sans-serif"],
+            "display-mobile": ["Space Grotesk", "sans-serif"],
+            "headline-sm-mobile": ["Space Grotesk", "sans-serif"],
+            "title-md": ["Inter", "sans-serif"],
+            "title-lg": ["Space Grotesk", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "headline-lg-mobile": ["Space Grotesk", "sans-serif"],
+            "headline-md": ["Space Grotesk", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "caption": ["Inter", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "headline-md-mobile": ["Space Grotesk", "sans-serif"],
+            "display": ["Space Grotesk", "sans-serif"]
+          },
+          "fontSize": {
+            "headline-lg": ["3.75rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-sm": ["2.375rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "display-mobile": ["2.5rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-sm-mobile": ["1.5rem", { "lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "600" }],
+            "title-md": ["1.125rem", { "lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600" }],
+            "title-lg": ["2rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "600" }],
+            "label-md": ["1rem", { "lineHeight": "1", "letterSpacing": "0", "fontWeight": "600" }],
+            "headline-lg-mobile": ["2rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "headline-md": ["3rem", { "lineHeight": "1.15", "letterSpacing": "0", "fontWeight": "700" }],
+            "label-sm": ["0.875rem", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "500" }],
+            "caption": ["0.8125rem", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "500" }],
+            "headline-md-mobile": ["1.75rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "700" }],
+            "display": ["5rem", { "lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-full font-body-md text-on-surface bg-surface antialiased overflow-x-hidden">
+<div class="flex min-h-screen">
+<!-- SIDEBAR COMPONENT (Exact Persistent SideNavBar Shell Preserved) -->
+<aside class="fixed left-0 top-0 bottom-0 w-72 z-40 p-4 border-r border-border-hairline dark:border-outline flex flex-col justify-between overflow-y-auto bg-surface-container-lowest dark:bg-inverse-surface">
+<div class="flex flex-col gap-6">
+<!-- Logo Header -->
+<div class="flex items-center gap-3 px-2 py-1">
+<div class="w-10 h-10 rounded-xl bg-primary-container text-on-surface flex items-center justify-center border border-on-surface/20 shadow-sm shrink-0">
+<span class="material-symbols-outlined text-2xl font-bold" data-icon="pest_control">pest_control</span>
+</div>
+<div>
+<div class="font-title-lg text-title-lg font-bold text-on-surface dark:text-inverse-on-surface tracking-tight leading-tight">
+              AgroWatch AI
+            </div>
+<div class="font-caption text-caption text-on-surface-variant font-medium">
+              Intelligent Pest Surveillance
+            </div>
+</div>
+</div>
+<!-- Navigation Tabs (Exact 7 nav tabs) -->
+<nav aria-label="Main Navigation" class="flex flex-col gap-1.5">
+<!-- Overview: Active tab -->
+<a class="flex items-center gap-3 px-4 py-3 bg-tertiary-container/30 dark:bg-tertiary-container/20 text-primary dark:text-inverse-primary font-title-md text-title-md rounded-DEFAULT border-l-4 border-primary dark:border-inverse-primary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- Risk Map -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span>Risk Map</span>
+</a>
+<!-- Field Observations -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span>Field Observations</span>
+</a>
+<!-- Risk History -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Risk History</span>
+</a>
+<!-- Alerts & Advisories -->
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span>Alerts &amp; Advisories</span>
+</div>
+<span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold bg-risk-critical text-on-error rounded-full">7</span>
+</a>
+<!-- Model Performance -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Model Performance</span>
+</a>
+<!-- System Health -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span>System Health</span>
+</a>
+</nav>
+</div>
+<!-- Footer Section: Status & Admin -->
+<div class="pt-4 border-t border-border-hairline flex flex-col gap-3">
+<!-- Live System Telemetry Badge -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-tertiary-container/20 border border-primary/20">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-caption text-caption font-semibold text-primary">Live Sync 10:42 UTC</span>
+</div>
+<span class="font-caption text-caption text-secondary font-mono">v2.4.1</span>
+</div>
+<div class="flex items-center gap-3 px-2 py-2 rounded-xl bg-surface-soft border border-border-hairline">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface font-semibold shrink-0">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</div>
+<div class="overflow-hidden">
+<div class="font-label-sm text-label-sm font-semibold truncate text-on-surface">Dr. A. Swaminathan</div>
+<div class="font-caption text-caption text-secondary truncate">Surveillance Administrator</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT CANVAS -->
+<div class="pl-72 flex-1 flex flex-col min-w-0">
+<!-- 1. TOP HEADER & FARMER WELCOME SECTION -->
+<header class="sticky top-0 z-30 flex flex-wrap items-center justify-between px-6 py-3 w-full border-b border-border-hairline bg-surface-container-lowest/95 backdrop-blur gap-4">
+<!-- Left: Breadcrumb / Station Location Selector -->
+<div class="flex items-center flex-wrap gap-4">
+<div class="hidden xl:flex items-center gap-2 text-sm text-secondary font-body-sm whitespace-nowrap">
+<span class="font-semibold text-on-surface">AgroWatch AI</span>
+<span>/</span>
+<span class="text-on-surface-variant font-medium">Farmer Overview</span>
+</div>
+<!-- Station Selector Dropdown with Location Pin -->
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-primary text-lg pointer-events-none" data-icon="location_on">location_on</span>
+<select class="pl-9 pr-8 h-10 bg-surface-soft hover:bg-canvas border border-border-hairline rounded-full text-xs sm:text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer appearance-none">
+<option selected="">Aduthurai Research Hub (Thanjavur Delta)</option>
+<option>Coimbatore Center (TNAU Campus)</option>
+<option>Mandya Substation (ZARS Region)</option>
+<option>Cuttack Coastal Paddy Station</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 text-secondary text-base pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Live Weather Sync Tag -->
+<div class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ecffe0] border border-primary/20 text-xs font-semibold text-primary">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span>Live Weather Sync 10:42 UTC</span>
+</div>
+</div>
+<!-- Center & Right Controls -->
+<div class="flex items-center gap-3">
+<!-- Crop Segmented Control: Rice (Paddy) / Cotton -->
+<div class="flex items-center bg-surface-soft p-1 rounded-full border border-border-hairline">
+<button class="bg-on-background text-canvas font-label-sm text-xs px-3.5 py-1.5 rounded-full shadow-sm font-semibold transition-all">
+Rice (Paddy)
+</button>
+<button class="text-on-surface-variant font-label-sm text-xs px-3.5 py-1.5 rounded-full hover:bg-surface-container-low font-semibold transition-all">
+Cotton
+</button>
+</div>
+<!-- Date Badge -->
+<div class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-soft border border-border-hairline text-xs font-medium text-secondary">
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="calendar_month">calendar_month</span>
+<span>Today, 24 Oct 2024</span>
+</div>
+<!-- Top Quick Notifications -->
+<div class="flex items-center gap-1 border-l border-border-hairline pl-2">
+<button class="relative p-2 rounded-full hover:bg-surface-soft text-on-surface-variant transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-4 h-4 bg-risk-critical text-on-error text-[10px] font-bold rounded-full flex items-center justify-center">7</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN BODY CONTAINER -->
+<main class="flex-1 p-6 lg:p-8 max-w-[1440px] w-full mx-auto flex flex-col gap-6">
+<!-- WELCOME BANNER -->
+<section class="bg-gradient-to-r from-[#ecffe0] via-canvas to-[#edf4ff] border border-[rgba(0,240,160,0.5)] rounded-[24px] p-6 sm:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+<div class="max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-canvas text-primary text-xs font-bold border border-primary/20 mb-3 shadow-xs">
+<span class="material-symbols-outlined text-sm" data-icon="agriculture">agriculture</span>
+<span>Aduthurai Hub • Rice (Paddy) Active Monitoring</span>
+</div>
+<h1 class="font-headline-sm text-2xl sm:text-3xl text-on-surface font-bold tracking-tight">Good Morning! Welcome to AgroWatch AI</h1>
+<p class="font-body-md text-sm sm:text-base text-secondary mt-1.5 leading-relaxed">Stay informed about your crops. Detect pest risks early and protect your harvest with timely field advisories.</p>
+</div>
+<div class="flex items-center gap-3 shrink-0">
+<div class="bg-canvas/90 backdrop-blur rounded-2xl p-4 border border-border-hairline shadow-xs flex items-center gap-3">
+<div class="w-11 h-11 rounded-full bg-primary-container text-on-surface flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-xl" data-icon="shield">shield</span>
+</div>
+<div>
+<div class="text-xs font-medium text-secondary">Advisory Status</div>
+<div class="text-sm font-bold text-risk-high flex items-center gap-1">
+<span>Scouting Urged</span>
+<span class="w-2 h-2 rounded-full bg-risk-high animate-ping"></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. QUICK ACTION BAR -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<button class="bg-canvas hover:bg-surface-soft border border-border-hairline rounded-full px-5 py-3.5 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-on-surface shadow-xs active:scale-[0.98] transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="bug_report">bug_report</span>
+<span>Report a Pest Observation</span>
+</button>
+<button class="bg-canvas hover:bg-surface-soft border border-border-hairline rounded-full px-5 py-3.5 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-on-surface shadow-xs active:scale-[0.98] transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="calculate">calculate</span>
+<span>Check Crop Risk</span>
+</button>
+<button class="bg-canvas hover:bg-surface-soft border border-border-hairline rounded-full px-5 py-3.5 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-on-surface shadow-xs active:scale-[0.98] transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="description">description</span>
+<span>View Advisory Guidelines</span>
+</button>
+<button class="bg-canvas hover:bg-surface-soft border border-border-hairline rounded-full px-5 py-3.5 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-on-surface shadow-xs active:scale-[0.98] transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="pin_drop">pin_drop</span>
+<span>Explore Regional Map</span>
+</button>
+</section>
+<!-- 3. THREE PROMINENT CROP HEALTH & RISK CARDS (Replaces old technical KPIs) -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+<!-- Card 1: Current Pest Risk -->
+<div class="bg-canvas border border-border-hairline rounded-[22px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-all">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-border-hairline">
+<span class="font-label-sm text-xs font-bold uppercase tracking-wider text-secondary">Card 1 • Current Pest Risk</span>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#fff7ed] text-risk-high border border-risk-high/40">HIGH RISK</span>
+</div>
+<div class="mt-4 flex items-center gap-4">
+<!-- Radial visual score meter -->
+<div class="relative w-20 h-20 rounded-full bg-surface-soft border-4 border-risk-high flex flex-col items-center justify-center shrink-0 shadow-inner">
+<span class="font-headline-sm text-2xl font-bold text-on-surface leading-none">84</span>
+<span class="text-[10px] text-secondary font-mono mt-0.5">/ 100</span>
+</div>
+<div>
+<div class="text-xs font-semibold text-primary">Crop: Rice (Paddy)</div>
+<h3 class="font-title-md text-base font-bold text-on-surface leading-snug">Yellow Stem Borer</h3>
+<p class="font-caption text-xs text-secondary italic">Scirpophaga incertulas</p>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3.5 border-t border-border-hairline bg-[#fff7ed]/50 rounded-xl p-3 border border-risk-high/20">
+<p class="text-xs font-semibold text-risk-high flex items-start gap-1.5">
+<span class="material-symbols-outlined text-base shrink-0" data-icon="warning">warning</span>
+<span>Immediate scouting recommended in tillering stage.</span>
+</p>
+</div>
+</div>
+<!-- Card 2: Weather Conditions & Pest Favorability -->
+<div class="bg-canvas border border-border-hairline rounded-[22px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-all">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-border-hairline">
+<span class="font-label-sm text-xs font-bold uppercase tracking-wider text-secondary">Card 2 • Weather &amp; Favorability</span>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#ecffe0] text-primary border border-primary/30">Micro-Climate</span>
+</div>
+<!-- Weather metrics grid -->
+<div class="grid grid-cols-2 gap-2.5 mt-4">
+<div class="bg-surface-soft p-2.5 rounded-xl border border-border-hairline flex items-center justify-between">
+<div>
+<div class="text-[11px] text-secondary font-medium">Temperature</div>
+<div class="text-base font-bold text-on-surface">29.4°C</div>
+</div>
+<span class="material-symbols-outlined text-risk-moderate text-xl" data-icon="thermostat">thermostat</span>
+</div>
+<div class="bg-surface-soft p-2.5 rounded-xl border border-border-hairline flex items-center justify-between">
+<div>
+<div class="text-[11px] text-secondary font-medium">Humidity (RH)</div>
+<div class="text-base font-bold text-risk-critical">84%</div>
+</div>
+<span class="material-symbols-outlined text-primary text-xl" data-icon="humidity_percentage">humidity_percentage</span>
+</div>
+<div class="bg-surface-soft p-2.5 rounded-xl border border-border-hairline flex items-center justify-between">
+<div>
+<div class="text-[11px] text-secondary font-medium">Rainfall 24h</div>
+<div class="text-base font-bold text-on-surface">14.2 mm</div>
+</div>
+<span class="material-symbols-outlined text-primary text-xl" data-icon="rainy">rainy</span>
+</div>
+<div class="bg-surface-soft p-2.5 rounded-xl border border-border-hairline flex items-center justify-between">
+<div>
+<div class="text-[11px] text-secondary font-medium">Wind Speed</div>
+<div class="text-base font-bold text-on-surface">11.8 km/h</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="air">air</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-border-hairline">
+<p class="text-xs text-on-surface-variant leading-relaxed">
+<strong class="text-risk-high">⚠️ Highly Favorable for Spore Hatching &amp; Stem Borer Moths:</strong> Sustained humidity above 80% with warm canopy temperatures speeds up larvae emergence.
+</p>
+</div>
+</div>
+<!-- Card 3: Crop Protection Status & ETL -->
+<div class="bg-canvas border border-border-hairline rounded-[22px] p-6 shadow-sm flex flex-col justify-between hover:border-outline-variant transition-all">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-border-hairline">
+<span class="font-label-sm text-xs font-bold uppercase tracking-wider text-secondary">Card 3 • Protection &amp; ETL</span>
+<span class="text-xs text-secondary font-mono">Daily Scouting Active</span>
+</div>
+<div class="mt-4 space-y-3">
+<div class="flex items-center justify-between text-xs">
+<span class="text-secondary">Field Observation:</span>
+<span class="font-semibold text-on-surface">Recorded 3 hrs ago (Delta Team)</span>
+</div>
+<!-- ETL Progress meter -->
+<div class="bg-surface-soft p-3 rounded-xl border border-border-hairline">
+<div class="flex justify-between items-center text-xs mb-1.5">
+<span class="font-bold text-on-surface">Pest Population vs ETL</span>
+<span class="font-bold text-risk-high font-mono">8% / 10% ETL</span>
+</div>
+<div class="w-full bg-border-hairline h-2.5 rounded-full overflow-hidden">
+<div class="bg-risk-high h-full rounded-full transition-all" style="width: 80%"></div>
+</div>
+<div class="flex justify-between text-[11px] text-secondary mt-1">
+<span>Current: 8% Dead Hearts</span>
+<span class="font-semibold text-risk-critical">ETL Threshold: 10%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3.5 border-t border-border-hairline text-xs text-on-surface-variant flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-base shrink-0" data-icon="event_repeat">event_repeat</span>
+<span><strong>Monitoring Frequency:</strong> Inspect fields every 48 hours during panicle initiation to prevent breakthrough.</span>
+</div>
+</div>
+</section>
+<!-- 4. ATTENTION REQUIRED - ACTIVE AGRICULTURAL ALERT (Pale-mint highlighted card) -->
+<section class="bg-[#ecffe0] border-2 border-[rgba(0,240,160,0.7)] rounded-[24px] p-6 sm:p-7 shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[rgba(0,108,70,0.2)]">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-canvas text-risk-high flex items-center justify-center shadow-xs border border-risk-high/30 shrink-0">
+<span class="material-symbols-outlined text-2xl" data-icon="notification_important">notification_important</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-title-lg text-lg sm:text-xl font-bold text-on-surface">Attention Required</h2>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#fff7ed] text-risk-high border border-risk-high/40">HIGH RISK ALERT</span>
+</div>
+<div class="text-sm font-semibold text-primary mt-0.5">HIGH RISK — Rice / Yellow Stem Borer</div>
+</div>
+</div>
+<div class="flex items-center flex-wrap gap-2.5">
+<button class="bg-on-background hover:bg-on-background/90 text-canvas font-label-sm text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full shadow-sm active:scale-[0.98] transition-all flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-primary-container" data-icon="task_alt">task_alt</span>
+<span>See Recommended Action</span>
+</button>
+<button class="bg-primary-container hover:bg-primary-fixed-dim text-on-surface font-label-sm text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full border border-on-surface/20 shadow-xs active:scale-[0.98] transition-all flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="info">info</span>
+<span>View Alert Details</span>
+</button>
+</div>
+</div>
+<p class="text-sm text-on-surface font-medium mt-4 leading-relaxed">
+Conditions at your selected monitoring area (<strong>Aduthurai Hub</strong>) indicate an increased risk of <strong>Yellow Stem Borer</strong> activity due to recent rainfall and high overnight humidity. Early intervention now protects harvest yields.
+</p>
+<!-- Details Grid -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 pt-3 border-t border-[rgba(0,108,70,0.15)] text-xs">
+<div class="bg-canvas/80 p-3 rounded-xl border border-border-hairline">
+<span class="text-secondary block">Affected Crop</span>
+<span class="font-bold text-on-surface">Rice (Paddy)</span>
+</div>
+<div class="bg-canvas/80 p-3 rounded-xl border border-border-hairline">
+<span class="text-secondary block">Pest Vector</span>
+<span class="font-bold text-on-surface">Yellow Stem Borer</span>
+</div>
+<div class="bg-canvas/80 p-3 rounded-xl border border-border-hairline">
+<span class="text-secondary block">Risk Severity</span>
+<span class="font-bold text-risk-high">High Risk (84%)</span>
+</div>
+<div class="bg-canvas/80 p-3 rounded-xl border border-border-hairline">
+<span class="text-secondary block">Location Hub</span>
+<span class="font-bold text-on-surface">Aduthurai, Thanjavur</span>
+</div>
+<div class="bg-canvas/80 p-3 rounded-xl border border-border-hairline col-span-2 md:col-span-1">
+<span class="text-secondary block">Timestamp</span>
+<span class="font-bold text-on-surface">Today, 08:30 AM</span>
+</div>
+</div>
+</section>
+<!-- 5. WHAT SHOULD I DO NOW? - ACTIONABLE ADVISORY -->
+<section class="bg-canvas border border-border-hairline rounded-[24px] p-6 sm:p-8 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-border-hairline gap-3">
+<div>
+<div class="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
+<span class="material-symbols-outlined text-base" data-icon="verified">verified</span>
+<span>Extension Best Practices</span>
+</div>
+<h2 class="font-headline-sm text-2xl font-bold text-on-surface mt-1">Recommended Actions for Your Crop</h2>
+<p class="font-caption text-xs sm:text-sm text-secondary">Step-by-step integrated pest management (IPM) guidelines verified by ICAR &amp; TNAU.</p>
+</div>
+<button class="bg-surface-soft hover:bg-canvas border border-border-hairline text-on-surface font-label-sm text-xs font-semibold px-4 py-2 rounded-full self-start sm:self-auto flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-base text-primary" data-icon="download">download</span>
+<span>Download Protocol PDF</span>
+</button>
+</div>
+<!-- 4 Step-by-step verified extension guidelines -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+<!-- Step 1 -->
+<div class="bg-surface-soft/60 rounded-2xl p-4 sm:p-5 border border-border-hairline flex gap-3.5">
+<div class="w-8 h-8 rounded-full bg-primary text-canvas flex items-center justify-center font-bold text-sm shrink-0">1</div>
+<div>
+<h4 class="font-title-md text-sm font-bold text-on-surface">Field Inspection</h4>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+Inspect 20 random hills across the field. Check for egg masses near leaf tips and early "dead heart" symptoms on central tillers.
+</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="bg-surface-soft/60 rounded-2xl p-4 sm:p-5 border border-border-hairline flex gap-3.5">
+<div class="w-8 h-8 rounded-full bg-primary text-canvas flex items-center justify-center font-bold text-sm shrink-0">2</div>
+<div>
+<h4 class="font-title-md text-sm font-bold text-on-surface">Pheromone Traps</h4>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+Install Yellow Stem Borer pheromone traps at <strong>5 traps/acre</strong> for mass trapping and accurate population surge monitoring.
+</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="bg-surface-soft/60 rounded-2xl p-4 sm:p-5 border border-border-hairline flex gap-3.5">
+<div class="w-8 h-8 rounded-full bg-primary text-canvas flex items-center justify-center font-bold text-sm shrink-0">3</div>
+<div>
+<h4 class="font-title-md text-sm font-bold text-on-surface">Water Management</h4>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+Drain excess standing water for 24-48 hours where agronomic conditions allow, to reduce micro-climate humidity around canopy bases.
+</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="bg-surface-soft/60 rounded-2xl p-4 sm:p-5 border border-border-hairline flex gap-3.5">
+<div class="w-8 h-8 rounded-full bg-risk-moderate text-canvas flex items-center justify-center font-bold text-sm shrink-0">4</div>
+<div>
+<h4 class="font-title-md text-sm font-bold text-on-surface">Verified Extension Notice</h4>
+<p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+Avoid routine broad-spectrum chemical sprays without verifying ETL. Consult local ICAR/TNAU Krishi Vigyan Kendra (KVK) advisory.
+</p>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<span class="text-xs text-secondary font-medium">Validated by ICAR-NRRI &amp; TNAU Plant Pathology Consortium</span>
+<button class="bg-on-background hover:bg-on-background/90 text-canvas font-label-md text-xs sm:text-sm font-semibold rounded-full px-6 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-all self-start sm:self-auto">
+<span>View Full ICAR Agricultural Advisory</span>
+<span class="material-symbols-outlined text-base" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- 6. 'CHECK PEST RISK FOR YOUR CROP' (Simplified Farmer Mode Prediction Studio) -->
+<section class="bg-canvas border border-border-hairline rounded-[24px] p-6 sm:p-8 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-border-hairline gap-3 mb-6">
+<div>
+<div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-primary-container text-on-surface text-xs font-bold uppercase tracking-wider mb-1">
+<span class="material-symbols-outlined text-sm" data-icon="psychology">psychology</span>
+<span>Farmer Mode Calculator</span>
+</div>
+<h2 class="font-headline-sm text-2xl font-bold text-on-surface">Check Pest Risk for Your Crop</h2>
+<p class="font-body-sm text-xs sm:text-sm text-secondary">Quickly simulate conditions or compute vulnerability using current station weather readings.</p>
+</div>
+<!-- Toggle for live prefill -->
+<div class="flex items-center gap-2 self-start sm:self-auto bg-surface-soft px-3.5 py-1.5 rounded-full border border-border-hairline">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+<span class="text-xs font-semibold text-on-surface">Prefilled with live station weather</span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Farmer Friendly Input Form (7 cols) -->
+<div class="lg:col-span-7 flex flex-col justify-between">
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Crop -->
+<div>
+<label class="block text-xs font-semibold text-on-surface mb-1.5">Select Your Crop</label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 bg-canvas border border-border-hairline rounded-xl text-xs sm:text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none appearance-none">
+<option selected="">Rice (Paddy)</option>
+<option>Cotton</option>
+<option>Maize</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-lg" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Pest Vector -->
+<div>
+<label class="block text-xs font-semibold text-on-surface mb-1.5">Select Pest Vector</label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 bg-canvas border border-border-hairline rounded-xl text-xs sm:text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none appearance-none">
+<option selected="">Yellow Stem Borer (Scirpophaga incertulas)</option>
+<option>Rice Brown Planthopper (Nilaparvata lugens)</option>
+<option>Gall Midge (Orseolia oryzae)</option>
+<option>Leaf Folder (Cnaphalocrocis medinalis)</option>
+<option>Auto-detect most likely threat</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-lg" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Farm Station Location -->
+<div>
+<label class="block text-xs font-semibold text-on-surface mb-1.5">Monitoring Station / Farm Location</label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 bg-canvas border border-border-hairline rounded-xl text-xs sm:text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none appearance-none">
+<option selected="">Aduthurai Hub (Cauvery Delta - Clay Loam)</option>
+<option>Coimbatore Agro Hub (Kongu Region)</option>
+<option>Mandya Station (Cauvery Basin)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-lg" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- 4 Weather Inputs with friendly indicators -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+<div class="bg-surface-soft/60 p-3 rounded-xl border border-border-hairline">
+<div class="flex justify-between items-center mb-1 text-xs">
+<span class="font-semibold text-on-surface">Temperature</span>
+<span class="font-bold text-primary font-mono bg-canvas px-2 py-0.5 rounded border border-border-hairline">29.4 °C</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-border-hairline rounded-lg cursor-pointer" max="45" min="15" step="0.5" type="range" value="29.4"/>
+<div class="flex justify-between text-[10px] text-secondary mt-1">
+<span>15°C</span>
+<span>Normal: 28-32°C</span>
+<span>45°C</span>
+</div>
+</div>
+<div class="bg-surface-soft/60 p-3 rounded-xl border border-border-hairline">
+<div class="flex justify-between items-center mb-1 text-xs">
+<span class="font-semibold text-on-surface">Relative Humidity</span>
+<span class="font-bold text-risk-critical font-mono bg-canvas px-2 py-0.5 rounded border border-border-hairline">84 %</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-border-hairline rounded-lg cursor-pointer" max="100" min="30" step="1" type="range" value="84"/>
+<div class="flex justify-between text-[10px] text-secondary mt-1">
+<span>30%</span>
+<span class="text-risk-critical font-medium">Critical above 80%</span>
+<span>100%</span>
+</div>
+</div>
+<div class="bg-surface-soft/60 p-3 rounded-xl border border-border-hairline">
+<div class="flex justify-between items-center mb-1 text-xs">
+<span class="font-semibold text-on-surface">Rainfall (24h)</span>
+<span class="font-bold text-primary font-mono bg-canvas px-2 py-0.5 rounded border border-border-hairline">14.2 mm</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-border-hairline rounded-lg cursor-pointer" max="100" min="0" step="0.5" type="range" value="14.2"/>
+<div class="flex justify-between text-[10px] text-secondary mt-1">
+<span>0 mm</span>
+<span>14.2 mm recent rain</span>
+<span>100 mm</span>
+</div>
+</div>
+<div class="bg-surface-soft/60 p-3 rounded-xl border border-border-hairline">
+<div class="flex justify-between items-center mb-1 text-xs">
+<span class="font-semibold text-on-surface">Wind Speed</span>
+<span class="font-bold text-primary font-mono bg-canvas px-2 py-0.5 rounded border border-border-hairline">11.8 km/h</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-border-hairline rounded-lg cursor-pointer" max="50" min="0" step="0.5" type="range" value="11.8"/>
+<div class="flex justify-between text-[10px] text-secondary mt-1">
+<span>Calm (0)</span>
+<span>Active vector drift</span>
+<span>50 km/h</span>
+</div>
+</div>
+</div>
+<!-- Primary CTA Button -->
+<div class="pt-2">
+<button class="w-full h-11 bg-on-background hover:bg-on-background/90 text-canvas font-label-md text-sm font-semibold rounded-full px-8 flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-primary-container text-lg" data-icon="insights">insights</span>
+<span>Check Pest Risk</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Instant Friendly Result Preview Panel (5 cols) -->
+<div class="lg:col-span-5 bg-[#ecffe0] border-2 border-[rgba(0,240,160,0.6)] rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-[rgba(0,108,70,0.2)]">
+<span class="text-xs font-bold uppercase tracking-wider text-primary">Instant Risk Outcome</span>
+<div class="flex items-center gap-1 text-xs font-bold text-risk-high">
+<span class="w-2 h-2 rounded-full bg-risk-high animate-ping"></span>
+<span>High Risk Level</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-4">
+<div class="relative w-18 h-18 rounded-full bg-canvas border-4 border-risk-high flex flex-col items-center justify-center shadow-xs shrink-0 p-3">
+<span class="font-headline-sm text-2xl font-bold text-on-surface leading-none">84</span>
+<span class="text-[10px] text-secondary font-mono mt-0.5">/100</span>
+</div>
+<div>
+<span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#fff7ed] text-risk-high border border-risk-high/40">URGENT</span>
+<h4 class="font-title-md text-base font-bold text-on-surface mt-1">Yellow Stem Borer</h4>
+<p class="text-xs text-on-surface-variant">Elevated egg-laying cycle detected.</p>
+</div>
+</div>
+<!-- Key Contributing Factors -->
+<div class="mt-4 space-y-2">
+<div class="text-xs font-bold text-on-surface uppercase tracking-wider">Key Contributing Factors</div>
+<div class="space-y-1.5 text-xs">
+<div class="bg-canvas/90 rounded-lg p-2.5 flex items-center justify-between border border-border-hairline">
+<span class="text-on-surface font-medium">Morning Humidity (&gt;80%)</span>
+<span class="font-bold text-risk-high">+38% surge factor</span>
+</div>
+<div class="bg-canvas/90 rounded-lg p-2.5 flex items-center justify-between border border-border-hairline">
+<span class="text-on-surface font-medium">Vegetative stage canopy temp (29.4°C)</span>
+<span class="font-bold text-risk-high">+29% surge factor</span>
+</div>
+</div>
+</div>
+<!-- What to do next box -->
+<div class="mt-4 bg-canvas rounded-xl p-3 border-l-4 border-primary shadow-xs">
+<div class="flex items-center gap-1 text-xs font-bold text-on-surface">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="fact_check">fact_check</span>
+<span>What To Do Next</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+Begin field scouting within 24 hours. Set up pheromone traps and inspect tillers for whitehead/deadheart formations.
+</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-[rgba(0,108,70,0.2)] text-[11px] text-secondary flex items-center justify-between">
+<span>Algorithm: ICAR-RF-Ensemble</span>
+<span class="text-primary font-semibold">Immediate Calculation</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. TWO-COLUMN BOTTOM SECTION (GIS & Field Observations) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left: Regional Pest Surveillance (5 cols) -->
+<div class="lg:col-span-5 bg-canvas border border-border-hairline rounded-[24px] p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Pest Risk Around You</h3>
+<p class="font-caption text-caption text-secondary">Spatial pest threat across regional agro-stations</p>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#ecffe0] text-primary border border-primary/20">Live Nodes</span>
+</div>
+<!-- Map Container -->
+<div class="relative bg-surface-soft rounded-2xl border border-border-hairline p-4 h-72 overflow-hidden flex flex-col justify-between">
+<div class="absolute inset-0 opacity-15 bg-[radial-gradient(#006c46_1px,transparent_1px)] [background-size:16px_16px]"></div>
+<!-- Interactive Map Nodes -->
+<div class="relative z-10 h-full w-full">
+<!-- Ludhiana -->
+<div class="absolute top-6 left-12 flex items-center gap-1.5 group cursor-pointer">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-low border-2 border-canvas shadow-sm"></span>
+<span class="text-[10px] font-semibold bg-canvas/90 px-1.5 py-0.5 rounded border border-border-hairline">Ludhiana (Low)</span>
+</div>
+<!-- Mandya -->
+<div class="absolute top-24 right-16 flex items-center gap-1.5 group cursor-pointer">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-low border-2 border-canvas shadow-sm"></span>
+<span class="text-[10px] font-semibold bg-canvas/90 px-1.5 py-0.5 rounded border border-border-hairline">Mandya (Low)</span>
+</div>
+<!-- Coimbatore -->
+<div class="absolute bottom-20 left-20 flex items-center gap-1.5 group cursor-pointer">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-moderate border-2 border-canvas shadow-sm"></span>
+<span class="text-[10px] font-semibold bg-canvas/90 px-1.5 py-0.5 rounded border border-border-hairline">Coimbatore (Mod)</span>
+</div>
+<!-- Aduthurai (Highlighted) -->
+<div class="absolute bottom-8 right-20 flex items-center gap-1.5 group cursor-pointer">
+<span class="w-4 h-4 rounded-full bg-risk-high border-2 border-canvas shadow-md ring-4 ring-risk-high/30 animate-pulse"></span>
+<span class="text-[11px] font-bold bg-[#fff7ed] text-risk-high px-2 py-0.5 rounded border border-risk-high/40">Aduthurai (HIGH)</span>
+</div>
+</div>
+<!-- Map Legend -->
+<div class="relative z-10 bg-canvas/95 backdrop-blur p-2 rounded-xl border border-border-hairline flex items-center justify-between text-[10px] font-semibold">
+<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-risk-low"></span> Low</div>
+<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-risk-moderate"></span> Moderate</div>
+<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-risk-high"></span> High</div>
+<div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-risk-critical"></span> Critical</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-border-hairline flex items-center justify-between">
+<span class="text-xs text-secondary">Coverage across Tamil Nadu &amp; Cauvery Delta</span>
+<button class="bg-on-background hover:bg-on-background/90 text-canvas text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1.5 transition-all">
+<span>Explore Full Risk Map</span>
+<span class="material-symbols-outlined text-sm" data-icon="map">map</span>
+</button>
+</div>
+</div>
+<!-- Right: Recent Field Observations (7 cols) -->
+<div class="lg:col-span-7 bg-canvas border border-border-hairline rounded-[24px] p-6 shadow-sm flex flex-col justify-between overflow-hidden">
+<div>
+<div class="flex items-center justify-between mb-4">
+<div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Recent Field Observations</h3>
+<p class="font-caption text-caption text-secondary">Verified surveillance telemetry logs and trap counts</p>
+</div>
+<span class="text-xs font-semibold px-3 py-1 rounded-full bg-surface-soft text-on-surface border border-border-hairline">
+Delta Cluster Logs
+</span>
+</div>
+<!-- Friendly Table -->
+<div class="overflow-x-auto custom-scrollbar border border-border-hairline rounded-xl">
+<table class="w-full text-left border-collapse text-xs">
+<thead>
+<tr class="bg-surface-soft text-[11px] font-semibold text-secondary uppercase tracking-wider border-b border-border-hairline">
+<th class="py-3 px-3.5">Station/Field</th>
+<th class="py-3 px-3">Crop</th>
+<th class="py-3 px-3">Pest</th>
+<th class="py-3 px-3">Latest Observation</th>
+<th class="py-3 px-3">Risk Severity</th>
+<th class="py-3 px-3 text-right">Date</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-hairline font-medium">
+<!-- Row 1: Aduthurai -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors">
+<td class="py-3 px-3.5">
+<span class="font-bold text-on-surface">Aduthurai</span>
+<div class="text-[10px] text-secondary">Plot R-14 (ICAR)</div>
+</td>
+<td class="py-3 px-3 text-on-surface">Rice</td>
+<td class="py-3 px-3 text-on-surface font-semibold">Stem Borer</td>
+<td class="py-3 px-3 text-on-surface">8% dead hearts</td>
+<td class="py-3 px-3">
+<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fff7ed] text-risk-high border border-risk-high/30">High</span>
+</td>
+<td class="py-3 px-3 text-right text-secondary font-mono">Today, 08:30</td>
+</tr>
+<!-- Row 2: Thanjavur West -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors">
+<td class="py-3 px-3.5">
+<span class="font-bold text-on-surface">Thanjavur West</span>
+<div class="text-[10px] text-secondary">KVK Demonstration</div>
+</td>
+<td class="py-3 px-3 text-on-surface">Rice</td>
+<td class="py-3 px-3 text-on-surface font-semibold">Brown Planthopper</td>
+<td class="py-3 px-3 text-on-surface">4 hoppers / hill</td>
+<td class="py-3 px-3">
+<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fffbeb] text-risk-moderate border border-risk-moderate/30">Moderate</span>
+</td>
+<td class="py-3 px-3 text-right text-secondary font-mono">Yesterday</td>
+</tr>
+<!-- Row 3: Coimbatore -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors">
+<td class="py-3 px-3.5">
+<span class="font-bold text-on-surface">Coimbatore</span>
+<div class="text-[10px] text-secondary">TNAU Farm</div>
+</td>
+<td class="py-3 px-3 text-on-surface">Cotton</td>
+<td class="py-3 px-3 text-on-surface font-semibold">Bollworm</td>
+<td class="py-3 px-3 text-on-surface">1 larva / 20 plants</td>
+<td class="py-3 px-3">
+<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecffe0] text-risk-low border border-risk-low/30">Low</span>
+</td>
+<td class="py-3 px-3 text-right text-secondary font-mono">22 Oct</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-border-hairline flex items-center justify-between">
+<span class="text-xs text-secondary">Updated continually by field scouts</span>
+<button class="bg-surface-soft hover:bg-canvas border border-border-hairline text-on-surface text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1 transition-all">
+<span>View All Observations</span>
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- SYSTEM FOOTER -->
+<footer class="mt-auto px-8 py-5 border-t border-border-hairline bg-canvas flex flex-col sm:flex-row items-center justify-between text-xs text-secondary gap-3">
+<div class="flex items-center gap-2">
+<span class="font-bold text-on-surface">AgroWatch AI Farmer Command</span>
+<span>•</span>
+<span>ICAR / TNAU Automated Agricultural Advisory System</span>
+</div>
+<div class="flex items-center gap-4">
+<span>Advisory ID: <strong>ADV-2024-10-84</strong></span>
+<span class="flex items-center gap-1 text-primary font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>Live Weather Sync 10:42 UTC</span>
+</span>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

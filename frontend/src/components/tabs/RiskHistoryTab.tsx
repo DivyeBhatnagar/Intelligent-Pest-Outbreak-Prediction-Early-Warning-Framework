@@ -1,243 +1,262 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
+  ResponsiveContainer,
   AreaChart,
   Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
 } from 'recharts';
-import { TrendingUp, History, Activity, Calendar } from 'lucide-react';
 import { apiService } from '../../services/api';
-import { RISK_COLORS, RISK_BADGES } from '../../constants/agroData';
+import { STATIONS, PESTS_BY_CROP } from '../../constants/agroData';
 
 export const RiskHistoryTab: React.FC = () => {
   const [historyData, setHistoryData] = useState<any[]>([]);
-  const [timeRange, setTimeRange] = useState<number>(30);
+  const [cropFilter, setCropFilter] = useState<string>('ALL');
+  const [locationFilter, setLocationFilter] = useState<string>('ALL');
+  const [pestFilter, setPestFilter] = useState<string>('ALL');
+  const [limit, setLimit] = useState<number>(50);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const loadHistory = useCallback(async () => {
+  const loadHistory = async () => {
+    setIsLoading(true);
     try {
-      const res = await apiService.getRiskHistory(timeRange);
-      setHistoryData(Array.isArray(res) ? res : []);
-    } catch {
-      // Fallback historical sample if DB is freshly seeded
-      setHistoryData([
-        { date: 'SMW 32', timestamp: '2026-08-10', risk_score: 0.22, risk_level: 'LOW', station: 'Cuttack', crop: 'Rice', pest: 'Brown Planthopper', gdd: 14.5, vpd: 0.85 },
-        { date: 'SMW 33', timestamp: '2026-08-17', risk_score: 0.35, risk_level: 'LOW', station: 'Cuttack', crop: 'Rice', pest: 'Brown Planthopper', gdd: 15.2, vpd: 0.72 },
-        { date: 'SMW 34', timestamp: '2026-08-24', risk_score: 0.58, risk_level: 'MODERATE', station: 'Maruteru', crop: 'Rice', pest: 'Yellow Stem Borer', gdd: 16.0, vpd: 0.65 },
-        { date: 'SMW 35', timestamp: '2026-08-31', risk_score: 0.72, risk_level: 'HIGH', station: 'Nagpur', crop: 'Cotton', pest: 'Whitefly', gdd: 17.5, vpd: 0.52 },
-        { date: 'SMW 36', timestamp: '2026-09-07', risk_score: 0.81, risk_level: 'HIGH', station: 'Lam', crop: 'Cotton', pest: 'American Bollworm', gdd: 18.2, vpd: 0.48 },
-        { date: 'SMW 37', timestamp: '2026-09-14', risk_score: 0.94, risk_level: 'CRITICAL', station: 'Cuttack', crop: 'Rice', pest: 'Brown Planthopper', gdd: 19.5, vpd: 0.38 },
-        { date: 'SMW 38', timestamp: '2026-09-21', risk_score: 0.88, risk_level: 'CRITICAL', station: 'Cuttack', crop: 'Rice', pest: 'Brown Planthopper', gdd: 18.9, vpd: 0.42 },
-      ]);
+      const data = await apiService.getRiskHistory({
+        limit,
+        crop: cropFilter !== 'ALL' ? cropFilter : undefined,
+        location: locationFilter !== 'ALL' ? locationFilter : undefined,
+        pest_name: pestFilter !== 'ALL' ? pestFilter : undefined,
+      });
+      setHistoryData(data);
+    } catch (err) {
+      console.error('Failed to load risk history:', err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [timeRange]);
+  };
 
   useEffect(() => {
     loadHistory();
-  }, [loadHistory]);
+  }, [cropFilter, locationFilter, pestFilter, limit]);
 
-  // Pie chart calculation
-  const distributionCounts = historyData.reduce((acc: Record<string, number>, item) => {
-    const lvl = item.risk_level || 'LOW';
-    acc[lvl] = (acc[lvl] || 0) + 1;
-    return acc;
-  }, { LOW: 0, MODERATE: 0, HIGH: 0, CRITICAL: 0 });
+  // Compute summary metrics from real database history
+  const totalEntries = historyData.length;
+  const avgRiskScore =
+    totalEntries > 0
+      ? (historyData.reduce((acc, curr) => acc + (curr.risk_score || 0), 0) / totalEntries) * 100
+      : 0;
+  const criticalOutbreaks = historyData.filter(
+    (d) => d.risk_level === 'CRITICAL' || (d.risk_score && d.risk_score >= 0.8)
+  ).length;
 
-  const pieData = [
-    { name: 'Low', value: distributionCounts.LOW || 2, color: RISK_COLORS.LOW },
-    { name: 'Moderate', value: distributionCounts.MODERATE || 3, color: RISK_COLORS.MODERATE },
-    { name: 'High', value: distributionCounts.HIGH || 4, color: RISK_COLORS.HIGH },
-    { name: 'Critical', value: distributionCounts.CRITICAL || 2, color: RISK_COLORS.CRITICAL },
-  ];
+  // Format data for Recharts chronological sequence
+  const chartData = [...historyData].reverse().map((item, idx) => ({
+    name: item.created_at ? item.created_at.split(' ')[0] : `#${idx + 1}`,
+    risk_score: item.risk_score !== undefined ? Math.round(item.risk_score * 100) : 0,
+    gdd: item.gdd_accumulated ? Math.round(item.gdd_accumulated * 10) / 10 : 0,
+    vpd: item.vpd_kpa ? Math.round(item.vpd_kpa * 100) / 100 : 0,
+    location: item.location,
+    pest: item.pest_name,
+    crop: item.crop,
+  }));
 
   return (
-    <div className="space-y-6 max-w-[1700px] mx-auto p-4 md:p-6">
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="glass-card p-5 flex items-center justify-between gap-4 flex-wrap">
+    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      {/* Header Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-DEFAULT bg-surface-container-low border border-border-hairline gap-4">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-400" />
-            Historical Risk Trends & Predictive Telemetry
-          </h2>
-          <p className="text-xs text-slate-400">
-            Multi-week temporal progression of pest probability and bio-climatic indices
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary">
+              Empirical Longitudinal Trends
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            <span className="text-xs text-secondary">Temporal Surveillance Log</span>
+          </div>
+          <h1 className="font-headline text-2xl md:text-3xl font-bold text-on-surface mt-1">
+            Risk History & Bio-Climatic Trajectories
+          </h1>
+          <p className="text-sm text-secondary mt-1">
+            Historical progression of pest risk probabilities correlated with physiological Degree-Days and VPD.
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <Calendar className="w-4 h-4 text-slate-400" />
-          <span className="text-slate-400">Time Horizon:</span>
+          <span className="text-secondary font-semibold">Time Window:</span>
           <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(parseInt(e.target.value))}
-            className="bg-[#0a1017] border border-white/10 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value))}
+            className="h-9 rounded-lg border border-border-hairline bg-surface-soft px-3 text-xs font-semibold text-on-surface focus:outline-none"
           >
-            <option value={7}>Last 7 Days</option>
-            <option value={30}>Last 30 Days</option>
-            <option value={90}>Last 90 Days</option>
+            <option value={20}>Last 20 Observations</option>
+            <option value={50}>Last 50 Observations</option>
+            <option value={100}>Last 100 Observations</option>
           </select>
         </div>
       </div>
 
-      {/* ── Charts Grid ────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Trend Area Chart (8 cols) */}
-        <div className="lg:col-span-8 glass-card p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-400" />
-              Outbreak Risk Probability Trajectory
-            </h3>
-            <span className="text-[11px] font-mono text-slate-400">Lead time: 7–14 days</span>
+      {/* 4 Summary Metrics Bento Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="p-5 rounded-DEFAULT bg-surface-container-lowest border border-border-hairline shadow-subtle">
+          <span className="text-xs font-bold uppercase text-secondary">Logged Predictions</span>
+          <div className="font-headline text-3xl font-bold text-on-surface mt-2">
+            {totalEntries}
+          </div>
+          <span className="text-[11px] text-secondary mt-1 block">Inference audit records</span>
+        </div>
+
+        <div className="p-5 rounded-DEFAULT bg-surface-container-lowest border border-border-hairline shadow-subtle">
+          <span className="text-xs font-bold uppercase text-secondary">Mean Outbreak Risk</span>
+          <div className="font-headline text-3xl font-bold text-primary mt-2">
+            {avgRiskScore.toFixed(1)}%
+          </div>
+          <span className="text-[11px] text-secondary mt-1 block">Aggregated risk index</span>
+        </div>
+
+        <div className="p-5 rounded-DEFAULT bg-surface-container-lowest border border-border-hairline shadow-subtle">
+          <span className="text-xs font-bold uppercase text-secondary">Critical Outbreaks</span>
+          <div className="font-headline text-3xl font-bold text-risk-critical mt-2">
+            {criticalOutbreaks}
+          </div>
+          <span className="text-[11px] text-secondary mt-1 block">Breaches above 80% risk</span>
+        </div>
+
+        <div className="p-5 rounded-DEFAULT bg-surface-container-lowest border border-border-hairline shadow-subtle">
+          <span className="text-xs font-bold uppercase text-secondary">Current Season</span>
+          <div className="font-headline text-3xl font-bold text-on-surface mt-2">
+            Kharif / Rabi
+          </div>
+          <span className="text-[11px] text-secondary mt-1 block">Active agricultural cycle</span>
+        </div>
+      </div>
+
+      {/* High Density Filter Dock */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-surface-container-lowest border border-border-hairline shadow-subtle">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-secondary font-semibold">Station:</span>
+            <select
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              className="h-9 rounded-lg border border-border-hairline bg-surface-soft px-2.5 text-xs font-medium text-on-surface focus:outline-none"
+            >
+              <option value="ALL">All Stations</option>
+              {Object.keys(STATIONS).map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="h-72 w-full pt-4">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-secondary font-semibold">Crop:</span>
+            <select
+              value={cropFilter}
+              onChange={(e) => setCropFilter(e.target.value)}
+              className="h-9 rounded-lg border border-border-hairline bg-surface-soft px-2.5 text-xs font-medium text-on-surface focus:outline-none"
+            >
+              <option value="ALL">All Crops</option>
+              <option value="Rice">Rice</option>
+              <option value="Cotton">Cotton</option>
+              <option value="Maize">Maize</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="text-secondary font-semibold">Pest:</span>
+            <select
+              value={pestFilter}
+              onChange={(e) => setPestFilter(e.target.value)}
+              className="h-9 rounded-lg border border-border-hairline bg-surface-soft px-2.5 text-xs font-medium text-on-surface focus:outline-none"
+            >
+              <option value="ALL">All Pests</option>
+              {(PESTS_BY_CROP[cropFilter] || Object.values(PESTS_BY_CROP).flat()).map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 text-xs font-medium text-secondary">
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" /> Risk Score (%)
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Degree-Days (GDD)
+          </span>
+        </div>
+      </div>
+
+      {/* Primary Historical Risk Progression Chart */}
+      <div className="p-6 rounded-DEFAULT bg-surface-container-lowest border border-border-hairline shadow-subtle space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-headline text-base font-bold text-on-surface">
+              Historical Risk Progression vs Thermal Accumulation
+            </h3>
+            <p className="text-xs text-secondary">
+              Direct telemetry from backend database audit logs
+            </p>
+          </div>
+          <span className="text-xs font-mono text-secondary">
+            {isLoading ? 'Querying records…' : `${chartData.length} Data Points`}
+          </span>
+        </div>
+
+        <div className="w-full h-80">
+          {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="riskGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#006c46" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#006c46" stopOpacity={0.0} />
+                  </linearGradient>
+                  <linearGradient id="gddGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" vertical={false} />
-                <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 11 }} />
-                <YAxis domain={[0, 1]} stroke="#64748b" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#0e1620',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderRadius: '10px',
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e5e7eb',
+                    borderRadius: '8px',
                     fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                   }}
-                  formatter={(val: any) => [`${(Number(val) * 100).toFixed(1)}%`, 'Risk Probability']}
                 />
                 <Area
                   type="monotone"
                   dataKey="risk_score"
-                  stroke="#10b981"
+                  stroke="#006c46"
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#riskGradient)"
+                  name="Risk Score (%)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="gdd"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#gddGradient)"
+                  name="GDD (°C-day)"
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Risk Distribution Pie Chart (4 cols) */}
-        <div className="lg:col-span-4 glass-card p-5 space-y-4">
-          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wide">
-            Evaluations by Risk Severity Tier
-          </h3>
-
-          <div className="h-60 w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0e1620',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    fontSize: '11px',
-                  }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: '11px', color: '#94a3b8' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-center text-xs">
-            <div className="p-2 rounded bg-white/[0.02] border border-white/5">
-              <span className="text-[10px] text-slate-400 block">Critical Events</span>
-              <span className="font-mono font-bold text-rose-400">{distributionCounts.CRITICAL}</span>
+          ) : (
+            <div className="h-full flex items-center justify-center text-secondary text-xs">
+              No historical prediction data available for the selected filters.
             </div>
-            <div className="p-2 rounded bg-white/[0.02] border border-white/5">
-              <span className="text-[10px] text-slate-400 block">High Risk Events</span>
-              <span className="font-mono font-bold text-amber-400">{distributionCounts.HIGH}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Detailed Evaluation Audit Trail Table ───────────────────────────── */}
-      <div className="glass-card overflow-hidden">
-        <div className="p-4 border-b border-white/10 flex items-center justify-between">
-          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
-            <History className="w-4 h-4 text-emerald-400" />
-            Model Prediction Audit Trail Logs
-          </h3>
-          <span className="text-xs font-mono text-slate-400">Total: {historyData.length} records</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-white/10 bg-white/[0.02] text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-4">Timestamp / Week</th>
-                <th className="py-3 px-4">Station</th>
-                <th className="py-3 px-4">Crop & Pest</th>
-                <th className="py-3 px-4 font-mono">Predicted Probability</th>
-                <th className="py-3 px-4">Severity Tier</th>
-                <th className="py-3 px-4 font-mono">GDD Accumulated</th>
-                <th className="py-3 px-4 font-mono">VPD Deficit</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {historyData.map((item, idx) => {
-                const badge = RISK_BADGES[item.risk_level as keyof typeof RISK_BADGES] || RISK_BADGES.LOW;
-                return (
-                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3 px-4 font-mono text-slate-300">
-                      <div>{item.timestamp || '2026-10-22'}</div>
-                      <div className="text-[10px] text-slate-500">{item.date || 'SMW 42'}</div>
-                    </td>
-                    <td className="py-3 px-4 font-semibold text-slate-200">{item.station || 'Cuttack'}</td>
-                    <td className="py-3 px-4">
-                      <div className="font-bold text-slate-100">{item.pest || 'Brown Planthopper'}</div>
-                      <div className="text-[10px] text-emerald-400">{item.crop || 'Rice'}</div>
-                    </td>
-                    <td className="py-3 px-4 font-mono font-bold text-slate-200">
-                      {((item.risk_score || 0) * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.color}`}>
-                        {item.risk_level || 'LOW'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-mono text-slate-300">
-                      {item.gdd ? `${item.gdd} °C-d` : '15.4 °C-d'}
-                    </td>
-                    <td className="py-3 px-4 font-mono text-slate-300">
-                      {item.vpd ? `${item.vpd} kPa` : '0.62 kPa'}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
 
+export type TabKey = 'overview' | 'map' | 'obs' | 'history' | 'alerts' | 'model' | 'system';
+
 export interface Station {
   code: string;
   name: string;
@@ -50,8 +52,8 @@ export interface PredictionRequest {
     rh_evening: number;
     rainfall: number;
     wind_speed: number;
-    sunshine_hours: number;
-    evaporation: number;
+    sunshine_hours?: number;
+    evaporation?: number;
   };
 }
 
@@ -65,6 +67,8 @@ export interface PredictionResponse {
   advisory: string;
   model_version: string;
   vpd?: string | number;
+  probability?: number;
+  confidence?: number;
 }
 
 export interface Observation {
@@ -99,9 +103,10 @@ export interface AlertItem {
   crop: string;
   pest_name: string;
   risk_level: RiskLevel;
+  severity?: RiskLevel;
   risk_score: number;
   advisory_text: string;
-  status: 'PENDING' | 'ACKNOWLEDGED' | 'RESOLVED';
+  status: string;
   officer_notes?: string;
   acknowledged_at?: string;
   acknowledged_by?: string;
@@ -118,6 +123,7 @@ export interface ModelMetric {
   recall: number;
   f1_score: number;
   roc_auc: number;
+  pr_auc?: number;
   false_negative_rate?: number;
   confusion_matrix?: {
     true_negative: number;
@@ -151,5 +157,4 @@ export interface SystemHealthResponse {
   active_alerts: number;
   model_loaded: boolean;
   weather_service: string;
-  database_connected?: boolean;
 }

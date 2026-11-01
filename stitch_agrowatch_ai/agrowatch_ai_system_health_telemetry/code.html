@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroWatch AI - System Health &amp; Infrastructure Telemetry</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed-variant": "#005234",
+            "surface-soft": "#f2f4f5",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#c6d8bb",
+            "inverse-surface": "#28313b",
+            "on-secondary-fixed": "#1b1b1b",
+            "primary-fixed": "#4dffb2",
+            "surface-container": "#e5effc",
+            "tertiary": "#52634b",
+            "on-secondary-container": "#646464",
+            "on-tertiary-container": "#4e5f47",
+            "secondary-container": "#e2e2e2",
+            "outline": "#6b7b70",
+            "primary": "#006c46",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#3b4b35",
+            "surface-tint": "#006c46",
+            "surface-container-highest": "#d9e3f1",
+            "primary-container": "#00f0a0",
+            "on-surface-variant": "#3b4a40",
+            "on-primary-container": "#006843",
+            "on-background": "#131c26",
+            "surface": "#f7f9ff",
+            "on-secondary-fixed-variant": "#474747",
+            "outline-variant": "#b9cbbe",
+            "border-hairline": "#e5e7eb",
+            "surface-bright": "#f7f9ff",
+            "risk-moderate": "#f59e0b",
+            "secondary-fixed-dim": "#c6c6c6",
+            "inverse-primary": "#00e296",
+            "surface-variant": "#d9e3f1",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#baccaf",
+            "on-surface": "#131c26",
+            "on-primary": "#ffffff",
+            "on-primary-fixed": "#002112",
+            "surface-container-low": "#edf4ff",
+            "surface-container-lowest": "#ffffff",
+            "risk-low": "#10b981",
+            "on-tertiary-fixed": "#111f0d",
+            "error": "#ba1a1a",
+            "risk-critical": "#ef4444",
+            "surface-container-high": "#dfe9f6",
+            "risk-high": "#f97316",
+            "background": "#f7f9ff",
+            "canvas": "#ffffff",
+            "surface-dim": "#d1dbe8",
+            "secondary": "#5e5e5e",
+            "on-tertiary": "#ffffff",
+            "inverse-on-surface": "#e8f2ff",
+            "secondary-fixed": "#e2e2e2",
+            "primary-fixed-dim": "#00e296",
+            "tertiary-fixed": "#d5e8ca"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-section": "6rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "gutter-sm": "1rem",
+            "gutter": "1.5rem",
+            "margin": "2rem",
+            "space-xxl": "3rem",
+            "margin-sm": "1rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Inter"],
+            "headline-sm": ["Space Grotesk"],
+            "body-md": ["Inter"],
+            "caption": ["Inter"],
+            "headline-md": ["Space Grotesk"],
+            "headline-md-mobile": ["Space Grotesk"],
+            "body-lg": ["Inter"],
+            "title-lg": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "title-md": ["Inter"],
+            "label-md": ["Inter"],
+            "display-mobile": ["Space Grotesk"],
+            "body-sm": ["Inter"],
+            "headline-sm-mobile": ["Space Grotesk"],
+            "display": ["Space Grotesk"],
+            "headline-lg-mobile": ["Space Grotesk"]
+          },
+          "fontSize": {
+            "label-sm": ["0.875rem", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-sm": ["2.375rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "body-md": ["1rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "500" }],
+            "caption": ["0.8125rem", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-md": ["3rem", { "lineHeight": "1.15", "letterSpacing": "0", "fontWeight": "700" }],
+            "headline-md-mobile": ["1.75rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "700" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+            "title-lg": ["2rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "600" }],
+            "headline-lg": ["3.75rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "title-md": ["1.125rem", { "lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600" }],
+            "label-md": ["1rem", { "lineHeight": "1", "letterSpacing": "0", "fontWeight": "600" }],
+            "display-mobile": ["2.5rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "500" }],
+            "headline-sm-mobile": ["1.5rem", { "lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "600" }],
+            "display": ["5rem", { "lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-lg-mobile": ["2rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex selection:bg-primary-container selection:text-on-background">
+<!-- SIDEBAR (Fixed Left Dock as defined in Shared Components JSON) -->
+<aside class="fixed left-0 top-0 bottom-0 w-72 z-40 p-4 border-r border-border-hairline bg-surface-container-lowest flex flex-col justify-between overflow-y-auto custom-scroll">
+<!-- Header / Brand -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-3 px-2 pt-2">
+<div class="w-10 h-10 rounded-DEFAULT bg-primary-container flex items-center justify-center border border-on-background shadow-sm">
+<span class="material-symbols-outlined text-on-background" data-icon="health_and_safety" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-lg text-title-lg font-bold text-on-surface tracking-tight leading-tight">AgroWatch AI</span>
+<span class="font-caption text-caption text-on-surface-variant font-medium">Intelligent Pest Surveillance</span>
+</div>
+</div>
+<!-- Live Sensor Telemetry Badge -->
+<div class="px-3 py-2 rounded-full bg-tertiary-container/30 border border-primary/20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="font-label-sm text-label-sm text-primary font-semibold">Operational: All Sensors Active</span>
+</div>
+<span class="font-caption text-caption text-on-surface-variant font-mono">v2.4.1</span>
+</div>
+<!-- Navigation Links -->
+<nav aria-label="Main Navigation" class="flex flex-col gap-1.5">
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low rounded-DEFAULT transition-colors active:scale-[0.99]" href="#overview">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- 2. Risk Map -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low rounded-DEFAULT transition-colors active:scale-[0.99]" href="#risk-map">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span>Risk Map</span>
+</a>
+<!-- 3. Field Observations -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low rounded-DEFAULT transition-colors active:scale-[0.99]" href="#field-observations">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span>Field Observations</span>
+</a>
+<!-- 4. Risk History -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low rounded-DEFAULT transition-colors active:scale-[0.99]" href="#risk-history">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Risk History</span>
+</a>
+<!-- 5. Alerts & Advisories -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low rounded-DEFAULT transition-colors active:scale-[0.99]" href="#alerts">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span>Alerts &amp; Advisories</span>
+</a>
+<!-- 6. Model Performance -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low rounded-DEFAULT transition-colors active:scale-[0.99]" href="#model-performance">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Model Performance</span>
+</a>
+<!-- 7. System Health (ACTIVE TAB mapped verbatim from JSON) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-tertiary-container/30 text-primary font-title-md text-title-md rounded-DEFAULT border-l-4 border-primary active:scale-[0.99]" href="#system">
+<span class="material-symbols-outlined text-primary" data-icon="health_and_safety" style="font-variation-settings: 'FILL' 1;">health_and_safety</span>
+<span>System Health</span>
+</a>
+</nav>
+</div>
+<!-- Sidebar Footer / Admin Identity -->
+<div class="pt-4 border-t border-border-hairline flex flex-col gap-3">
+<div class="flex items-center gap-3 px-2 py-2 rounded-DEFAULT bg-surface-soft hover:bg-surface-container-low transition-colors">
+<div class="w-10 h-10 rounded-full bg-on-background text-canvas flex items-center justify-center font-bold text-sm tracking-wider">
+          AS
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm font-semibold truncate text-on-surface">Dr. A. Swaminathan</span>
+<span class="font-caption text-caption text-on-surface-variant truncate">Surveillance Administrator</span>
+</div>
+<span class="material-symbols-outlined ml-auto text-outline text-lg" data-icon="account_circle">account_circle</span>
+</div>
+<div class="text-[11px] font-caption text-outline text-center">
+        Regional Agro-Bio Sentinel Tier-1 © 2025
+      </div>
+</div>
+</aside>
+<!-- MAIN WRAPPER (Shifted 288px / w-72 for docked left nav) -->
+<div class="flex-1 ml-72 flex flex-col min-h-screen bg-canvas">
+<!-- TOP APP BAR (from Shared Components JSON specifications) -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-8 py-3.5 w-full border-b border-border-hairline bg-surface-container-lowest/95 backdrop-blur">
+<!-- Breadcrumb + Left Search -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-on-surface-variant">AgroWatch AI</span>
+<span class="text-outline">/</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">System Health &amp; Infrastructure Telemetry</span>
+</div>
+<div class="relative w-64 hidden xl:block">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-sm" data-icon="search">search</span>
+<input class="w-full pl-9 pr-3 py-1.5 bg-surface-soft border border-border-hairline rounded-full font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-on-background focus:ring-1 focus:ring-on-background transition-all" placeholder="Search ICAR station or telemetry node..." type="text"/>
+</div>
+</div>
+<!-- Right Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- Crop Selection Pills -->
+<div class="flex items-center bg-surface-soft p-1 rounded-full border border-border-hairline mr-2">
+<button class="bg-on-background text-canvas font-label-md text-label-md px-3.5 py-1 rounded-full shadow-sm text-xs">Rice (Paddy)</button>
+<button class="text-on-surface-variant font-label-md text-label-md px-3.5 py-1 rounded-full hover:bg-surface-container-high text-xs transition-colors">Cotton</button>
+</div>
+<!-- Live Sync Status Badge -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-soft border border-border-hairline">
+<span class="w-2 h-2 rounded-full bg-risk-low animate-pulse"></span>
+<span class="font-caption text-caption text-on-surface font-mono font-medium">Live Sync 10:42 UTC</span>
+</div>
+<!-- Trailing Primary Action: Flush Cache / Ping Services (Black pill button) -->
+<button class="bg-on-background hover:bg-inverse-surface text-canvas font-label-sm text-label-sm px-5 py-2 rounded-full transition-all active:scale-[0.98] flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-sm text-primary-container" data-icon="refresh">refresh</span>
+<span>Flush Cache / Ping Services</span>
+</button>
+<!-- Trailing Icon Actions -->
+<div class="flex items-center gap-1 border-l border-border-hairline pl-2">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-soft rounded-full transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-soft rounded-full transition-colors" title="Tune Telemetry">
+<span class="material-symbols-outlined text-xl" data-icon="tune">tune</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-soft rounded-full transition-colors" title="Documentation">
+<span class="material-symbols-outlined text-xl" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN SCROLLABLE CONTENT CANVAS -->
+<main class="flex-1 p-8 max-w-[1400px] w-full mx-auto space-y-8">
+<!-- 1. OVERALL SYSTEM STATUS BANNER -->
+<section class="rounded-DEFAULT border border-primary/40 bg-gradient-to-r from-tertiary-container/30 via-surface-container-low to-canvas p-6 shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<!-- Main status badge + title -->
+<div class="flex items-start sm:items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-canvas border border-primary/30 flex items-center justify-center relative shadow-sm">
+<span class="material-symbols-outlined text-3xl text-primary" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-primary"></span>
+</span>
+</div>
+<div>
+<div class="flex items-center gap-3">
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Overall Status: ALL SYSTEMS OPERATIONAL</h1>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low font-bold text-xs">
+                  99.98% Uptime
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                Continuous agricultural pest bio-surveillance cluster across 11 ICAR agronomic monitoring zones. Zero degraded components detected.
+              </p>
+</div>
+</div>
+<!-- Quick telemetry summary pill group -->
+<div class="flex flex-wrap items-center gap-3 pt-4 lg:pt-0 border-t lg:border-t-0 border-border-hairline">
+<div class="px-4 py-2.5 rounded-DEFAULT bg-canvas border border-border-hairline shadow-sm flex flex-col min-w-[130px]">
+<span class="font-caption text-caption text-outline uppercase font-semibold text-[11px]">ML Inference</span>
+<span class="font-title-md text-title-md font-bold text-on-surface font-mono">35ms <span class="text-xs font-normal text-on-surface-variant">avg</span></span>
+</div>
+<div class="px-4 py-2.5 rounded-DEFAULT bg-canvas border border-border-hairline shadow-sm flex flex-col min-w-[130px]">
+<span class="font-caption text-caption text-outline uppercase font-semibold text-[11px]">Active IoT Nodes</span>
+<span class="font-title-md text-title-md font-bold text-primary font-mono">88 / 88</span>
+</div>
+<div class="px-4 py-2.5 rounded-DEFAULT bg-canvas border border-border-hairline shadow-sm flex flex-col min-w-[130px]">
+<span class="font-caption text-caption text-outline uppercase font-semibold text-[11px]">Cleaned Dataset</span>
+<span class="font-title-md text-title-md font-bold text-on-surface font-mono">35,499</span>
+</div>
+<div class="px-4 py-2.5 rounded-DEFAULT bg-canvas border border-border-hairline shadow-sm flex flex-col min-w-[110px]">
+<span class="font-caption text-caption text-outline uppercase font-semibold text-[11px]">Sync Status</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-md text-label-md font-bold text-primary font-mono text-sm">LIVE</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. CORE SUBSYSTEM HEALTH CARDS (5 Services Grid) -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface font-bold">Core Subsystem Telemetry</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Autonomous service mesh integrity, runtime benchmarks, and data pipeline availability.</p>
+</div>
+<span class="font-caption text-caption text-outline">Polled via Consul Health Agent @ 10:42:00 UTC</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+<!-- Card 1: FastAPI Core Engine -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-on-background transition-all group shadow-sm">
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="w-9 h-9 rounded-lg bg-surface-soft flex items-center justify-center text-on-surface group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="bolt">bolt</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low text-xs font-semibold">Operational</span>
+</div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">FastAPI Core Engine</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-1">High-throughput asynchronous ASGI microservice broker.</p>
+<div class="mt-4 pt-4 border-t border-border-hairline space-y-2">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Uptime</span>
+<span class="font-mono font-semibold text-on-surface">99.99%</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">HTTP Latency</span>
+<span class="font-mono font-semibold text-primary">18ms</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-dashed border-border-hairline">
+<span class="font-mono text-[11px] text-outline truncate block bg-surface-soft px-2 py-1 rounded">
+                /api/v2/predict healthy
+              </span>
+</div>
+</div>
+<!-- Card 2: ML Model Engine -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-on-background transition-all group shadow-sm">
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="w-9 h-9 rounded-lg bg-surface-soft flex items-center justify-center text-on-surface group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="psychology">psychology</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low text-xs font-semibold">Operational</span>
+</div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">ML Model Engine</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-1 font-mono text-xs">RF-Ensemble v4.2 in-memory</p>
+<div class="mt-4 pt-4 border-t border-border-hairline space-y-2">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Batch Inference</span>
+<span class="font-mono font-semibold text-primary">35ms</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Failed Runs</span>
+<span class="font-mono font-semibold text-on-surface">0 errors</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-dashed border-border-hairline">
+<span class="font-mono text-[11px] text-primary truncate block bg-tertiary-container/30 px-2 py-1 rounded font-semibold">
+                In-Memory Loaded (2.1GB)
+              </span>
+</div>
+</div>
+<!-- Card 3: SQLite Production Database -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-on-background transition-all group shadow-sm">
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="w-9 h-9 rounded-lg bg-surface-soft flex items-center justify-center text-on-surface group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="database">database</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low text-xs font-semibold">Operational</span>
+</div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">SQLite Production DB</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-1">WAL-mode primary operational datastore.</p>
+<div class="mt-4 pt-4 border-t border-border-hairline space-y-2">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Records</span>
+<span class="font-mono font-semibold text-on-surface">35,499 rows</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Query Latency</span>
+<span class="font-mono font-semibold text-primary">4.2ms</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-dashed border-border-hairline">
+<span class="font-mono text-[11px] text-outline truncate block bg-surface-soft px-2 py-1 rounded">
+                Write Lock: Free (WAL Active)
+              </span>
+</div>
+</div>
+<!-- Card 4: DuckDB Analytics Engine -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-on-background transition-all group shadow-sm">
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="w-9 h-9 rounded-lg bg-surface-soft flex items-center justify-center text-on-surface group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="query_stats">query_stats</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low text-xs font-semibold">Operational</span>
+</div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">DuckDB Analytics</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-1">Embedded OLAP vectorized aggregation.</p>
+<div class="mt-4 pt-4 border-t border-border-hairline space-y-2">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Cached Queries</span>
+<span class="font-mono font-semibold text-on-surface">142k</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Columnar Scan</span>
+<span class="font-mono font-semibold text-primary">0.9ms/100k</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-dashed border-border-hairline">
+<span class="font-mono text-[11px] text-outline truncate block bg-surface-soft px-2 py-1 rounded">
+                Fast Aggregation Active
+              </span>
+</div>
+</div>
+<!-- Card 5: Open-Meteo Weather API -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-on-background transition-all group shadow-sm">
+<div>
+<div class="flex items-center justify-between mb-3">
+<div class="w-9 h-9 rounded-lg bg-surface-soft flex items-center justify-center text-on-surface group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="cloud_sync">cloud_sync</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low text-xs font-semibold">Operational</span>
+</div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Open-Meteo API</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-1">11 ICAR stations sync every 15 min.</p>
+<div class="mt-4 pt-4 border-t border-border-hairline space-y-2">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Stations Monitored</span>
+<span class="font-mono font-semibold text-on-surface">11 ICAR</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Last Sync</span>
+<span class="font-mono font-semibold text-primary">4m ago (10:42)</span>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-dashed border-border-hairline">
+<span class="font-mono text-[11px] text-outline truncate block bg-surface-soft px-2 py-1 rounded">
+                Next sweep in 11:00 min
+              </span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. LIVE TELEMETRY & LATENCY TRENDS (2 CHARTS SIDE BY SIDE) -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Chart 1: Latency Past 24h -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Inference &amp; API Latency (ms)</h3>
+</div>
+<span class="font-caption text-caption text-outline">Past 24 Hours</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Continuous baseline maintained between 30ms–40ms with zero threshold breaches above 50ms SLA boundary.
+            </p>
+</div>
+<!-- Synthetic High-Density SVG Telemetry Graph -->
+<div class="my-6 bg-surface-soft/60 rounded-DEFAULT p-4 border border-border-hairline">
+<div class="flex justify-between text-[11px] font-mono text-outline mb-2">
+<span>SLA Target Limit: 50.0ms</span>
+<span class="text-primary font-bold">Current: 34.8ms</span>
+</div>
+<div class="relative w-full h-44 flex items-end">
+<!-- Grid hairline guidelines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-30">
+<div class="border-b border-dashed border-error w-full"></div>
+<div class="border-b border-border-hairline w-full"></div>
+<div class="border-b border-border-hairline w-full"></div>
+<div class="border-b border-border-hairline w-full"></div>
+</div>
+<!-- SVG Latency Curve -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 500 120">
+<!-- SLA Reference Line at 50ms -->
+<line opacity="0.6" stroke="#ba1a1a" stroke-dasharray="4,4" stroke-width="1.5" x1="0" x2="500" y1="20" y2="20"></line>
+<!-- Pale Mint Area Fill -->
+<path d="M 0,85 
+                         C 30,82 60,88 90,84 
+                         C 120,80 150,83 180,86 
+                         C 210,89 240,78 270,81 
+                         C 300,84 330,85 360,79 
+                         C 390,75 420,84 450,82 
+                         L 500,83 L 500,120 L 0,120 Z" fill="#ecffe0" opacity="0.9"></path>
+<!-- Primary Solid Green Telemetry Wave -->
+<path d="M 0,85 
+                         C 30,82 60,88 90,84 
+                         C 120,80 150,83 180,86 
+                         C 210,89 240,78 270,81 
+                         C 300,84 330,85 360,79 
+                         C 390,75 420,84 450,82 
+                         L 500,83" fill="none" stroke="#006c46" stroke-width="2.5"></path>
+<!-- Current point dot -->
+<circle cx="500" cy="83" fill="#00f0a0" r="4" stroke="#000000" stroke-width="1.5"></circle>
+</svg>
+</div>
+<!-- X-Axis timeline labels -->
+<div class="flex justify-between text-[11px] font-mono text-outline mt-3 pt-2 border-t border-border-hairline">
+<span>12:00 (Yesterday)</span>
+<span>18:00</span>
+<span>00:00 (Midnight)</span>
+<span>06:00 (Morning)</span>
+<span class="text-on-surface font-semibold">10:42 UTC (Now)</span>
+</div>
+</div>
+<!-- Bottom Metric Pill -->
+<div class="flex items-center justify-between text-xs pt-2">
+<span class="text-on-surface-variant">P99 Latency: <strong class="text-on-surface font-mono">41.2ms</strong></span>
+<span class="text-on-surface-variant">Min: <strong class="text-on-surface font-mono">29.1ms</strong></span>
+<span class="text-on-surface-variant">Max: <strong class="text-on-surface font-mono">43.8ms</strong></span>
+<span class="text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+              Within SLA
+            </span>
+</div>
+</div>
+<!-- Chart 2: Prediction Request Volume -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-on-background"></span>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Hourly Prediction Request Volume</h3>
+</div>
+<span class="font-caption text-caption text-outline">Scouting Activity Peak</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Diurnal telemetry surges correlate with morning &amp; midday agronomic ground scouting runs (~2,400 queries/hr).
+            </p>
+</div>
+<!-- Volume Bar Column Visualization -->
+<div class="my-6 bg-surface-soft/60 rounded-DEFAULT p-4 border border-border-hairline">
+<div class="flex justify-between text-[11px] font-mono text-outline mb-2">
+<span>Peak Capacity: 5,000 req/hr</span>
+<span class="text-on-surface font-bold">Morning Peak: 2,410 req/hr</span>
+</div>
+<!-- CSS Flex Bar Simulation -->
+<div class="h-44 flex items-end justify-between gap-1.5 pt-4">
+<!-- 24 hourly bars with realistic diurnal agritech load -->
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[14%]" title="00:00 - 320 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[12%]" title="01:00 - 280 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[10%]" title="02:00 - 210 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[10%]" title="03:00 - 200 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[15%]" title="04:00 - 350 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[22%]" title="05:00 - 520 req"></div>
+<div class="flex-1 bg-on-surface-variant/40 rounded-t-sm h-[48%]" title="06:00 - 1,150 req"></div>
+<div class="flex-1 bg-on-background rounded-t-sm h-[82%]" title="07:00 - 1,980 req"></div>
+<div class="flex-1 bg-primary-container border-t-2 border-on-background rounded-t-sm h-[98%]" title="08:00 Peak - 2,410 req"></div>
+<div class="flex-1 bg-primary-container border-t-2 border-on-background rounded-t-sm h-[92%]" title="09:00 - 2,240 req"></div>
+<div class="flex-1 bg-on-background rounded-t-sm h-[75%]" title="10:00 - 1,820 req"></div>
+<div class="flex-1 bg-primary-container border-t-2 border-on-background rounded-t-sm h-[64%]" title="11:00 - 1,540 req"></div>
+<div class="flex-1 bg-on-surface-variant/40 rounded-t-sm h-[55%]" title="12:00 - 1,320 req"></div>
+<div class="flex-1 bg-on-surface-variant/40 rounded-t-sm h-[52%]" title="13:00 - 1,250 req"></div>
+<div class="flex-1 bg-on-surface-variant/40 rounded-t-sm h-[60%]" title="14:00 - 1,440 req"></div>
+<div class="flex-1 bg-on-background rounded-t-sm h-[78%]" title="15:00 - 1,870 req"></div>
+<div class="flex-1 bg-on-background rounded-t-sm h-[70%]" title="16:00 - 1,690 req"></div>
+<div class="flex-1 bg-on-surface-variant/40 rounded-t-sm h-[45%]" title="17:00 - 1,080 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[32%]" title="18:00 - 760 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[26%]" title="19:00 - 620 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[20%]" title="20:00 - 480 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[18%]" title="21:00 - 420 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[16%]" title="22:00 - 390 req"></div>
+<div class="flex-1 bg-border-hairline rounded-t-sm h-[15%]" title="23:00 - 360 req"></div>
+</div>
+<!-- X-Axis timeline labels -->
+<div class="flex justify-between text-[11px] font-mono text-outline mt-3 pt-2 border-t border-border-hairline">
+<span>00:00 (Night)</span>
+<span>06:00 (Dawn)</span>
+<span class="text-on-background font-semibold">08:00 (Scout Peak)</span>
+<span>14:00</span>
+<span>23:00</span>
+</div>
+</div>
+<!-- Bottom Metric Pill -->
+<div class="flex items-center justify-between text-xs pt-2">
+<span class="text-on-surface-variant">Daily Aggregate: <strong class="text-on-surface font-mono">24,370 inferences</strong></span>
+<span class="text-on-surface-variant">Cache Hit Rate: <strong class="text-on-surface font-mono">87.4%</strong></span>
+<span class="text-on-surface-variant font-mono text-outline">HTTP 200: 99.98%</span>
+</div>
+</div>
+</section>
+<!-- 4. REAL-TIME INFRASTRUCTURE EVENT & AUDIT LOG -->
+<section class="bg-canvas border border-border-hairline rounded-DEFAULT overflow-hidden shadow-sm">
+<!-- Header & Action Row -->
+<div class="p-6 border-b border-border-hairline flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-soft/40">
+<div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="terminal">terminal</span>
+<h3 class="font-title-md text-title-md font-bold text-on-surface">Real-Time Infrastructure Event &amp; Audit Log</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Immutable audit stream across database checkpoints, API rate quotas, and multispectral drone payloads.</p>
+</div>
+<!-- Technical Actions Buttons -->
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 rounded-full border border-border-hairline bg-canvas hover:bg-surface-soft text-on-surface font-label-sm text-label-sm flex items-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="download">download</span>
+<span>Download Audit Log (JSON)</span>
+</button>
+<button class="px-4 py-2 rounded-full border border-on-background bg-on-background text-canvas hover:bg-inverse-surface font-label-sm text-label-sm flex items-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm text-primary-container" data-icon="assessment">assessment</span>
+<span>Diagnostics Report</span>
+</button>
+</div>
+</div>
+<!-- Table Component adhering to Data Tables & Pest Telemetry Logs guidelines -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-soft border-b border-border-hairline text-outline font-label-sm text-[13px] uppercase tracking-wider">
+<th class="py-3 px-5 font-semibold">Timestamp</th>
+<th class="py-3 px-5 font-semibold">Component</th>
+<th class="py-3 px-5 font-semibold">Event Description</th>
+<th class="py-3 px-5 font-semibold">Severity</th>
+<th class="py-3 px-5 font-semibold text-right">Latency / Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-hairline font-body-sm text-body-sm text-on-surface">
+<!-- Row 1: Open-Meteo -->
+<tr class="hover:bg-tertiary-container/10 transition-colors">
+<td class="py-3 px-5 font-mono text-xs text-on-surface-variant whitespace-nowrap">
+                  10:42:15 UTC
+                </td>
+<td class="py-3 px-5 font-semibold whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Open-Meteo Syncer
+                </td>
+<td class="py-3 px-5 text-on-surface">
+                  Polled micro-climate data for Aduthurai, Raipur, Dharwad
+                </td>
+<td class="py-3 px-5 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-[11px] bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low font-bold">
+                    SUCCESS
+                  </span>
+</td>
+<td class="py-3 px-5 font-mono text-xs text-right text-primary font-semibold whitespace-nowrap">
+                  142ms
+                </td>
+</tr>
+<!-- Row 2: ML Inference -->
+<tr class="hover:bg-tertiary-container/10 transition-colors">
+<td class="py-3 px-5 font-mono text-xs text-on-surface-variant whitespace-nowrap">
+                  10:41:02 UTC
+                </td>
+<td class="py-3 px-5 font-semibold whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  ML Inference
+                </td>
+<td class="py-3 px-5 text-on-surface">
+                  Batch risk inference executed for 11 ICAR stations
+                </td>
+<td class="py-3 px-5 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-[11px] bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low font-bold">
+                    SUCCESS
+                  </span>
+</td>
+<td class="py-3 px-5 font-mono text-xs text-right text-primary font-semibold whitespace-nowrap">
+                  34.8ms
+                </td>
+</tr>
+<!-- Row 3: SQLite DB -->
+<tr class="hover:bg-tertiary-container/10 transition-colors">
+<td class="py-3 px-5 font-mono text-xs text-on-surface-variant whitespace-nowrap">
+                  10:35:00 UTC
+                </td>
+<td class="py-3 px-5 font-semibold whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  SQLite DB
+                </td>
+<td class="py-3 px-5 text-on-surface">
+                  Checkpoint &amp; WAL vacuum completed
+                </td>
+<td class="py-3 px-5 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-[11px] bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low font-bold">
+                    SUCCESS
+                  </span>
+</td>
+<td class="py-3 px-5 font-mono text-xs text-right text-primary font-semibold whitespace-nowrap">
+                  12.1ms
+                </td>
+</tr>
+<!-- Row 4: Drone Telemetry -->
+<tr class="hover:bg-tertiary-container/10 transition-colors">
+<td class="py-3 px-5 font-mono text-xs text-on-surface-variant whitespace-nowrap">
+                  10:20:18 UTC
+                </td>
+<td class="py-3 px-5 font-semibold whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Drone Telemetry
+                </td>
+<td class="py-3 px-5 text-on-surface">
+                  Ingested multispectral canopy NDVI payload (Drone-04)
+                </td>
+<td class="py-3 px-5 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-[11px] bg-risk-low/20 text-on-primary-fixed-variant border border-risk-low font-bold">
+                    SUCCESS
+                  </span>
+</td>
+<td class="py-3 px-5 font-mono text-xs text-right text-primary font-semibold whitespace-nowrap">
+                  89ms
+                </td>
+</tr>
+<!-- Row 5: Weather API Rate Limit Info -->
+<tr class="hover:bg-tertiary-container/10 transition-colors">
+<td class="py-3 px-5 font-mono text-xs text-on-surface-variant whitespace-nowrap">
+                  09:55:00 UTC
+                </td>
+<td class="py-3 px-5 font-semibold whitespace-nowrap flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+                  Weather API
+                </td>
+<td class="py-3 px-5 text-on-surface">
+                  Rate limit quota refreshed (10,000 requests remaining)
+                </td>
+<td class="py-3 px-5 whitespace-nowrap">
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-[11px] bg-surface-container-high text-on-surface-variant border border-outline-variant font-bold">
+                    INFO
+                  </span>
+</td>
+<td class="py-3 px-5 font-mono text-xs text-right text-outline whitespace-nowrap">
+                  —
+                </td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer Pagination / Status strip -->
+<div class="p-4 bg-surface-soft/40 border-t border-border-hairline flex flex-col sm:flex-row items-center justify-between text-xs text-on-surface-variant gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="sensors">sensors</span>
+<span>Displaying 5 most recent automated audit events • Streaming buffer synchronized</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-mono">Log Rotation: Every 24h</span>
+<span class="text-outline">|</span>
+<button class="text-primary hover:underline font-semibold">View Historical Logs Archive →</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

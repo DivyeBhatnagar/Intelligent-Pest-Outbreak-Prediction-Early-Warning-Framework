@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroWatch AI - Risk History</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-fixed-variant": "#005234",
+            "surface-soft": "#f2f4f5",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#c6d8bb",
+            "inverse-surface": "#28313b",
+            "on-secondary-fixed": "#1b1b1b",
+            "primary-fixed": "#4dffb2",
+            "surface-container": "#e5effc",
+            "tertiary": "#52634b",
+            "on-secondary-container": "#646464",
+            "on-tertiary-container": "#4e5f47",
+            "secondary-container": "#e2e2e2",
+            "outline": "#6b7b70",
+            "primary": "#006c46",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#3b4b35",
+            "surface-tint": "#006c46",
+            "surface-container-highest": "#d9e3f1",
+            "primary-container": "#00f0a0",
+            "on-surface-variant": "#3b4a40",
+            "on-primary-container": "#006843",
+            "on-background": "#131c26",
+            "surface": "#f7f9ff",
+            "on-secondary-fixed-variant": "#474747",
+            "outline-variant": "#b9cbbe",
+            "border-hairline": "#e5e7eb",
+            "surface-bright": "#f7f9ff",
+            "risk-moderate": "#f59e0b",
+            "secondary-fixed-dim": "#c6c6c6",
+            "inverse-primary": "#00e296",
+            "surface-variant": "#d9e3f1",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#baccaf",
+            "on-surface": "#131c26",
+            "on-primary": "#ffffff",
+            "on-primary-fixed": "#002112",
+            "surface-container-low": "#edf4ff",
+            "surface-container-lowest": "#ffffff",
+            "risk-low": "#10b981",
+            "on-tertiary-fixed": "#111f0d",
+            "error": "#ba1a1a",
+            "risk-critical": "#ef4444",
+            "surface-container-high": "#dfe9f6",
+            "risk-high": "#f97316",
+            "background": "#f7f9ff",
+            "canvas": "#ffffff",
+            "surface-dim": "#d1dbe8",
+            "secondary": "#5e5e5e",
+            "on-tertiary": "#ffffff",
+            "inverse-on-surface": "#e8f2ff",
+            "secondary-fixed": "#e2e2e2",
+            "primary-fixed-dim": "#00e296",
+            "tertiary-fixed": "#d5e8ca"
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            "label-sm": ["Inter"],
+            "headline-sm": ["Space Grotesk"],
+            "body-md": ["Inter"],
+            "caption": ["Inter"],
+            "headline-md": ["Space Grotesk"],
+            "headline-md-mobile": ["Space Grotesk"],
+            "body-lg": ["Inter"],
+            "title-lg": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "title-md": ["Inter"],
+            "label-md": ["Inter"],
+            "display-mobile": ["Space Grotesk"],
+            "body-sm": ["Inter"],
+            "headline-sm-mobile": ["Space Grotesk"],
+            "display": ["Space Grotesk"],
+            "headline-lg-mobile": ["Space Grotesk"]
+          },
+          fontSize: {
+            "label-sm": ["0.875rem", { lineHeight: "1.4", letterSpacing: "0.01em", fontWeight: "600" }],
+            "headline-sm": ["2.375rem", { lineHeight: "1.2", letterSpacing: "0", fontWeight: "700" }],
+            "body-md": ["1rem", { lineHeight: "1.6", letterSpacing: "0", fontWeight: "500" }],
+            "caption": ["0.8125rem", { lineHeight: "1.4", letterSpacing: "0.02em", fontWeight: "500" }],
+            "headline-md": ["3rem", { lineHeight: "1.15", letterSpacing: "0", fontWeight: "700" }],
+            "headline-md-mobile": ["1.75rem", { lineHeight: "1.25", letterSpacing: "0", fontWeight: "700" }],
+            "body-lg": ["1.125rem", { lineHeight: "1.6", letterSpacing: "0", fontWeight: "400" }],
+            "title-lg": ["2rem", { lineHeight: "1.25", letterSpacing: "0", fontWeight: "600" }],
+            "headline-lg": ["3.75rem", { lineHeight: "1.1", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "title-md": ["1.125rem", { lineHeight: "1.4", letterSpacing: "0", fontWeight: "600" }],
+            "label-md": ["1rem", { lineHeight: "1", letterSpacing: "0", fontWeight: "600" }],
+            "display-mobile": ["2.5rem", { lineHeight: "1.1", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "body-sm": ["0.875rem", { lineHeight: "1.5", letterSpacing: "0", fontWeight: "500" }],
+            "headline-sm-mobile": ["1.5rem", { lineHeight: "1.3", letterSpacing: "0", fontWeight: "600" }],
+            "display": ["5rem", { lineHeight: "1.05", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-lg-mobile": ["2rem", { lineHeight: "1.2", letterSpacing: "0", fontWeight: "700" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-surface-soft text-on-surface antialiased flex min-h-screen">
+<!-- LEFT PERSISTENT SIDEBAR (Shared Component: SideNavBar) -->
+<aside class="fixed left-0 top-0 bottom-0 w-72 z-40 p-4 border-r border-border-hairline dark:border-outline flex flex-col justify-between overflow-y-auto bg-surface-container-lowest dark:bg-inverse-surface">
+<!-- Sidebar Header -->
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-3 px-2 pt-2">
+<div class="w-10 h-10 rounded-DEFAULT bg-primary-container flex items-center justify-center text-on-primary-container shadow-sm border border-black/10">
+<span class="material-symbols-outlined text-2xl font-bold" data-icon="bug_report">bug_report</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-lg text-title-lg font-bold text-on-surface dark:text-inverse-on-surface tracking-tight leading-none text-lg">AgroWatch AI</span>
+<span class="font-body-sm text-body-sm text-outline text-xs mt-1">Intelligent Pest Surveillance</span>
+</div>
+</div>
+<!-- Live Operational Status Indicator -->
+<div class="bg-surface-soft border border-border-hairline rounded-DEFAULT px-3.5 py-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+<span class="font-label-sm text-label-sm text-on-surface text-xs font-semibold">Operational: All Sensors Active</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline text-xs">v2.4.1</span>
+</div>
+<!-- Navigation Links -->
+<nav aria-label="Main Navigation" class="flex flex-col gap-1.5">
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors active:scale-[0.99] transition-all duration-150 ease-out" href="#overview">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- 2. Risk Map -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors active:scale-[0.99] transition-all duration-150 ease-out" href="#risk-map">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span>Risk Map</span>
+</a>
+<!-- 3. Field Observations -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors active:scale-[0.99] transition-all duration-150 ease-out" href="#observations">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span>Field Observations</span>
+</a>
+<!-- 4. Risk History (ACTIVE TAB per Mandate) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-tertiary-container/30 dark:bg-tertiary-container/20 text-primary dark:text-inverse-primary font-title-md text-title-md rounded-DEFAULT border-l-4 border-primary dark:border-inverse-primary active:scale-[0.99] transition-all duration-150 ease-out shadow-sm" href="#risk-history">
+<span class="material-symbols-outlined" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-bold text-on-surface">Risk History</span>
+</a>
+<!-- 5. Alerts & Advisories -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors active:scale-[0.99] transition-all duration-150 ease-out" href="#alerts">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span>Alerts &amp; Advisories</span>
+</a>
+<!-- 6. Model Performance -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors active:scale-[0.99] transition-all duration-150 ease-out" href="#model-performance">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Model Performance</span>
+</a>
+<!-- 7. System Health -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors active:scale-[0.99] transition-all duration-150 ease-out" href="#system-health">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span>System Health</span>
+</a>
+</nav>
+</div>
+<!-- Sidebar Footer -->
+<div class="pt-4 border-t border-border-hairline flex flex-col gap-3">
+<div class="flex items-center gap-3 p-2 rounded-DEFAULT bg-canvas border border-border-hairline">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold text-sm">
+          AS
+        </div>
+<div class="flex flex-col overflow-hidden">
+<span class="font-label-sm text-label-sm text-on-surface truncate font-bold">Dr. A. Swaminathan</span>
+<span class="font-caption text-caption text-outline truncate text-xs">Surveillance Administrator</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline px-1">
+<span class="font-caption text-caption text-xs">TNAU ICAR Cluster #4</span>
+<span class="flex items-center gap-1 font-caption text-caption text-xs text-primary font-semibold">
+<span class="material-symbols-outlined text-sm" data-icon="wifi_tethering">wifi_tethering</span> Sync OK
+        </span>
+</div>
+</div>
+</aside>
+<!-- MAIN CANVAS AREA -->
+<div class="ml-72 flex-1 flex flex-col min-w-0">
+<!-- TOP NAVIGATION BAR (Shared Component: TopNavBar) -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-8 py-3 w-full border-b border-border-hairline bg-surface-container-lowest/90 dark:bg-inverse-surface/90 backdrop-blur">
+<!-- Breadcrumb & Search -->
+<div class="flex items-center gap-6 flex-1 max-w-2xl">
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 text-xs font-label-sm">
+<span class="text-outline">AgroWatch AI</span>
+<span class="text-outline">/</span>
+<span class="text-on-surface font-bold">Risk History</span>
+</nav>
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-lg" data-icon="search">search</span>
+<input class="w-full bg-surface-soft border border-border-hairline rounded-full pl-9 pr-4 py-1.5 text-xs text-on-surface placeholder:text-outline focus:outline-none focus:border-black focus:ring-2 focus:ring-primary-container/40" placeholder="Search stations, plots, SMW..." type="text" value="Aduthurai Hub (TRRI-01)"/>
+</div>
+</div>
+<!-- Right Controls & Actions -->
+<div class="flex items-center gap-3">
+<!-- Crop Switcher Pills -->
+<div class="bg-surface-soft p-1 rounded-full border border-border-hairline flex items-center gap-1">
+<button class="bg-on-background text-canvas font-label-md text-label-md px-3.5 py-1 text-xs rounded-full shadow-sm">
+            Rice (Paddy)
+          </button>
+<button class="text-on-surface-variant font-label-md text-label-md px-3.5 py-1 text-xs rounded-full hover:bg-surface-container-high transition-colors">
+            Cotton
+          </button>
+</div>
+<!-- Date Range Filter Pill Cluster -->
+<div class="hidden xl:flex items-center bg-surface-soft border border-border-hairline rounded-full p-1 text-xs">
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface rounded-full transition-colors font-medium">Last 7 Days</button>
+<button class="px-3 py-1 bg-canvas font-bold text-on-surface rounded-full shadow-sm">Last 30 Days</button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface rounded-full transition-colors font-medium">Last 90 Days</button>
+<button class="px-3 py-1 text-outline hover:text-on-surface rounded-full transition-colors font-medium flex items-center gap-1">
+<span>Custom (SMW 36-43)</span>
+<span class="material-symbols-outlined text-xs" data-icon="calendar_month">calendar_month</span>
+</button>
+</div>
+<!-- Export CSV / PDF Analytics Action Button -->
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 bg-canvas border border-border-hairline hover:bg-surface-soft text-on-surface px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-base" data-icon="file_download">file_download</span>
+<span>Export CSV / PDF Analytics</span>
+</button>
+<button class="p-2 rounded-full border border-border-hairline bg-canvas hover:bg-surface-soft text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-lg" data-icon="tune">tune</span>
+</button>
+</div>
+</div>
+</header>
+<!-- MAIN BODY CONTENT -->
+<main class="flex-1 p-8 max-w-[1440px] mx-auto w-full flex flex-col gap-6">
+<!-- SECTION 1: SUMMARY METRICS HEADER (Bento Tonal Cards) -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Metric 1: Predictions -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider text-xs">Total Historical Predictions</span>
+<span class="p-2 rounded-DEFAULT bg-surface-soft text-on-surface">
+<span class="material-symbols-outlined text-lg" data-icon="batch_prediction">batch_prediction</span>
+</span>
+</div>
+<div class="mt-4 flex items-baseline justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none text-2xl font-bold">142,850</h3>
+<span class="font-label-sm text-label-sm text-risk-low bg-[#ecffe0] border border-risk-low/30 px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-xs" data-icon="north">north</span> +12.4% MoM
+            </span>
+</div>
+<p class="font-caption text-caption text-outline text-xs mt-1">Multi-spectral satellite &amp; trap inputs</p>
+</div>
+<!-- Metric 2: Avg Risk Score -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider text-xs">Historical Avg Risk Score</span>
+<span class="p-2 rounded-DEFAULT bg-[#ecffe0] text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="speed">speed</span>
+</span>
+</div>
+<div class="mt-4 flex items-baseline justify-between">
+<div class="flex items-baseline gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-none text-2xl font-bold">41.2</h3>
+<span class="font-body-sm text-body-sm text-outline text-xs">/ 100</span>
+</div>
+<span class="font-label-sm text-label-sm text-risk-moderate bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-full text-xs font-semibold">
+              Moderate Tier
+            </span>
+</div>
+<div class="w-full bg-surface-soft h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-risk-moderate h-full rounded-full" style="width: 41.2%;"></div>
+</div>
+</div>
+<!-- Metric 3: Severe / Critical Outbreaks -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider text-xs">Severe / Critical Events</span>
+<span class="p-2 rounded-DEFAULT bg-red-50 text-risk-critical">
+<span class="material-symbols-outlined text-lg" data-icon="warning">warning</span>
+</span>
+</div>
+<div class="mt-4 flex items-baseline justify-between">
+<h3 class="font-headline-sm text-headline-sm text-risk-critical tracking-tight leading-none text-2xl font-bold">12</h3>
+<span class="font-label-sm text-label-sm text-risk-critical bg-red-50 border border-risk-critical/30 px-2 py-0.5 rounded-full text-xs font-semibold">
+              Economic Loss Averted
+            </span>
+</div>
+<p class="font-caption text-caption text-outline text-xs mt-1">Interventions deployed in &lt;18 hrs</p>
+</div>
+<!-- Metric 4: Current Surveillance Season -->
+<div class="bg-[#ecffe0] border border-primary/20 rounded-DEFAULT p-5 flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-wider text-xs font-bold">Current Surveillance Season</span>
+<span class="material-symbols-outlined text-primary text-xl" data-icon="eco">eco</span>
+</div>
+<div class="mt-4">
+<h3 class="font-title-md text-title-md text-on-surface font-bold leading-tight">Kharif 2024</h3>
+<span class="font-label-sm text-label-sm text-primary font-bold text-xs mt-1 block">Standard Meteorological Week 43 (SMW 43)</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant text-xs mt-2 flex items-center gap-1 font-medium">
+<span class="w-2 h-2 rounded-full bg-primary-container border border-black"></span> Active Phase: Booting &amp; Heading
+          </p>
+</div>
+</section>
+<!-- SECTION 2: HIGH-DENSITY QUERY & FILTER DOCK -->
+<section class="bg-canvas border border-border-hairline rounded-DEFAULT p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+<div class="flex flex-wrap items-center gap-3">
+<!-- Station Dropdown -->
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline text-xs font-semibold uppercase">Station:</span>
+<div class="relative">
+<select class="appearance-none bg-surface-soft border border-border-hairline rounded-full pl-3 pr-8 py-1.5 text-xs font-semibold text-on-surface focus:outline-none focus:border-black cursor-pointer">
+<option selected="">Aduthurai Hub - TNAU (TRRI-01)</option>
+<option>Madurai Agricultural College (MDU-04)</option>
+<option>Thanjavur Delta Monitor (TNJ-08)</option>
+<option>Coimbatore Central Field Unit (CBE-02)</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-2 text-outline text-sm" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Target Pest Dropdown -->
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline text-xs font-semibold uppercase">Target Pest:</span>
+<div class="relative">
+<select class="appearance-none bg-surface-soft border border-border-hairline rounded-full pl-3 pr-8 py-1.5 text-xs font-semibold text-on-surface focus:outline-none focus:border-black cursor-pointer">
+<option selected="">Yellow Stem Borer (Scirpophaga incertulas)</option>
+<option>Brown Planthopper (Nilaparvata lugens)</option>
+<option>Rice Leaf Folder (Cnaphalocrocis medinalis)</option>
+<option>Gall Midge (Orseolia oryzae)</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-2 text-outline text-sm" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Crop Dropdown -->
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline text-xs font-semibold uppercase">Crop:</span>
+<div class="relative">
+<select class="appearance-none bg-surface-soft border border-border-hairline rounded-full pl-3 pr-8 py-1.5 text-xs font-semibold text-on-surface focus:outline-none focus:border-black cursor-pointer">
+<option selected="">Rice (CR 1009 Sub 1)</option>
+<option>Rice (ADT 53 Early Maturing)</option>
+<option>Cotton (MCU 5 Medium Staple)</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-2 text-outline text-sm" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Granularity Selector Toggle -->
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-outline text-xs font-semibold uppercase">Granularity:</span>
+<div class="bg-surface-soft p-0.5 rounded-full border border-border-hairline flex items-center">
+<button class="bg-black text-canvas font-label-sm text-xs px-3 py-1 rounded-full shadow-sm">Daily</button>
+<button class="text-on-surface-variant font-label-sm text-xs px-3 py-1 rounded-full hover:text-black">Weekly SMW</button>
+</div>
+<button class="p-1.5 text-outline hover:text-on-surface rounded-full hover:bg-surface-soft" title="Reset Filters">
+<span class="material-symbols-outlined text-lg" data-icon="refresh">refresh</span>
+</button>
+</div>
+</section>
+<!-- SECTION 3: PRIMARY HISTORICAL RISK PROGRESSION CHART -->
+<section class="bg-canvas border border-border-hairline rounded-DEFAULT p-6 shadow-sm flex flex-col gap-6">
+<!-- Card Header with Threshold Legend -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-hairline pb-4">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-title-lg text-title-lg text-on-surface font-bold text-xl tracking-tight">
+                Pest Risk Progression vs Economic Threshold (ETL) - Past 30 Days
+              </h2>
+<span class="bg-red-50 text-risk-critical border border-risk-critical/30 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                Critical Incursion Zone
+              </span>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-1 text-xs">
+              Calibrated against ICAR Standard Micro-climatic Models &amp; Historical Light-Trap Catch Indices.
+            </p>
+</div>
+<!-- Threshold Zones Legend -->
+<div class="flex flex-wrap items-center gap-3 text-xs">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-risk-low rounded"></span>
+<span class="text-outline">Low (&lt;30)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-risk-moderate rounded"></span>
+<span class="text-outline">Moderate (30-60)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-risk-high rounded"></span>
+<span class="text-outline">High (60-80)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 border-t-2 border-dashed border-risk-critical"></span>
+<span class="text-risk-critical font-bold">Critical ETL (&gt;80)</span>
+</div>
+</div>
+</div>
+<!-- Interactive SVG Chart Canvas -->
+<div class="relative w-full h-80 bg-surface-soft/40 rounded-DEFAULT border border-border-hairline p-4 select-none overflow-hidden">
+<!-- Background Threshold Zones Shading -->
+<div class="absolute inset-0 flex flex-col pointer-events-none opacity-40">
+<div class="h-[20%] bg-red-100/50 border-b border-dashed border-red-300"></div> <!-- 80-100 -->
+<div class="h-[20%] bg-orange-100/40 border-b border-dashed border-orange-300"></div> <!-- 60-80 -->
+<div class="h-[30%] bg-amber-50/40 border-b border-dashed border-amber-200"></div> <!-- 30-60 -->
+<div class="h-[30%] bg-emerald-50/40"></div> <!-- 0-30 -->
+</div>
+<!-- SVG Time-Series Chart -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 240">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#00f0a0" stop-opacity="0.35"></stop>
+<stop offset="60%" stop-color="#00f0a0" stop-opacity="0.08"></stop>
+<stop offset="100%" stop-color="#00f0a0" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Y-Gridlines & Labels -->
+<!-- Y=100 (height 0) -->
+<line stroke="#e5e7eb" stroke-dasharray="4 4" stroke-width="1" x1="40" x2="980" y1="20" y2="20"></line>
+<text class="text-[10px] fill-gray-400 font-mono" x="10" y="24">100</text>
+<!-- Y=80 (Critical Threshold) -->
+<line stroke="#ef4444" stroke-dasharray="6 4" stroke-width="1.5" x1="40" x2="980" y1="64" y2="64"></line>
+<text class="text-[10px] fill-red-500 font-mono font-bold" x="10" y="68">80 ETL</text>
+<!-- Y=60 (High) -->
+<line stroke="#f97316" stroke-dasharray="4 4" stroke-width="1" x1="40" x2="980" y1="108" y2="108"></line>
+<text class="text-[10px] fill-gray-400 font-mono" x="10" y="112">60</text>
+<!-- Y=30 (Moderate) -->
+<line stroke="#f59e0b" stroke-dasharray="4 4" stroke-width="1" x1="40" x2="980" y1="152" y2="152"></line>
+<text class="text-[10px] fill-gray-400 font-mono" x="10" y="156">30</text>
+<!-- Y=0 -->
+<line stroke="#cbd5e1" stroke-width="1.5" x1="40" x2="980" y1="210" y2="210"></line>
+<text class="text-[10px] fill-gray-400 font-mono" x="18" y="214">0</text>
+<!-- Shaded Area Under Curve -->
+<path d="M 60,185 
+                     C 120,180 180,170 240,165 
+                     C 300,160 360,175 420,150 
+                     C 480,125 540,140 600,110 
+                     C 660,80  720,120 780,95 
+                     C 840,70  900,58  960,45 
+                     L 960,210 L 60,210 Z" fill="url(#chartGradient)"></path>
+<!-- Main Primary Line Trend -->
+<path d="M 60,185 
+                     C 120,180 180,170 240,165 
+                     C 300,160 360,175 420,150 
+                     C 480,125 540,140 600,110 
+                     C 660,80  720,120 780,95 
+                     C 840,70  900,58  960,45" fill="none" stroke="#006c46" stroke-linecap="round" stroke-width="3"></path>
+<!-- Historical Data Points -->
+<circle cx="60" cy="185" fill="#ffffff" r="4" stroke="#006c46" stroke-width="2"></circle>
+<circle cx="240" cy="165" fill="#ffffff" r="4" stroke="#006c46" stroke-width="2"></circle>
+<circle cx="420" cy="150" fill="#ffffff" r="4" stroke="#006c46" stroke-width="2"></circle>
+<circle cx="600" cy="110" fill="#ffffff" r="4" stroke="#006c46" stroke-width="2"></circle>
+<circle cx="780" cy="95" fill="#ffffff" r="4" stroke="#006c46" stroke-width="2"></circle>
+<!-- Terminal Outbreak Data Point (Oct 24 - 84/100) -->
+<circle cx="960" cy="45" fill="#ef4444" fill-opacity="0.2" r="8"></circle>
+<circle cx="960" cy="45" fill="#ef4444" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<!-- Subtle X-Axis Dates -->
+<text class="text-[10px] fill-gray-500 font-mono" text-anchor="middle" x="60" y="230">Oct 01</text>
+<text class="text-[10px] fill-gray-500 font-mono" text-anchor="middle" x="210" y="230">Oct 05</text>
+<text class="text-[10px] fill-gray-500 font-mono" text-anchor="middle" x="360" y="230">Oct 09</text>
+<text class="text-[10px] fill-gray-500 font-mono" text-anchor="middle" x="510" y="230">Oct 13</text>
+<text class="text-[10px] fill-gray-500 font-mono" text-anchor="middle" x="660" y="230">Oct 17</text>
+<text class="text-[10px] fill-gray-500 font-mono" text-anchor="middle" x="810" y="230">Oct 21</text>
+<text class="text-[10px] fill-black font-mono font-bold" text-anchor="middle" x="960" y="230">Oct 24 (Today)</text>
+</svg>
+<!-- Interactive Tooltip Marker Overlay (Oct 24) -->
+<div class="absolute right-4 top-4 bg-black text-canvas p-3 rounded-DEFAULT shadow-xl border border-black/20 flex flex-col gap-1 z-10 w-56 animate-fade-in">
+<div class="flex items-center justify-between">
+<span class="font-caption text-caption text-xs text-gray-400 font-mono">Oct 24, 2024 · 06:00 UTC</span>
+<span class="w-2 h-2 rounded-full bg-risk-critical animate-ping"></span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-label-sm text-label-sm text-xs font-semibold">Predicted Incursion:</span>
+<span class="font-headline-sm text-headline-sm text-primary-container text-xl font-bold">84 / 100</span>
+</div>
+<div class="text-[11px] text-gray-300 border-t border-white/10 pt-1.5 flex flex-col gap-0.5">
+<div class="flex justify-between">
+<span>Larval Cohort:</span>
+<span class="text-white font-mono">3rd Instar Peak</span>
+</div>
+<div class="flex justify-between">
+<span>Trap Catch:</span>
+<span class="text-white font-mono">38 moths / night</span>
+</div>
+<div class="flex justify-between text-primary-container font-semibold mt-0.5">
+<span>Bio-Advisory:</span>
+<span>Deploy Pheromone Traps</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Summary Under Chart -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+<div class="p-3 bg-surface-soft rounded-DEFAULT flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="trending_up">trending_up</span>
+<div>
+<div class="font-label-sm text-label-sm text-xs font-bold text-on-surface">Steepest Gradient (+31.4 pts)</div>
+<div class="font-caption text-caption text-xs text-outline">Observed Oct 18 - Oct 22 during continuous nocturnal mist</div>
+</div>
+</div>
+<div class="p-3 bg-surface-soft rounded-DEFAULT flex items-center gap-3">
+<span class="material-symbols-outlined text-risk-moderate text-xl" data-icon="timelapse">timelapse</span>
+<div>
+<div class="font-label-sm text-label-sm text-xs font-bold text-on-surface">Time Beyond ETL (&gt;80)</div>
+<div class="font-caption text-caption text-xs text-outline">Accumulated 48 continuous surveillance hours</div>
+</div>
+</div>
+<div class="p-3 bg-surface-soft rounded-DEFAULT flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="verified_user">verified_user</span>
+<div>
+<div class="font-label-sm text-label-sm text-xs font-bold text-on-surface">Model Accuracy Concordance</div>
+<div class="font-caption text-caption text-xs text-outline">94.8% ground truth validation across 14 sentinel plots</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: CLIMATIC & AGRO-METEOROLOGICAL TREND CORRELATION (Grid of 3 Analytical Cards) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1: Temp & Relative Humidity -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-xs font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="device_thermostat">device_thermostat</span>
+                Temp &amp; Relative Humidity Correlates
+              </span>
+<span class="text-[11px] font-mono text-outline">30-Day Sync</span>
+</div>
+<p class="font-caption text-caption text-xs text-outline">
+              RH sustained &gt;80% coinciding directly with larval hatching window.
+            </p>
+</div>
+<!-- Micro Sparkline / Trend Canvas -->
+<div class="my-4 h-32 bg-surface-soft/60 rounded-DEFAULT border border-border-hairline p-2 relative flex flex-col justify-between">
+<div class="flex justify-between text-[10px] font-mono text-outline">
+<span>RH: 88% Peak</span>
+<span class="text-risk-high font-bold">29.4°C Mean</span>
+</div>
+<!-- Dual Trend SVG Representation -->
+<svg class="w-full h-20" viewbox="0 0 300 80">
+<!-- RH Area -->
+<path d="M 0,60 Q 50,50 100,55 T 200,30 T 300,10 L 300,80 L 0,80 Z" fill="#00f0a0" fill-opacity="0.15"></path>
+<path d="M 0,60 Q 50,50 100,55 T 200,30 T 300,10" fill="none" stroke="#006c46" stroke-width="2"></path>
+<!-- Temp Line -->
+<path d="M 0,35 Q 75,30 150,40 T 300,25" fill="none" stroke="#f97316" stroke-dasharray="3 3" stroke-width="1.5"></path>
+</svg>
+<div class="flex justify-between text-[10px] text-outline">
+<span>Oct 01</span>
+<span class="text-on-surface font-semibold">Critical Moisture Overlap</span>
+<span>Oct 24</span>
+</div>
+</div>
+<div class="text-xs text-on-surface-variant bg-[#ecffe0] p-2.5 rounded-DEFAULT border border-primary/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-base" data-icon="check_circle">check_circle</span>
+<span class="font-medium text-[11px]">84% correlation with rapid adult oviposition surge.</span>
+</div>
+</div>
+<!-- Card 2: Growing Degree Days & VPD -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-xs font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="vital_signs">vital_signs</span>
+                GDD &amp; Vapor Pressure Deficit (VPD)
+              </span>
+<span class="text-[11px] font-mono text-outline">Base 10°C</span>
+</div>
+<p class="font-caption text-caption text-xs text-outline">
+              Accumulated thermal units surpassed Yellow Stem Borer pupation threshold.
+            </p>
+</div>
+<!-- Micro Thermal Curve Canvas -->
+<div class="my-4 h-32 bg-surface-soft/60 rounded-DEFAULT border border-border-hairline p-2 relative flex flex-col justify-between">
+<div class="flex justify-between text-[10px] font-mono text-outline">
+<span>GDD: 492°C-d</span>
+<span class="text-primary font-bold">VPD: 0.62 kPa</span>
+</div>
+<!-- GDD Accumulation S-Curve -->
+<svg class="w-full h-20" viewbox="0 0 300 80">
+<line stroke="#ef4444" stroke-dasharray="4 2" stroke-width="1" x1="0" x2="300" y1="25" y2="25"></line>
+<text class="text-[9px] fill-red-500 font-mono" x="210" y="20">Pupation ETL (450°C-d)</text>
+<!-- Cumulative Curve -->
+<path d="M 0,75 C 80,70 160,50 220,28 C 260,18 280,12 300,10" fill="none" stroke="#000000" stroke-width="2.5"></path>
+<circle cx="220" cy="28" fill="#ef4444" r="3.5"></circle>
+</svg>
+<div class="flex justify-between text-[10px] text-outline">
+<span>Oct 01</span>
+<span class="text-risk-critical font-bold">Emergence Peak Reached</span>
+<span>Oct 24</span>
+</div>
+</div>
+<div class="text-xs text-on-surface-variant bg-amber-50 p-2.5 rounded-DEFAULT border border-amber-200 flex items-center gap-2">
+<span class="material-symbols-outlined text-risk-moderate text-base" data-icon="info">info</span>
+<span class="font-medium text-[11px]">2nd generation moth emergence initiated Oct 19.</span>
+</div>
+</div>
+<!-- Card 3: Rainfall & Canopy Wetness -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 shadow-sm flex flex-col justify-between">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-xs font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="rainy">rainy</span>
+                Rainfall &amp; Canopy Wetness Duration
+              </span>
+<span class="text-[11px] font-mono text-outline">IoT Leaf Sensors</span>
+</div>
+<p class="font-caption text-caption text-xs text-outline">
+              Intermittent rainfall showers paired with 11.2h average leaf canopy moisture.
+            </p>
+</div>
+<!-- Micro Histogram Bar Canvas -->
+<div class="my-4 h-32 bg-surface-soft/60 rounded-DEFAULT border border-border-hairline p-2 relative flex flex-col justify-between">
+<div class="flex justify-between text-[10px] font-mono text-outline">
+<span>Rain: 124.6 mm</span>
+<span class="text-primary font-bold">Wetness: 11.2 hrs/day</span>
+</div>
+<!-- Bar Chart Representation -->
+<svg class="w-full h-20" viewbox="0 0 300 80">
+<!-- Wetness Trend Wave -->
+<path d="M 0,50 Q 80,20 160,40 T 300,15" fill="none" stroke="#00f0a0" stroke-width="2"></path>
+<!-- Rainfall Bars -->
+<rect fill="#cbd5e1" height="20" rx="2" width="10" x="20" y="60"></rect>
+<rect fill="#cbd5e1" height="25" rx="2" width="10" x="60" y="55"></rect>
+<rect fill="#94a3b8" height="40" rx="2" width="10" x="100" y="40"></rect>
+<rect fill="#cbd5e1" height="15" rx="2" width="10" x="140" y="65"></rect>
+<rect fill="#006c46" height="50" rx="2" width="10" x="180" y="30"></rect>
+<rect fill="#006c46" height="60" rx="2" width="10" x="220" y="20"></rect>
+<rect fill="#94a3b8" height="35" rx="2" width="10" x="260" y="45"></rect>
+</svg>
+<div class="flex justify-between text-[10px] text-outline">
+<span>Oct 01</span>
+<span class="text-on-surface font-semibold">High Spore/Larval Viability</span>
+<span>Oct 24</span>
+</div>
+</div>
+<div class="text-xs text-on-surface-variant bg-surface-soft p-2.5 rounded-DEFAULT border border-border-hairline flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-base" data-icon="cloud_done">cloud_done</span>
+<span class="font-medium text-[11px]">Canopy conditions remain optimal for egg mass survival.</span>
+</div>
+</div>
+</section>
+<!-- SECTION 5: RISK DISTRIBUTION & HISTORICAL OUTBREAK BREAKDOWN -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+<!-- Left Column: Circular/Donut Risk Distribution breakdown (4 Cols) -->
+<div class="lg:col-span-4 bg-canvas border border-border-hairline rounded-DEFAULT p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-border-hairline pb-3">
+<h3 class="font-title-md text-title-md text-on-surface font-bold text-base">
+                Historical Risk Distribution
+              </h3>
+<span class="text-xs font-mono text-outline">SMW 36-43</span>
+</div>
+<p class="font-caption text-caption text-outline text-xs mt-2">
+              Aggregated categorical distribution of all 142,850 simulation runs.
+            </p>
+</div>
+<!-- Circular Donut SVG Representation -->
+<div class="my-6 flex flex-col items-center justify-center relative">
+<svg class="w-48 h-48 transform -rotate-90" viewbox="0 0 36 36">
+<!-- Background Circle -->
+<path class="text-surface-soft" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4.5"></path>
+<!-- Low: 44% (Stroke: #10b981) -->
+<path class="text-risk-low" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="44, 100" stroke-width="4.5"></path>
+<!-- Moderate: 32% (Stroke: #f59e0b) -->
+<path class="text-risk-moderate" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="32, 100" stroke-dashoffset="-44" stroke-width="4.5"></path>
+<!-- High: 18% (Stroke: #f97316) -->
+<path class="text-risk-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="18, 100" stroke-dashoffset="-76" stroke-width="4.5"></path>
+<!-- Critical: 6% (Stroke: #ef4444) -->
+<path class="text-risk-critical" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="6, 100" stroke-dashoffset="-94" stroke-width="4.5"></path>
+</svg>
+<!-- Centered Ring Label -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold text-2xl leading-none">142.8k</span>
+<span class="font-caption text-caption text-outline text-[11px] mt-0.5 uppercase tracking-wider font-semibold">Total Runs</span>
+</div>
+</div>
+<!-- Breakdown Pills & Stats -->
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div class="p-2.5 rounded-DEFAULT bg-[#ecffe0] border border-risk-low/20 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-low"></span>
+<span class="font-bold text-on-surface">Low Risk</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="font-mono font-bold text-sm text-primary">44%</span>
+<span class="text-outline text-[11px]">62,854 runs</span>
+</div>
+</div>
+<div class="p-2.5 rounded-DEFAULT bg-amber-50/70 border border-risk-moderate/20 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-moderate"></span>
+<span class="font-bold text-on-surface">Moderate</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="font-mono font-bold text-sm text-amber-700">32%</span>
+<span class="text-outline text-[11px]">45,712 runs</span>
+</div>
+</div>
+<div class="p-2.5 rounded-DEFAULT bg-orange-50/70 border border-risk-high/20 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-high"></span>
+<span class="font-bold text-on-surface">High Risk</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="font-mono font-bold text-sm text-orange-700">18%</span>
+<span class="text-outline text-[11px]">25,713 runs</span>
+</div>
+</div>
+<div class="p-2.5 rounded-DEFAULT bg-red-50/70 border border-risk-critical/20 flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-critical"></span>
+<span class="font-bold text-on-surface">Critical</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="font-mono font-bold text-sm text-risk-critical">6%</span>
+<span class="text-outline text-[11px]">8,571 runs</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Historical Outbreak Events Log (8 Cols) -->
+<div class="lg:col-span-8 bg-canvas border border-border-hairline rounded-DEFAULT p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-border-hairline pb-3">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-bold text-base">
+                  Historical Outbreak Events Log by SMW
+                </h3>
+<p class="font-caption text-caption text-outline text-xs mt-0.5">
+                  Verified high-severity incursion records requiring targeted bio-intervention.
+                </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-caption text-caption text-xs text-outline">Filter:</span>
+<button class="text-xs bg-surface-soft px-2.5 py-1 rounded-full border border-border-hairline font-semibold text-on-surface">
+                  All Stations (5)
+                </button>
+</div>
+</div>
+<!-- Telemetry Table -->
+<div class="overflow-x-auto custom-scroll mt-3">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-soft border-b border-border-hairline text-outline uppercase font-label-sm text-[11px] tracking-wider">
+<th class="py-2.5 px-3">SMW / Period</th>
+<th class="py-2.5 px-3">Station Node</th>
+<th class="py-2.5 px-3">Peak Score</th>
+<th class="py-2.5 px-3">Intervention Deployed</th>
+<th class="py-2.5 px-3 text-right">Resolution Days</th>
+<th class="py-2.5 px-3 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-hairline text-xs font-body-sm text-on-surface">
+<!-- Row 1 (Current Active Event) -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors bg-red-50/20">
+<td class="py-3 px-3">
+<div class="font-bold text-on-surface">SMW 43 (2024)</div>
+<div class="text-[10px] text-outline font-mono">Oct 21 - Present</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Aduthurai Hub (TRRI)</div>
+<div class="text-[10px] text-outline">Block B-4 Delta Sector</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 font-mono font-bold text-risk-critical bg-red-50 border border-risk-critical/30 px-2 py-0.5 rounded-full text-xs">
+<span class="material-symbols-outlined text-xs" data-icon="error">error</span> 84 / 100
+                      </span>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Cartap Hydrochloride 50% SP</div>
+<div class="text-[10px] text-primary font-medium">Drone Spray Grid + Trichogramma Cards</div>
+</td>
+<td class="py-3 px-3 text-right font-mono font-bold text-risk-critical">
+                      In Progress (Day 3)
+                    </td>
+<td class="py-3 px-3 text-center">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-risk-critical border border-red-300">
+                        ACTIVE
+                      </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors">
+<td class="py-3 px-3">
+<div class="font-bold text-on-surface">SMW 39 (2024)</div>
+<div class="text-[10px] text-outline font-mono">Sep 24 - Sep 30</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Madurai College Field</div>
+<div class="text-[10px] text-outline">Plot 12-Southern Basin</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 font-mono font-bold text-orange-700 bg-orange-50 border border-orange-300 px-2 py-0.5 rounded-full text-xs">
+                        78 / 100
+                      </span>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Chlorantraniliprole 18.5% SC</div>
+<div class="text-[10px] text-outline">Targeted knapsack mist application</div>
+</td>
+<td class="py-3 px-3 text-right font-mono text-on-surface font-semibold">
+                      4 Days
+                    </td>
+<td class="py-3 px-3 text-center">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecffe0] text-primary border border-primary/30">
+                        RESOLVED
+                      </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors">
+<td class="py-3 px-3">
+<div class="font-bold text-on-surface">SMW 35 (2024)</div>
+<div class="text-[10px] text-outline font-mono">Aug 27 - Sep 02</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Thanjavur Delta Mon</div>
+<div class="text-[10px] text-outline">Kaveri Canal Riparian</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 font-mono font-bold text-risk-critical bg-red-50 border border-risk-critical/30 px-2 py-0.5 rounded-full text-xs">
+                        89 / 100
+                      </span>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Pheromone Lure Mass Trapping</div>
+<div class="text-[10px] text-outline">20 traps/ha + Neem Oil 3%</div>
+</td>
+<td class="py-3 px-3 text-right font-mono text-on-surface font-semibold">
+                      6 Days
+                    </td>
+<td class="py-3 px-3 text-center">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecffe0] text-primary border border-primary/30">
+                        RESOLVED
+                      </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-[#ecffe0]/50 transition-colors">
+<td class="py-3 px-3">
+<div class="font-bold text-on-surface">SMW 28 (2024)</div>
+<div class="text-[10px] text-outline font-mono">Jul 09 - Jul 15</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Coimbatore Central</div>
+<div class="text-[10px] text-outline">Agronomy Research Block</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 font-mono font-bold text-orange-700 bg-orange-50 border border-orange-300 px-2 py-0.5 rounded-full text-xs">
+                        74 / 100
+                      </span>
+</td>
+<td class="py-3 px-3">
+<div class="font-semibold text-on-surface">Biological Parasitoid Release</div>
+<div class="text-[10px] text-outline">Trichogramma japonicum 100k/ha</div>
+</td>
+<td class="py-3 px-3 text-right font-mono text-on-surface font-semibold">
+                      5 Days
+                    </td>
+<td class="py-3 px-3 text-center">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ecffe0] text-primary border border-primary/30">
+                        RESOLVED
+                      </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Table Bottom Bar -->
+<div class="pt-4 border-t border-border-hairline flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+<span class="text-outline font-caption">Showing 4 of 12 documented historical outbreak incidents in 2024</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1 bg-surface-soft border border-border-hairline rounded-full font-semibold text-on-surface hover:bg-canvas">
+                Previous SMWs
+              </button>
+<button class="px-3 py-1 bg-canvas border border-border-hairline rounded-full font-semibold text-on-surface hover:bg-surface-soft">
+                View Full Audit Archive
+              </button>
+</div>
+</div>
+</div>
+</section>
+<!-- BOTTOMLINE COMMAND BANNER (Jobright-inspired Dark Command Deck) -->
+<footer class="bg-black text-canvas rounded-DEFAULT p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 mb-4 border border-black/20">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-black font-bold">
+<span class="material-symbols-outlined text-2xl" data-icon="troubleshoot">troubleshoot</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md font-bold text-white text-base">
+              Autonomous Surveillance Drone Fleet On Standby
+            </h4>
+<p class="font-body-sm text-body-sm text-gray-400 text-xs mt-0.5">
+              Station TRRI-01 triggers aerial thermal sweeps when 48h predicted risk persists above 80 ETL.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 rounded-full bg-canvas text-black text-xs font-semibold hover:bg-gray-100 transition-all active:scale-[0.98]">
+            Configure Threshold Rules
+          </button>
+<button class="px-8 py-2.5 rounded-full bg-primary-container text-black border border-black font-bold text-xs hover:bg-[#3dffb8] transition-all shadow-md active:scale-[0.98] flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="flight_takeoff">flight_takeoff</span>
+<span>Dispatch Drone Sweep</span>
+</button>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

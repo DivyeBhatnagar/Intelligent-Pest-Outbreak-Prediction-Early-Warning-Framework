@@ -659,6 +659,26 @@ def update_alert(alert_id: int, payload: AlertStatusUpdate):
     return {"status": "updated", "alert_id": alert_id, "new_status": payload.status}
 
 
+@app.post("/api/v1/alerts/{alert_id}/ack", tags=["Alerts"])
+@app.post("/api/alerts/{alert_id}/ack", tags=["Alerts"])
+def acknowledge_alert(alert_id: int):
+    """Convenience endpoint to acknowledge an active alert."""
+    updated = db_service.update_alert_status(alert_id, "acknowledged")
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Alert {alert_id} not found.")
+    return {"status": "updated", "alert_id": alert_id, "new_status": "acknowledged"}
+
+
+@app.post("/api/v1/alerts/{alert_id}/resolve", tags=["Alerts"])
+@app.post("/api/alerts/{alert_id}/resolve", tags=["Alerts"])
+def resolve_alert(alert_id: int):
+    """Convenience endpoint to resolve an active or acknowledged alert."""
+    updated = db_service.update_alert_status(alert_id, "resolved")
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Alert {alert_id} not found.")
+    return {"status": "updated", "alert_id": alert_id, "new_status": "resolved"}
+
+
 # -------------------------------------------------------------------------
 # Risk History
 # -------------------------------------------------------------------------
