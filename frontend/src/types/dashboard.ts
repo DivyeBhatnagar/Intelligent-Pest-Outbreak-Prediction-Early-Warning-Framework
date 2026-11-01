@@ -1,6 +1,6 @@
 export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
 
-export type TabKey = 'overview' | 'map' | 'obs' | 'history' | 'alerts' | 'model' | 'system';
+export type TabKey = 'overview' | 'predict' | 'map' | 'obs' | 'history' | 'alerts' | 'model' | 'system';
 
 export interface Station {
   code: string;

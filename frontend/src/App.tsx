@@ -3,6 +3,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Topbar } from './components/layout/Topbar';
 import { TabKey, SystemHealthResponse, WeatherTelemetry } from './types/dashboard';
 import { OverviewTab } from './components/tabs/OverviewTab';
+import { PredictionStudioTab } from './components/tabs/PredictionStudioTab';
 import { RiskMapTab } from './components/tabs/RiskMapTab';
 import { ObservationsTab } from './components/tabs/ObservationsTab';
 import { RiskHistoryTab } from './components/tabs/RiskHistoryTab';
@@ -16,7 +17,7 @@ export const App: React.FC = () => {
   const getInitialTab = (): TabKey => {
     const params = new URLSearchParams(window.location.search);
     const t = params.get('tab') as TabKey;
-    const validTabs: TabKey[] = ['overview', 'map', 'obs', 'history', 'alerts', 'model', 'system'];
+    const validTabs: TabKey[] = ['overview', 'predict', 'map', 'obs', 'history', 'alerts', 'model', 'system'];
     return validTabs.includes(t) ? t : 'overview';
   };
 
@@ -142,6 +143,15 @@ export const App: React.FC = () => {
         <main className="flex-1 pb-16">
           {activeTab === 'overview' && (
             <OverviewTab
+              selectedLocation={selectedStation}
+              selectedCrop={selectedCrop}
+              weather={weather}
+              onRefreshWeather={() => fetchWeather(selectedStation)}
+              onNavigateToTab={(t) => handleTabChange(t as TabKey)}
+            />
+          )}
+          {activeTab === 'predict' && (
+            <PredictionStudioTab
               selectedLocation={selectedStation}
               selectedCrop={selectedCrop}
               weather={weather}

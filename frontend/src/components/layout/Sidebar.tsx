@@ -16,6 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     { key: 'overview' as TabKey, label: 'Overview', icon: 'dashboard' },
+    { key: 'predict' as TabKey, label: 'Prediction Studio', icon: 'psychology' },
     { key: 'map' as TabKey, label: 'Risk Map', icon: 'map' },
     { key: 'obs' as TabKey, label: 'Field Observations', icon: 'visibility' },
     { key: 'history' as TabKey, label: 'Risk History', icon: 'history' },

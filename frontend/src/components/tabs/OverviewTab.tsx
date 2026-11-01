@@ -374,14 +374,26 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
 
       {/* 5. Prediction Studio Form & Result */}
       <div className="p-6 rounded-DEFAULT bg-surface-container-lowest border border-border-hairline shadow-subtle">
-        <div className="mb-6">
-          <h2 className="font-headline text-lg font-bold text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">psychology</span>
-            Machine Learning Pest Risk Prediction Studio
-          </h2>
-          <p className="text-xs text-secondary mt-0.5">
-            Submit agronomic and weather parameters directly to the FastAPI Champion Random Forest Inference Engine.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-border-hairline gap-3">
+          <div>
+            <h2 className="font-headline text-lg font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">psychology</span>
+              Machine Learning Pest Risk Prediction Studio
+            </h2>
+            <p className="text-xs text-secondary mt-0.5">
+              Submit agronomic and weather parameters directly to the FastAPI Champion Random Forest Inference Engine.
+            </p>
+          </div>
+          {onNavigateToTab && (
+            <button
+              type="button"
+              onClick={() => onNavigateToTab('predict')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-tertiary-container/30 hover:bg-tertiary-container text-primary font-bold text-xs border border-primary/20 transition-all cursor-pointer whitespace-nowrap self-start sm:self-auto"
+            >
+              <span>Dedicated Studio Page</span>
+              <span className="material-symbols-outlined text-sm">open_in_new</span>
+            </button>
+          )}
         </div>
 
         <form onSubmit={handleEvaluate} className="grid grid-cols-1 lg:grid-cols-12 gap-6">

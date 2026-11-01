@@ -31,6 +31,15 @@ export const ModelPerformanceTab: React.FC = () => {
   const championModel =
     models.find((m) => m.model === (benchmarkData?.champion || 'Random Forest')) || models[0];
 
+  if (isLoading && !benchmarkData) {
+    return (
+      <div className="flex flex-col items-center justify-center p-24 space-y-4">
+        <span className="w-8 h-8 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+        <span className="text-sm font-semibold text-secondary">Loading Model Evaluation Benchmarks...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
       {/* Header Banner */}
@@ -70,9 +79,16 @@ export const ModelPerformanceTab: React.FC = () => {
                 Production Champion Model: {championModel.model}
               </h3>
             </div>
-            <span className="text-xs text-secondary font-mono">
-              Train: {benchmarkData?.train_size?.toLocaleString()} · Test: {benchmarkData?.test_size?.toLocaleString()}
-            </span>
+            <div className="flex items-center gap-3">
+              {modelInfo?.hyperparameters && (
+                <span className="hidden md:inline text-[11px] text-secondary font-mono">
+                  {Object.entries(modelInfo.hyperparameters).slice(0, 2).map(([k, v]) => `${k}=${v}`).join(' · ')}
+                </span>
+              )}
+              <span className="text-xs text-secondary font-mono">
+                Train: {benchmarkData?.train_size?.toLocaleString()} · Test: {benchmarkData?.test_size?.toLocaleString()}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 text-center">

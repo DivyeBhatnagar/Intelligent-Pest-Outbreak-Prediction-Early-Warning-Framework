@@ -16,6 +16,7 @@ interface TopbarProps {
 
 const TAB_TITLES: Record<TabKey, string> = {
   overview: 'Farmer Overview & Advisory',
+  predict: 'Machine Learning Pest Risk Prediction Studio',
   map: 'Geographic Risk Map & Network',
   obs: 'Field Surveillance Records',
   history: 'Climatic Trends & Risk History',
