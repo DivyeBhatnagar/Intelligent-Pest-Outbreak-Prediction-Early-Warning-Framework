@@ -43,6 +43,9 @@ wheels/
 *.swo
 *~
 
+# Large Training Datasets & Binary Dumps
+datasetfortraining/
+
 # Node & Frontend (for future web app)
 node_modules/
 .next/

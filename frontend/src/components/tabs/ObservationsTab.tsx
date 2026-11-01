@@ -97,9 +97,9 @@ export const ObservationsTab: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 p-3 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-DEFAULT bg-surface-container-low border border-border-hairline gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-6 rounded-DEFAULT bg-surface-container-low border border-border-hairline gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-primary">
@@ -255,8 +255,8 @@ export const ObservationsTab: React.FC = () => {
 
       {/* Modal: Record New In-Field Observation */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg p-6 rounded-DEFAULT bg-canvas border border-border-hairline shadow-elevated space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-DEFAULT bg-canvas border border-border-hairline shadow-elevated space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-border-hairline">
               <h3 className="font-headline text-lg font-bold text-on-surface">
                 Record In-Field Scouting Observation
