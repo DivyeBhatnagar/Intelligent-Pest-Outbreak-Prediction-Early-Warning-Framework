@@ -62,9 +62,9 @@ export const RiskHistoryTab: React.FC = () => {
   }));
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 p-3 sm:p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-DEFAULT bg-surface-container-low border border-border-hairline gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-6 rounded-DEFAULT bg-surface-container-low border border-border-hairline gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-primary">

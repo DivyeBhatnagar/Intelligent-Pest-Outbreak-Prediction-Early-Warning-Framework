@@ -25,6 +25,34 @@ export const App: React.FC = () => {
   const [health, setHealth] = useState<SystemHealthResponse | null>(null);
   const [activeAlertCount, setActiveAlertCount] = useState<number>(0);
 
+  // Responsive Sidebar state (Collapsible on Desktop, Off-canvas Drawer on Mobile/Tablet)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('agrowatch_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('agrowatch_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleToggleMobile = () => {
+    setIsMobileOpen((prev) => !prev);
+  };
+
+  const handleCloseMobile = () => {
+    setIsMobileOpen(false);
+  };
+
   // Global Station and Crop Selector for Topbar
   const [selectedStation, setSelectedStation] = useState<string>('Cuttack');
   const [selectedCrop, setSelectedCrop] = useState<string>('Rice');
@@ -108,6 +136,7 @@ export const App: React.FC = () => {
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
+    setIsMobileOpen(false);
     const url = new URL(window.location.href);
     url.searchParams.set('tab', tab);
     window.history.replaceState({}, '', url.toString());
@@ -115,16 +144,24 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex bg-surface text-on-surface">
-      {/* ── Persistent Sidebar Component (Stitch Redesign) ────────────────── */}
+      {/* ── Responsive & Collapsible Sidebar Component ────────────────────── */}
       <Sidebar
         activeTab={activeTab}
         onTabChange={handleTabChange}
         alertCount={activeAlertCount}
         lastSyncTime={weather?.time}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={handleToggleCollapse}
+        isMobileOpen={isMobileOpen}
+        onCloseMobile={handleCloseMobile}
       />
 
-      {/* ── Main Canvas Viewport (Shifted by 288px / w-72 for Sidebar) ───── */}
-      <div className="pl-72 flex-1 flex flex-col min-w-0">
+      {/* ── Main Canvas Viewport (Mobile: pl-0, Desktop: lg:pl-72 or lg:pl-20) ── */}
+      <div
+        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${
+          isCollapsed ? 'lg:pl-20' : 'lg:pl-72'
+        } pl-0`}
+      >
         {/* ── Persistent Topbar (Stitch Redesign) ─────────────────────────── */}
         <Topbar
           activeTab={activeTab}
@@ -137,6 +174,10 @@ export const App: React.FC = () => {
           weatherTemp={weather?.current_temp}
           alertCount={activeAlertCount}
           onRefreshWeather={() => fetchWeather(selectedStation)}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={handleToggleCollapse}
+          isMobileOpen={isMobileOpen}
+          onToggleMobile={handleToggleMobile}
         />
 
         {/* ── Active Tab Page Canvas ─────────────────────────────────────── */}
@@ -170,7 +211,7 @@ export const App: React.FC = () => {
         </main>
 
         {/* ── Persistent Footer ──────────────────────────────────────────── */}
-        <footer className="border-t border-border-hairline bg-surface-container-lowest py-5 px-6 text-center text-xs text-secondary">
+        <footer className="border-t border-border-hairline bg-surface-container-lowest py-4 sm:py-5 px-3 sm:px-6 text-center text-xs text-secondary">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
             <div>
               <span className="font-bold text-on-surface">AgroWatch AI</span> · Precision Bio-Climatic
