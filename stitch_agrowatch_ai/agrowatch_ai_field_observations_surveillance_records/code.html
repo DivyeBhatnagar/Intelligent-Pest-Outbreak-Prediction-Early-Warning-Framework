@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroWatch AI - Field Observations</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Space Grotesk & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-error-container": "#93000a",
+            "outline-variant": "#b9cbbe",
+            "on-surface": "#131c26",
+            "surface-tint": "#006c46",
+            "inverse-on-surface": "#e8f2ff",
+            "error-container": "#ffdad6",
+            "error": "#ba1a1a",
+            "surface-container-high": "#dfe9f6",
+            "surface-container": "#e5effc",
+            "on-surface-variant": "#3b4a40",
+            "on-tertiary-fixed": "#111f0d",
+            "surface-bright": "#f7f9ff",
+            "on-primary": "#ffffff",
+            "primary": "#006c46",
+            "surface-dim": "#d1dbe8",
+            "outline": "#6b7b70",
+            "surface-soft": "#f2f4f5",
+            "on-primary-container": "#006843",
+            "risk-high": "#f97316",
+            "background": "#f7f9ff",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed": "#002112",
+            "secondary": "#5e5e5e",
+            "risk-critical": "#ef4444",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed-variant": "#3b4b35",
+            "primary-fixed-dim": "#00e296",
+            "surface-container-low": "#edf4ff",
+            "on-secondary-container": "#646464",
+            "canvas": "#ffffff",
+            "on-secondary": "#ffffff",
+            "surface-variant": "#d9e3f1",
+            "secondary-container": "#e2e2e2",
+            "on-tertiary-container": "#4e5f47",
+            "risk-low": "#10b981",
+            "surface": "#f7f9ff",
+            "surface-container-highest": "#d9e3f1",
+            "risk-moderate": "#f59e0b",
+            "primary-fixed": "#4dffb2",
+            "tertiary": "#52634b",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#baccaf",
+            "on-secondary-fixed-variant": "#474747",
+            "secondary-fixed": "#e2e2e2",
+            "border-hairline": "#e5e7eb",
+            "tertiary-fixed": "#d5e8ca",
+            "inverse-surface": "#28313b",
+            "secondary-fixed-dim": "#c6c6c6",
+            "tertiary-container": "#c6d8bb",
+            "on-primary-fixed-variant": "#005234",
+            "primary-container": "#00f0a0",
+            "on-background": "#131c26",
+            "inverse-primary": "#00e296",
+            "on-secondary-fixed": "#1b1b1b"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "gutter-sm": "1rem",
+            "margin": "2rem",
+            "space-xxl": "3rem",
+            "margin-sm": "1rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "space-section": "6rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "headline-md-mobile": ["Space Grotesk"],
+            "title-lg": ["Space Grotesk"],
+            "body-sm": ["Inter"],
+            "headline-sm": ["Space Grotesk"],
+            "body-md": ["Inter"],
+            "headline-lg-mobile": ["Space Grotesk"],
+            "label-md": ["Inter"],
+            "caption": ["Inter"],
+            "headline-md": ["Space Grotesk"],
+            "body-lg": ["Inter"],
+            "headline-sm-mobile": ["Space Grotesk"],
+            "display-mobile": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "display": ["Space Grotesk"],
+            "label-sm": ["Inter"],
+            "title-md": ["Inter"]
+          },
+          "fontSize": {
+            "headline-md-mobile": ["1.75rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "700" }],
+            "title-lg": ["2rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "600" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "500" }],
+            "headline-sm": ["2.375rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "body-md": ["1rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "500" }],
+            "headline-lg-mobile": ["2rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "label-md": ["1rem", { "lineHeight": "1", "letterSpacing": "0", "fontWeight": "600" }],
+            "caption": ["0.8125rem", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-md": ["3rem", { "lineHeight": "1.15", "letterSpacing": "0", "fontWeight": "700" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+            "headline-sm-mobile": ["1.5rem", { "lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "600" }],
+            "display-mobile": ["2.5rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-lg": ["3.75rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "display": ["5rem", { "lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-sm": ["0.875rem", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "title-md": ["1.125rem", { "lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .material-symbols-outlined.fill-1 {
+      font-variation-settings: 'FILL' 1;
+    }
+    /* Architectural table scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f2f4f5;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #b9cbbe;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6b7b70;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-fixed">
+<!-- ============================================================== -->
+<!-- 1. LEFT SIDEBAR (Shared Component: SideNavBar)                  -->
+<!-- ============================================================== -->
+<aside class="fixed left-0 top-0 bottom-0 w-72 z-40 p-4 border-r border-border-hairline bg-surface-container-lowest flex flex-col justify-between overflow-y-auto">
+<!-- Brand / Header Section -->
+<div>
+<div class="flex items-center gap-3 px-3 py-2 mb-6">
+<div class="w-10 h-10 rounded-xl bg-on-background flex items-center justify-center text-primary-container shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 24px;">psychiatry</span>
+</div>
+<div>
+<div class="font-title-lg text-title-lg font-bold text-on-surface tracking-tight leading-none">AgroWatch AI</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-1 leading-tight">Intelligent Pest Surveillance</div>
+</div>
+</div>
+<!-- Operational Status Pill -->
+<div class="px-3 py-2 mb-4 bg-tertiary-container/20 rounded-DEFAULT border border-primary/20 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-risk-low animate-pulse"></span>
+<span class="font-caption text-caption text-primary font-semibold">Operational: All Sensors Active</span>
+</div>
+<!-- Navigation Links -->
+<nav class="space-y-1">
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-on-surface rounded-DEFAULT transition-colors" href="#overview">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- 2. Risk Map -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-on-surface rounded-DEFAULT transition-colors" href="#risk-map">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span>Risk Map</span>
+</a>
+<!-- 3. Field Observations (ACTIVE - Semantic Lock) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-tertiary-container/30 text-primary font-title-md text-title-md rounded-DEFAULT border-l-4 border-primary" href="?tab=obs">
+<span class="material-symbols-outlined fill-1" data-icon="visibility">visibility</span>
+<span class="font-semibold text-on-surface">Field Observations</span>
+</a>
+<!-- 4. Risk History -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-on-surface rounded-DEFAULT transition-colors" href="#risk-history">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Risk History</span>
+</a>
+<!-- 5. Alerts & Advisories -->
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-on-surface rounded-DEFAULT transition-colors" href="#alerts">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span>Alerts &amp; Advisories</span>
+</div>
+<span class="bg-risk-critical/10 text-risk-critical border border-risk-critical/30 font-caption text-caption px-2 py-0.5 rounded-full font-bold">7</span>
+</a>
+<!-- 6. Model Performance -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-on-surface rounded-DEFAULT transition-colors" href="#model-performance">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Model Performance</span>
+</a>
+<!-- 7. System Health -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-low hover:text-on-surface rounded-DEFAULT transition-colors" href="#system-health">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span>
+<span>System Health</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Footer Anchor -->
+<div class="pt-4 border-t border-border-hairline space-y-3">
+<div class="flex items-center justify-between text-secondary px-2">
+<span class="font-caption text-caption">Live Sync 10:42 UTC</span>
+<span class="font-caption text-caption font-semibold bg-surface-soft px-2 py-0.5 rounded-full">v2.4.1</span>
+</div>
+<div class="flex items-center gap-3 p-2 bg-surface rounded-DEFAULT border border-border-hairline">
+<div class="w-9 h-9 rounded-full bg-on-background text-canvas flex items-center justify-center font-title-md text-title-md font-bold">
+          AS
+        </div>
+<div class="overflow-hidden">
+<div class="font-label-sm text-label-sm font-semibold text-on-surface truncate">Dr. A. Swaminathan</div>
+<div class="font-caption text-caption text-on-surface-variant truncate">Surveillance Administrator</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- ============================================================== -->
+<!-- 2. MAIN VIEWPORT & CONTENT AREA                                -->
+<!-- ============================================================== -->
+<div class="pl-72 flex-1 flex flex-col min-w-0">
+<!-- Top Navigation Bar (Shared Component: TopNavBar) -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-8 py-3 w-full border-b border-border-hairline bg-surface-container-lowest/90 backdrop-blur">
+<!-- Breadcrumbs & Quick ICAR Search -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="font-semibold text-on-surface">AgroWatch AI</span>
+<span>/</span>
+<span class="text-primary font-semibold">Field Observations</span>
+</div>
+<div class="relative w-80">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 h-10 bg-canvas border border-border-hairline rounded-full font-body-sm text-body-sm text-on-surface placeholder-secondary focus:outline-none focus:border-on-background focus:ring-2 focus:ring-primary-container/40 transition" placeholder="Search ICAR station or record ID..." type="text"/>
+</div>
+</div>
+<!-- Actions & Filters Cluster -->
+<div class="flex items-center gap-4">
+<!-- Crop Toggles -->
+<div class="flex items-center bg-surface-soft p-1 rounded-full border border-border-hairline text-label-sm">
+<button class="bg-on-background text-canvas font-label-md text-label-md px-4 py-1.5 rounded-full transition-transform active:scale-[0.98]">Rice (Paddy)</button>
+<button class="text-on-surface-variant font-label-md text-label-md px-4 py-1.5 rounded-full hover:bg-surface-container-low transition-colors">Cotton</button>
+</div>
+<div class="h-6 w-px bg-border-hairline"></div>
+<!-- Trailing Icon Actions -->
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-soft hover:text-on-surface transition-colors" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-soft hover:text-on-surface transition-colors" title="Configuration">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-soft hover:text-on-surface transition-colors" title="Help Guide">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<!-- Quick Primary Trigger -->
+<button class="inline-flex items-center gap-2 bg-on-background text-canvas font-label-md text-label-md px-5 py-2.5 rounded-full hover:bg-on-surface transition-all active:scale-[0.98] shadow-sm" onclick="document.getElementById('recordDrawer').classList.remove('translate-x-full')">
+<span class="material-symbols-outlined text-primary-container" data-icon="add">add</span>
+<span>Record Observation</span>
+</button>
+</div>
+</header>
+<!-- MAIN SCROLLABLE CONTENT CANVAS -->
+<main class="flex-1 p-8 space-y-8 max-w-[1440px] mx-auto w-full">
+<!-- ============================================================== -->
+<!-- A. PAGE HEADER SECTION                                          -->
+<!-- ============================================================== -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-border-hairline">
+<div>
+<div class="flex items-center gap-3">
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Field Observations</h1>
+<span class="bg-primary-container/20 text-on-primary-container border border-primary/30 px-3 py-0.5 rounded-full font-label-sm text-label-sm font-semibold">11 ICAR Stations Sync</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1.5 max-w-3xl">
+            Monitor, review, and manage agricultural pest surveillance records across all 11 ICAR/TNAU monitoring stations.
+          </p>
+</div>
+<div class="flex items-center gap-3 shrink-0">
+<button class="inline-flex items-center gap-2 bg-canvas text-on-surface border border-border-hairline font-label-md text-label-md px-4 py-2.5 rounded-full hover:bg-surface-soft transition active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+<span>Export CSV / GIS Data</span>
+</button>
+<button class="inline-flex items-center gap-2 bg-primary-container text-on-primary-fixed border border-on-background font-label-md text-label-md px-6 py-2.5 rounded-full hover:bg-primary-fixed transition shadow-sm active:scale-[0.98]" onclick="document.getElementById('recordDrawer').classList.remove('translate-x-full')">
+<span class="material-symbols-outlined font-bold" data-icon="add_circle">add_circle</span>
+<span>+ Record Observation</span>
+</button>
+</div>
+</div>
+<!-- ============================================================== -->
+<!-- B. SUMMARY CARDS (4-Column Bento Row)                         -->
+<!-- ============================================================== -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+<!-- 1. Total Observations -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-primary/40 transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Total Observations</span>
+<div class="w-9 h-9 rounded-full bg-surface-soft flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="folder_managed">folder_managed</span>
+</div>
+</div>
+<div class="mt-4">
+<div class="font-title-lg text-title-lg font-bold text-on-surface">35,499</div>
+<div class="flex items-center gap-1.5 mt-2 font-caption text-caption text-risk-low">
+<span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+<span class="font-semibold">+1,240 this month</span>
+<span class="text-secondary ml-1">• ICAR verified</span>
+</div>
+</div>
+</div>
+<!-- 2. Rice (Paddy) Records -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-primary/40 transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Rice (Paddy) Records</span>
+<div class="w-9 h-9 rounded-full bg-tertiary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="grass">grass</span>
+</div>
+</div>
+<div class="mt-4">
+<div class="font-title-lg text-title-lg font-bold text-on-surface">21,840</div>
+<div class="mt-2 font-caption text-caption text-on-surface-variant truncate" title="Yellow Stem Borer, BPH, Leaf Folder">
+              Yellow Stem Borer, BPH, Leaf Folder
+            </div>
+</div>
+</div>
+<!-- 3. Cotton Records -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between hover:border-primary/40 transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Cotton Records</span>
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="spa">spa</span>
+</div>
+</div>
+<div class="mt-4">
+<div class="font-title-lg text-title-lg font-bold text-on-surface">13,659</div>
+<div class="mt-2 font-caption text-caption text-on-surface-variant truncate" title="Pink Bollworm, Whitefly, American Bollworm">
+              Pink Bollworm, Whitefly, American Bollworm
+            </div>
+</div>
+</div>
+<!-- 4. Active ETL Breaches -->
+<div class="bg-canvas border-2 border-risk-critical/30 rounded-DEFAULT p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-canvas to-risk-critical/5">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-risk-critical font-bold uppercase tracking-wider">Active ETL Breaches</span>
+<div class="w-9 h-9 rounded-full bg-risk-critical/10 flex items-center justify-center text-risk-critical">
+<span class="material-symbols-outlined fill-1" data-icon="warning">warning</span>
+</div>
+</div>
+<div class="mt-4">
+<div class="flex items-baseline gap-2">
+<div class="font-title-lg text-title-lg font-bold text-risk-critical">18 Records</div>
+<span class="bg-risk-critical text-on-primary font-caption text-caption px-2 py-0.5 rounded-full font-bold">Action Needed</span>
+</div>
+<div class="mt-2 font-caption text-caption text-on-surface-variant">
+              Needs immediate field scouting &amp; advisory
+            </div>
+</div>
+</div>
+</section>
+<!-- ============================================================== -->
+<!-- C. FILTER & SEARCH TOOLBAR                                     -->
+<!-- ============================================================== -->
+<section class="bg-canvas border border-border-hairline rounded-DEFAULT p-4 space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+<!-- Text Search Filter -->
+<div class="lg:col-span-2 relative">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-3 py-2 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface placeholder-secondary focus:bg-canvas focus:outline-none focus:border-on-background focus:ring-1 focus:ring-on-background transition" placeholder="Search station, pest, or record ID..." type="text" value=""/>
+</div>
+<!-- Station Dropdown -->
+<div>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:bg-canvas focus:outline-none focus:border-on-background">
+<option value="">All 11 ICAR Stations</option>
+<option selected="">Aduthurai Hub (TNAU)</option>
+<option>Raipur (IGKV)</option>
+<option>Hyderabad (IIRR)</option>
+<option>Cuttack (NRRI)</option>
+<option>Dharwad (UAS)</option>
+<option>Anand (AAU)</option>
+<option>Ludhiana (PAU)</option>
+</select>
+</div>
+<!-- Crop Filter -->
+<div>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:bg-canvas focus:outline-none focus:border-on-background">
+<option value="">All Crops</option>
+<option selected="">Rice (Paddy)</option>
+<option>Cotton</option>
+</select>
+</div>
+<!-- Pest Vector Filter -->
+<div>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:bg-canvas focus:outline-none focus:border-on-background">
+<option value="">All Pest Vectors</option>
+<option>Yellow Stem Borer</option>
+<option>Brown Planthopper (BPH)</option>
+<option>Rice Gall Midge</option>
+<option>Pink Bollworm</option>
+<option>Whitefly</option>
+</select>
+</div>
+<!-- Severity / ETL Status -->
+<div>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:bg-canvas focus:outline-none focus:border-on-background">
+<option value="">All ETL Severities</option>
+<option>Safe / Normal</option>
+<option>Approaching ETL</option>
+<option>ETL Breached</option>
+</select>
+</div>
+</div>
+<!-- Secondary Toolbar Row: Dates + Count + Reset -->
+<div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border-hairline">
+<div class="flex items-center gap-3">
+<!-- Date Range Selector -->
+<div class="inline-flex items-center gap-2 bg-surface-soft px-3 py-1.5 rounded-DEFAULT border border-border-hairline font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-outline" data-icon="calendar_month">calendar_month</span>
+<span class="font-medium">Oct 1 - Oct 24, 2024</span>
+<span class="material-symbols-outlined text-outline cursor-pointer" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+<!-- Quick Pill Filter -->
+<div class="flex items-center gap-2 text-caption">
+<span class="text-secondary font-medium">Applied:</span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full text-on-surface font-semibold">
+                Station: Aduthurai
+                <button class="hover:text-risk-critical flex items-center"><span class="material-symbols-outlined" style="font-size: 14px;">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full text-on-surface font-semibold">
+                Crop: Rice
+                <button class="hover:text-risk-critical flex items-center"><span class="material-symbols-outlined" style="font-size: 14px;">close</span></button>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-caption text-caption text-on-surface-variant font-medium">Showing <strong class="text-on-surface">7</strong> of <strong class="text-on-surface">35,499</strong> records</span>
+<button class="font-label-sm text-label-sm text-secondary hover:text-on-surface underline underline-offset-4 decoration-border-hairline transition">Clear Filters</button>
+</div>
+</div>
+</section>
+<!-- ============================================================== -->
+<!-- D. SURVEILLANCE DATA TABLE                                      -->
+<!-- ============================================================== -->
+<section class="bg-canvas border border-border-hairline rounded-DEFAULT overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-soft border-b border-border-hairline text-secondary font-label-sm text-[12px] uppercase tracking-wider">
+<th class="py-3 px-4 font-semibold">Record ID</th>
+<th class="py-3 px-4 font-semibold">Date &amp; Time</th>
+<th class="py-3 px-4 font-semibold">Station / Location</th>
+<th class="py-3 px-4 font-semibold">Crop &amp; Stage</th>
+<th class="py-3 px-4 font-semibold">Target Pest</th>
+<th class="py-3 px-4 font-semibold">Observed Population</th>
+<th class="py-3 px-4 font-semibold">ETL Threshold</th>
+<th class="py-3 px-4 font-semibold">ETL Status</th>
+<th class="py-3 px-4 font-semibold">Micro-Climate</th>
+<th class="py-3 px-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-hairline font-body-sm text-body-sm">
+<!-- ROW 1: OBS-8841 (Approaching ETL) -->
+<tr class="hover:bg-tertiary-container/10 transition-colors group">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-moderate"></span>
+                    #OBS-2024-8841
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>24 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">07:30 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Aduthurai Hub</div>
+<div class="font-caption text-caption text-secondary">TNAU • Scout Murugan</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Rice (Paddy)</div>
+<div class="font-caption text-caption text-on-surface-variant">Tillering stage</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Yellow Stem Borer</span>
+<div class="font-caption text-caption text-secondary italic">Scirpophaga incertulas</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-semibold text-risk-moderate">
+                  8.2% Dead Hearts
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  10.0% Dead Hearts
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-amber-50 text-risk-moderate border border-risk-moderate/30">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-moderate"></span>
+                    Approaching ETL
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">29.4°C</span> | 84% RH | 14.2mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2: OBS-8840 (ETL BREACHED) -->
+<tr class="hover:bg-risk-critical/5 transition-colors group bg-red-50/20">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-risk-critical">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-critical animate-ping"></span>
+                    #OBS-2024-8840
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>24 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">06:45 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Raipur Station</div>
+<div class="font-caption text-caption text-secondary">IGKV • Scout Verma</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Rice (Paddy)</div>
+<div class="font-caption text-caption text-on-surface-variant">Panicle initiation</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Yellow Stem Borer</span>
+<div class="font-caption text-caption text-secondary italic">Scirpophaga incertulas</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-bold text-risk-critical">
+                  12.4% Dead Hearts
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  10.0% Dead Hearts
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-red-50 text-risk-critical border border-risk-critical/40">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-critical"></span>
+                    ETL BREACHED
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">31.0°C</span> | 88% RH | 3.5mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-risk-critical hover:text-on-error-container" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 3: OBS-8839 (Approaching ETL) -->
+<tr class="hover:bg-tertiary-container/10 transition-colors group">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-moderate"></span>
+                    #OBS-2024-8839
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>23 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">16:15 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Hyderabad Central</div>
+<div class="font-caption text-caption text-secondary">IIRR • Scout Rao</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Rice (Paddy)</div>
+<div class="font-caption text-caption text-on-surface-variant">Tillering stage</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Brown Planthopper (BPH)</span>
+<div class="font-caption text-caption text-secondary italic">Nilaparvata lugens</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-semibold text-risk-moderate">
+                  14 hoppers/hill
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  15 hoppers/hill
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-amber-50 text-risk-moderate border border-risk-moderate/30">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-moderate"></span>
+                    Approaching ETL
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">28.5°C</span> | 81% RH | 0.0mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 4: OBS-8838 (Safe / Normal) -->
+<tr class="hover:bg-surface-soft transition-colors group">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low"></span>
+                    #OBS-2024-8838
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>23 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">11:00 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Cuttack East</div>
+<div class="font-caption text-caption text-secondary">NRRI • Scout Mohapatra</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Rice (Paddy)</div>
+<div class="font-caption text-caption text-on-surface-variant">Vegetative phase</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Rice Gall Midge</span>
+<div class="font-caption text-caption text-secondary italic">Orseolia oryzae</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-medium text-on-surface">
+                  4.1% Silver Shoots
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  5.0% Silver Shoots
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-emerald-50 text-risk-low border border-risk-low/30">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low"></span>
+                    Safe / Normal
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">27.8°C</span> | 76% RH | 0.0mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 5: OBS-8837 (Cotton, Normal) -->
+<tr class="hover:bg-surface-soft transition-colors group">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low"></span>
+                    #OBS-2024-8837
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>23 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">09:10 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Dharwad Field</div>
+<div class="font-caption text-caption text-secondary">UAS • Scout Kulkarni</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Cotton</div>
+<div class="font-caption text-caption text-on-surface-variant">Flowering stage</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Pink Bollworm</span>
+<div class="font-caption text-caption text-secondary italic">Pectinophora gossypiella</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-medium text-on-surface">
+                  3.5% Rosetted Flowers
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  10.0% Rosetted Flowers
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-emerald-50 text-risk-low border border-risk-low/30">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low"></span>
+                    Safe / Normal
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">26.2°C</span> | 70% RH | 0.0mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 6: OBS-8836 (Cotton, Approaching ETL) -->
+<tr class="hover:bg-tertiary-container/10 transition-colors group">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-moderate"></span>
+                    #OBS-2024-8836
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>22 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">15:40 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Anand Agri Hub</div>
+<div class="font-caption text-caption text-secondary">AAU • Scout Patel</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Cotton</div>
+<div class="font-caption text-caption text-on-surface-variant">Squaring phase</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Whitefly</span>
+<div class="font-caption text-caption text-secondary italic">Bemisia tabaci</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-semibold text-risk-moderate">
+                  6 adults/leaf
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  8 adults/leaf
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-amber-50 text-risk-moderate border border-risk-moderate/30">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-moderate"></span>
+                    Approaching ETL
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">30.5°C</span> | 65% RH | 0.0mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 7: OBS-8835 (Rice, Safe) -->
+<tr class="hover:bg-surface-soft transition-colors group">
+<td class="py-3.5 px-4 font-title-md text-[13px] font-bold text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low"></span>
+                    #OBS-2024-8835
+                  </div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface">
+<div>22 Oct 2024</div>
+<div class="font-caption text-caption text-secondary">08:20 IST</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-semibold text-on-surface">Ludhiana Central</div>
+<div class="font-caption text-caption text-secondary">PAU • Scout Singh</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="font-medium text-on-surface">Rice (Paddy)</div>
+<div class="font-caption text-caption text-on-surface-variant">Booting phase</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="font-semibold text-on-surface">Rice Leaf Folder</span>
+<div class="font-caption text-caption text-secondary italic">Cnaphalocrocis medinalis</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-medium text-on-surface">
+                  1.8% Damaged Leaves
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap text-secondary">
+                  10.0% Damaged Leaves
+                </td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold bg-emerald-50 text-risk-low border border-risk-low/30">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low"></span>
+                    Safe / Normal
+                  </span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap font-caption text-caption text-on-surface-variant">
+<span class="font-semibold text-on-surface">25.4°C</span> | 62% RH | 0.0mm
+                </td>
+<td class="py-3.5 px-4 text-right whitespace-nowrap">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="View Details">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Edit Record">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-surface-soft text-on-surface-variant hover:text-on-surface" title="Audit Log">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="p-4 bg-canvas border-t border-border-hairline flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3 font-caption text-caption text-on-surface-variant">
+<span>Showing <strong class="text-on-surface">1 - 7</strong> of <strong class="text-on-surface">35,499</strong> records</span>
+<span class="text-border-hairline">|</span>
+<div class="flex items-center gap-1.5">
+<span>Rows per page:</span>
+<select class="bg-surface-soft border border-border-hairline text-on-surface text-caption rounded py-1 px-2 focus:outline-none">
+<option selected="">7</option>
+<option>25</option>
+<option>50</option>
+<option>100</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 rounded-full border border-border-hairline flex items-center justify-center text-on-surface-variant hover:bg-surface-soft disabled:opacity-40" disabled="">
+<span class="material-symbols-outlined" style="font-size: 16px;">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-on-background text-canvas font-bold text-caption flex items-center justify-center">1</button>
+<button class="w-8 h-8 rounded-full hover:bg-surface-soft text-on-surface text-caption flex items-center justify-center">2</button>
+<button class="w-8 h-8 rounded-full hover:bg-surface-soft text-on-surface text-caption flex items-center justify-center">3</button>
+<span class="px-1 text-secondary text-caption">...</span>
+<button class="w-8 h-8 rounded-full hover:bg-surface-soft text-on-surface text-caption flex items-center justify-center">5071</button>
+<button class="w-8 h-8 rounded-full border border-border-hairline flex items-center justify-center text-on-surface-variant hover:bg-surface-soft">
+<span class="material-symbols-outlined" style="font-size: 16px;">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Contextual Informational Banner -->
+<div class="bg-tertiary-container/20 border border-primary/20 rounded-DEFAULT p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 18px;">verified</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">ICAR-NCIPM Bio-Surveillance Protocol Active</div>
+<div class="font-caption text-caption text-on-surface-variant">Observations logged are automatically cross-correlated with satellite canopy NDVI and regional Doppler radar imagery.</div>
+</div>
+</div>
+<button class="font-label-sm text-label-sm text-primary font-semibold hover:underline">View National Surveillance SOP</button>
+</div>
+</main>
+</div>
+<!-- ============================================================== -->
+<!-- E. RECORD OBSERVATION INTERACTIVE WORKFLOW SLIDE-OVER DRAWER   -->
+<!-- ============================================================== -->
+<div class="fixed inset-y-0 right-0 w-full max-w-xl bg-canvas border-l border-border-hairline z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl" id="recordDrawer">
+<!-- Drawer Header -->
+<div class="px-6 py-4 border-b border-border-hairline flex items-center justify-between bg-surface-soft">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container border border-on-background"></span>
+<h2 class="font-title-lg text-[20px] font-bold text-on-surface">Record Field Observation</h2>
+</div>
+<p class="font-caption text-caption text-secondary mt-0.5">Submit verified ICAR scout findings into central AgroWatch AI pipeline.</p>
+</div>
+<button class="w-9 h-9 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition" onclick="document.getElementById('recordDrawer').classList.add('translate-x-full')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Drawer Scrollable Form Body -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<!-- Section 1: Location & Temporal Data -->
+<div class="space-y-3">
+<div class="flex items-center gap-2 pb-1 border-b border-border-hairline">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider">1. Location &amp; Temporal Data</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">ICAR / TNAU Station</label>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-on-background">
+<option selected="">Aduthurai Hub (TNAU, Tamil Nadu)</option>
+<option>Raipur Station (IGKV)</option>
+<option>Hyderabad Central (IIRR)</option>
+<option>Cuttack East (NRRI)</option>
+</select>
+</div>
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Observation Date &amp; Time</label>
+<input class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-on-background" type="datetime-local" value="2024-10-24T07:30"/>
+</div>
+<div class="col-span-2">
+<label class="block font-caption text-caption text-secondary mb-1">Assigned Field Scout ID</label>
+<div class="flex items-center gap-2">
+<input class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface cursor-not-allowed" readonly="" type="text" value="ICAR-SC-042 (Scout Murugan K.)"/>
+<span class="shrink-0 bg-primary-container/20 text-on-primary-container border border-primary/30 px-3 py-1.5 rounded-DEFAULT font-caption text-caption font-semibold">Active Token</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Crop & Pest Identification -->
+<div class="space-y-3">
+<div class="flex items-center gap-2 pb-1 border-b border-border-hairline">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider">2. Crop &amp; Pest Identification</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Target Crop</label>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-on-background">
+<option selected="">Rice (Oryza sativa)</option>
+<option>Cotton (Gossypium hirsutum)</option>
+</select>
+</div>
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Phenological Growth Stage</label>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-on-background">
+<option selected="">Tillering stage (20-40 DAT)</option>
+<option>Vegetative phase</option>
+<option>Panicle initiation</option>
+<option>Booting stage</option>
+</select>
+</div>
+<div class="col-span-2">
+<label class="block font-caption text-caption text-secondary mb-1">Target Pest Vector</label>
+<select class="w-full py-2 px-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-on-background">
+<option selected="">Yellow Stem Borer (Scirpophaga incertulas)</option>
+<option>Brown Planthopper (Nilaparvata lugens)</option>
+<option>Rice Gall Midge (Orseolia oryzae)</option>
+<option>Rice Leaf Folder (Cnaphalocrocis medinalis)</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Section 3: Field Scouting Counts & ETL Calculation -->
+<div class="space-y-3">
+<div class="flex items-center gap-2 pb-1 border-b border-border-hairline">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider">3. Field Counts &amp; ETL Computation</span>
+</div>
+<div class="bg-surface-soft p-3 rounded-DEFAULT border border-border-hairline space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Sampling Methodology</label>
+<input class="w-full py-1.5 px-3 bg-canvas border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface" readonly="" type="text" value="20 Random Hills (ICAR SOP)"/>
+</div>
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Dead Hearts Count (%)</label>
+<input class="w-full py-1.5 px-3 bg-canvas border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface font-semibold" type="text" value="8.2%"/>
+</div>
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Egg Masses (/m²)</label>
+<input class="w-full py-1.5 px-3 bg-canvas border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface" type="text" value="2 masses / m²"/>
+</div>
+<div>
+<label class="block font-caption text-caption text-secondary mb-1">Official ETL Reference</label>
+<input class="w-full py-1.5 px-3 bg-canvas border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-secondary" readonly="" type="text" value="10.0% Dead Hearts"/>
+</div>
+</div>
+<!-- Automated Calculation Inset -->
+<div class="p-3 bg-amber-50 rounded-DEFAULT border border-risk-moderate/30 flex items-center justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-risk-moderate font-bold">Calculated Severity: 82% of ETL</div>
+<div class="font-caption text-caption text-on-surface-variant">Approaching economic threshold. Spray hold advised.</div>
+</div>
+<span class="px-2.5 py-1 bg-risk-moderate text-on-primary font-caption text-caption font-bold rounded-full">APPROACHING</span>
+</div>
+</div>
+</div>
+<!-- Section 4: Micro-Climate IoT Auto-Telemetry -->
+<div class="space-y-3">
+<div class="flex items-center justify-between pb-1 border-b border-border-hairline">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider">4. Micro-Climate at Observation</span>
+<span class="font-caption text-caption text-risk-low flex items-center gap-1 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-risk-low animate-pulse"></span>
+            Auto-synced from IoT Node #114
+          </span>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<div class="bg-surface-soft p-2.5 rounded-DEFAULT text-center border border-border-hairline">
+<span class="font-caption text-caption text-secondary block">Temperature</span>
+<span class="font-title-md text-title-md font-bold text-on-surface">29.4°C</span>
+</div>
+<div class="bg-surface-soft p-2.5 rounded-DEFAULT text-center border border-border-hairline">
+<span class="font-caption text-caption text-secondary block">Relative Humidity</span>
+<span class="font-title-md text-title-md font-bold text-on-surface">84%</span>
+</div>
+<div class="bg-surface-soft p-2.5 rounded-DEFAULT text-center border border-border-hairline">
+<span class="font-caption text-caption text-secondary block">Precipitation (24h)</span>
+<span class="font-title-md text-title-md font-bold text-on-surface">14.2 mm</span>
+</div>
+</div>
+</div>
+<!-- Section 5: Field Notes & Photo Upload Slot -->
+<div class="space-y-3">
+<div class="flex items-center gap-2 pb-1 border-b border-border-hairline">
+<span class="font-label-sm text-label-sm font-bold text-on-surface uppercase tracking-wider">5. Field Notes &amp; Scouting Imagery</span>
+</div>
+<textarea class="w-full p-3 bg-surface-soft border border-border-hairline rounded-DEFAULT font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-on-background focus:bg-canvas" placeholder="Add qualitative observations (e.g. canopy density, water logging, parasite presence)..." rows="3">Canopy shows isolated dead heart symptoms in sub-plot B4. Egg parasitoid Trichogramma activity sighted near bund edge.</textarea>
+<!-- Photo Attachment Slot with placeholder -->
+<div class="border-2 border-dashed border-border-hairline rounded-DEFAULT p-4 flex flex-col items-center justify-center gap-2 bg-surface-soft/50 hover:bg-surface-soft transition cursor-pointer">
+<img class="w-16 h-16 rounded-DEFAULT object-cover border border-border-hairline" data-alt="Close-up macro high-resolution agricultural laboratory inspection photography of paddy rice stems infected with yellow stem borer damage. Precise scientific illumination, clean green canopy foliage with clear dead heart stem symptom, hyper-detailed entomological surveillance style with modern clinical contrast and natural depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD9W15VbWH8mjrs5TRplHAQ7wmnFe5e-C0N_Pbac_oc45MVSoB0aM_0YRRz1lO0lCIIPbgLKLVfi1rfe-LJUZU1L622yXFeGPWVu2lZX9owEW_BLaSdQzAI8y4S-B1qieX0mVDEyOfVwrH2mK8Qk0O55DxI8RcXTypcBytjddPxwipeJ-nl6wiH0mgGg1Bg0Gr3UEwR5OPEMvFZf7PW69XCsKIgIqL03ww-PTcAQAJ"/>
+<div class="text-center">
+<div class="font-label-sm text-label-sm font-semibold text-on-surface">Attached: YSB_sample_plotB4_macro.jpg</div>
+<div class="font-caption text-caption text-secondary">Click to replace or add thermal drone imagery (Max 25MB)</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Drawer Footer Actions -->
+<div class="p-4 border-t border-border-hairline bg-surface-soft flex items-center justify-between">
+<button class="font-label-md text-label-md text-secondary hover:text-on-surface px-4 py-2 rounded-full transition" onclick="document.getElementById('recordDrawer').classList.add('translate-x-full')">
+        Cancel / Draft
+      </button>
+<div class="flex items-center gap-3">
+<button class="bg-canvas border border-border-hairline text-on-surface font-label-md text-label-md px-5 py-2.5 rounded-full hover:bg-surface-container transition" onclick="document.getElementById('recordDrawer').classList.add('translate-x-full')">
+          Save as Draft
+        </button>
+<button class="bg-on-background text-canvas font-label-md text-label-md px-6 py-2.5 rounded-full hover:bg-on-surface transition shadow-sm active:scale-[0.98]" onclick="document.getElementById('recordDrawer').classList.add('translate-x-full')">
+          Save Observation
+        </button>
+</div>
+</div>
+</div>
+<!-- Interactive Backdrop for Drawer -->
+<div class="fixed inset-0 bg-on-background/20 backdrop-blur-sm z-40 hidden" id="drawerBackdrop" onclick="document.getElementById('recordDrawer').classList.add('translate-x-full'); this.classList.add('hidden')"></div>
+<script>
+    // Synchronize backdrop state with drawer visibility
+    const drawer = document.getElementById('recordDrawer');
+    const backdrop = document.getElementById('drawerBackdrop');
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          if (drawer.classList.contains('translate-x-full')) {
+            backdrop.classList.add('hidden');
+          } else {
+            backdrop.classList.remove('hidden');
+          }
+        }
+      });
+    });
+
+    observer.observe(drawer, { attributes: true });
+  </script>
+</body></html>

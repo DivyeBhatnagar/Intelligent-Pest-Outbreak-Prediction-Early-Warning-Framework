@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgroWatch AI - Geographic Risk Map &amp; Surveillance Network</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#3b4b35",
+            "inverse-surface": "#28313b",
+            "secondary-fixed-dim": "#c6c6c6",
+            "surface-soft": "#f2f4f5",
+            "surface-container-low": "#edf4ff",
+            "inverse-on-surface": "#e8f2ff",
+            "background": "#f7f9ff",
+            "on-error": "#ffffff",
+            "border-hairline": "#e5e7eb",
+            "primary-container": "#00f0a0",
+            "on-surface-variant": "#3b4a40",
+            "on-secondary": "#ffffff",
+            "on-tertiary-container": "#4e5f47",
+            "canvas": "#ffffff",
+            "surface-container": "#e5effc",
+            "surface": "#f7f9ff",
+            "on-primary-fixed-variant": "#005234",
+            "surface-tint": "#006c46",
+            "on-surface": "#131c26",
+            "primary-fixed": "#4dffb2",
+            "primary": "#006c46",
+            "secondary-fixed": "#e2e2e2",
+            "surface-dim": "#d1dbe8",
+            "surface-variant": "#d9e3f1",
+            "on-primary-fixed": "#002112",
+            "on-secondary-fixed": "#1b1b1b",
+            "outline-variant": "#b9cbbe",
+            "surface-container-highest": "#d9e3f1",
+            "risk-high": "#f97316",
+            "on-secondary-fixed-variant": "#474747",
+            "risk-moderate": "#f59e0b",
+            "tertiary-fixed": "#d5e8ca",
+            "error-container": "#ffdad6",
+            "surface-bright": "#f7f9ff",
+            "outline": "#6b7b70",
+            "on-background": "#131c26",
+            "on-primary-container": "#006843",
+            "risk-critical": "#ef4444",
+            "error": "#ba1a1a",
+            "risk-low": "#10b981",
+            "on-tertiary-fixed": "#111f0d",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#00e296",
+            "tertiary-fixed-dim": "#baccaf",
+            "on-primary": "#ffffff",
+            "inverse-primary": "#00e296",
+            "secondary": "#5e5e5e",
+            "tertiary-container": "#c6d8bb",
+            "on-secondary-container": "#646464",
+            "tertiary": "#52634b",
+            "on-tertiary": "#ffffff",
+            "secondary-container": "#e2e2e2",
+            "on-error-container": "#93000a",
+            "surface-container-high": "#dfe9f6"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "gutter-sm": "1rem",
+            "space-section": "6rem",
+            "space-xxl": "3rem",
+            "margin": "2rem",
+            "margin-sm": "1rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-sm-mobile": ["Space Grotesk"],
+            "headline-sm": ["Space Grotesk"],
+            "display": ["Space Grotesk"],
+            "display-mobile": ["Space Grotesk"],
+            "title-md": ["Inter"],
+            "title-lg": ["Space Grotesk"],
+            "headline-md-mobile": ["Space Grotesk"],
+            "label-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-md": ["Space Grotesk"],
+            "caption": ["Inter"],
+            "headline-lg-mobile": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"]
+          },
+          "fontSize": {
+            "label-sm": ["0.875rem", { "lineHeight": "1.4", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-lg": ["1.125rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+            "body-sm": ["0.875rem", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "500" }],
+            "headline-sm-mobile": ["1.5rem", { "lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "600" }],
+            "headline-sm": ["2.375rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "display": ["5rem", { "lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "display-mobile": ["2.5rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "title-md": ["1.125rem", { "lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600" }],
+            "title-lg": ["2rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "600" }],
+            "headline-md-mobile": ["1.75rem", { "lineHeight": "1.25", "letterSpacing": "0", "fontWeight": "700" }],
+            "label-md": ["1rem", { "lineHeight": "1", "letterSpacing": "0", "fontWeight": "600" }],
+            "body-md": ["1rem", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "500" }],
+            "headline-md": ["3rem", { "lineHeight": "1.15", "letterSpacing": "0", "fontWeight": "700" }],
+            "caption": ["0.8125rem", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["2rem", { "lineHeight": "1.2", "letterSpacing": "0", "fontWeight": "700" }],
+            "headline-lg": ["3.75rem", { "lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    
+    @keyframes radar-pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+      }
+      70% {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 16px rgba(249, 115, 22, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+      }
+    }
+    .animate-radar {
+      animation: radar-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    .india-map-grid {
+      background-image: radial-gradient(rgba(0, 108, 70, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased flex min-h-screen">
+<!-- ========================================================================= -->
+<!-- SIDE NAVIGATION (Shared Component: SideNavBar)                            -->
+<!-- ========================================================================= -->
+<aside class="fixed left-0 top-0 bottom-0 w-72 z-40 p-4 border-r border-border-hairline dark:border-outline flex flex-col justify-between overflow-y-auto bg-surface-container-lowest dark:bg-inverse-surface">
+<!-- Brand Emblem & Header -->
+<div class="space-y-6">
+<div class="flex items-center gap-3 px-2 py-1">
+<div class="w-10 h-10 rounded-DEFAULT bg-primary text-canvas flex items-center justify-center font-title-lg font-bold">
+<span class="material-symbols-outlined text-primary-container text-2xl" data-icon="psychiatry">psychiatry</span>
+</div>
+<div>
+<span class="font-title-lg text-title-lg font-bold text-on-surface dark:text-inverse-on-surface tracking-tight block">AgroWatch AI</span>
+<span class="font-caption text-caption text-on-surface-variant dark:text-outline-variant block">Intelligent Pest Surveillance</span>
+</div>
+</div>
+<!-- Live Sensor Telemetry Badge -->
+<div class="px-3 py-2 bg-surface-soft dark:bg-inverse-surface rounded-DEFAULT border border-border-hairline flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
+<span class="font-caption text-caption text-on-surface-variant">Operational: All Sensors Active</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="space-y-1">
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="?tab=overview">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- 2. Risk Map (ACTIVE DESTINATION) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-tertiary-container/30 dark:bg-tertiary-container/20 text-primary dark:text-inverse-primary font-title-md text-title-md rounded-DEFAULT border-l-4 border-primary dark:border-inverse-primary" href="?tab=map">
+<span class="material-symbols-outlined text-lg" data-icon="map" data-weight="fill" style="font-variation-settings: 'FILL' 1;">map</span>
+<span>Risk Map</span>
+</a>
+<!-- 3. Field Observations -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="?tab=observations">
+<span class="material-symbols-outlined text-lg" data-icon="visibility">visibility</span>
+<span>Field Observations</span>
+</a>
+<!-- 4. Risk History -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="?tab=history">
+<span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+<span>Risk History</span>
+</a>
+<!-- 5. Alerts & Advisories (with badge 7) -->
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="?tab=alerts">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lg" data-icon="notifications_active">notifications_active</span>
+<span>Alerts &amp; Advisories</span>
+</div>
+<span class="px-2 py-0.5 text-xs font-bold rounded-full bg-risk-high text-canvas">7</span>
+</a>
+<!-- 6. Model Performance -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="?tab=performance">
+<span class="material-symbols-outlined text-lg" data-icon="analytics">analytics</span>
+<span>Model Performance</span>
+</a>
+<!-- 7. System Health -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant font-body-md text-body-md hover:bg-surface-container-low dark:hover:bg-surface-container-high rounded-DEFAULT transition-colors" href="?tab=health">
+<span class="material-symbols-outlined text-lg" data-icon="health_and_safety">health_and_safety</span>
+<span>System Health</span>
+</a>
+</nav>
+</div>
+<!-- Sidebar Footer / Identity -->
+<div class="pt-4 border-t border-border-hairline dark:border-outline space-y-3">
+<div class="flex items-center gap-3 px-2">
+<div class="w-9 h-9 rounded-full bg-surface-soft border border-border-hairline flex items-center justify-center text-primary font-bold">
+<span class="material-symbols-outlined text-xl" data-icon="account_circle">account_circle</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-label-sm text-label-sm text-on-surface truncate">Surveillance Administrator</p>
+<p class="font-caption text-caption text-on-surface-variant truncate">ICAR National Center</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE CANVAS                                                     -->
+<!-- ========================================================================= -->
+<div class="ml-72 flex-1 flex flex-col min-w-0">
+<!-- TopNavBar (Shared Component: TopNavBar) -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-6 py-3 w-full border-b border-border-hairline dark:border-outline bg-surface-container-lowest/90 dark:bg-inverse-surface/90 backdrop-blur">
+<div class="flex items-center gap-6">
+<!-- Breadcrumb & Scope -->
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="font-bold text-on-surface">AgroWatch AI</span>
+<span class="text-secondary">/</span>
+<span class="text-primary font-medium">Geographic Risk Map</span>
+</div>
+<!-- Quick Crop Selector Pills -->
+<div class="flex items-center gap-1.5 p-1 bg-surface-soft rounded-full border border-border-hairline">
+<button class="bg-on-background dark:bg-primary-container text-canvas dark:text-on-primary-container font-label-md text-label-md px-4 py-1 rounded-full text-xs transition-colors">
+            Rice
+          </button>
+<button class="text-on-surface-variant dark:text-outline-variant font-label-md text-label-md px-4 py-1 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-high text-xs transition-colors">
+            Cotton
+          </button>
+</div>
+</div>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- Telemetry Live Sync -->
+<div class="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-surface-soft rounded-full border border-border-hairline text-on-surface-variant font-caption text-caption">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>Live Sync 10:42 UTC</span>
+</div>
+<!-- Dispatch Drone Sweep Action -->
+<button class="flex items-center gap-2 bg-primary-container hover:bg-primary-fixed text-on-surface font-label-sm text-label-sm px-4 py-2 rounded-full border border-on-surface transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-base" data-icon="flight_takeoff">flight_takeoff</span>
+<span>Dispatch Drone Sweep</span>
+</button>
+<!-- Tool Icons -->
+<div class="flex items-center border-l border-border-hairline pl-3 gap-1">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-soft rounded-full transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-soft rounded-full transition-colors" title="Layer Configuration">
+<span class="material-symbols-outlined text-xl" data-icon="tune">tune</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-soft rounded-full transition-colors" title="Documentation">
+<span class="material-symbols-outlined text-xl" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Page Content Container -->
+<main class="p-6 space-y-6 flex-1 flex flex-col">
+<!-- Header & Page Controls Banner -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-border-hairline">
+<div>
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Geographic Surveillance Network</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Real-time spatial pest risk monitoring, climatic favorability zones, and ICAR/TNAU station surveillance across India.</p>
+</div>
+<div class="flex items-center gap-3 self-start md:self-auto">
+<button class="flex items-center gap-2 px-4 py-2 rounded-DEFAULT bg-canvas border border-border-hairline text-on-surface font-label-sm text-label-sm hover:bg-surface-soft transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="download">download</span>
+<span>Export GIS Layer</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-DEFAULT bg-on-background text-canvas font-label-sm text-label-sm hover:bg-inverse-surface transition-colors">
+<span class="material-symbols-outlined text-base text-primary-container" data-icon="sync">sync</span>
+<span>Sync Station Telemetry</span>
+</button>
+</div>
+</div>
+<!-- Map Filter & Layer Control Bar -->
+<section class="bg-canvas border border-border-hairline rounded-DEFAULT p-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+<div class="flex flex-wrap items-center gap-3">
+<!-- Search Station Input -->
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg" data-icon="search">search</span>
+<input class="w-full h-10 pl-9 pr-3 rounded-full border border-border-hairline bg-surface-soft text-on-surface placeholder:text-outline text-xs focus:ring-1 focus:ring-primary focus:border-primary outline-none" placeholder="Search 11 ICAR stations..." type="text" value="Aduthurai (TNAU)"/>
+</div>
+<!-- Region Dropdown -->
+<div class="flex items-center gap-2">
+<label class="font-caption text-caption text-on-surface-variant">Region:</label>
+<select class="h-10 px-3 pr-8 rounded-DEFAULT border border-border-hairline bg-canvas text-xs font-medium text-on-surface focus:outline-none focus:border-on-surface cursor-pointer">
+<option>All Regions (National)</option>
+<option selected="">Tamil Nadu Delta</option>
+<option>Punjab Plains</option>
+<option>Odisha Coastal</option>
+<option>Telangana Plateau</option>
+<option>Gujarat Agro-Ecological</option>
+</select>
+</div>
+<!-- Risk Severity Filter -->
+<div class="flex items-center gap-1.5 border-l border-border-hairline pl-3">
+<span class="font-caption text-caption text-on-surface-variant mr-1">Risk:</span>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-full border border-border-hairline bg-surface-soft text-on-surface hover:bg-surface-container">All</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-risk-low border border-emerald-300">Low</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-risk-moderate border border-amber-300">Moderate</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-full bg-orange-100 text-risk-high border-2 border-risk-high">High (2)</button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-50 text-risk-critical border border-red-300">Critical (1)</button>
+</div>
+</div>
+<!-- Layer Toggles -->
+<div class="flex items-center gap-2 border-l border-border-hairline pl-3">
+<label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-on-surface-variant hover:text-on-surface">
+<input checked="" class="rounded border-border-hairline text-primary focus:ring-0" type="checkbox"/>
+<span>Heatmap</span>
+</label>
+<label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-on-surface-variant hover:text-on-surface">
+<input checked="" class="rounded border-border-hairline text-primary focus:ring-0" type="checkbox"/>
+<span>Weather (11)</span>
+</label>
+<label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-on-surface-variant hover:text-on-surface">
+<input checked="" class="rounded border-border-hairline text-primary focus:ring-0" type="checkbox"/>
+<span>ETL Breaches</span>
+</label>
+<label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-on-surface-variant hover:text-on-surface">
+<input class="rounded border-border-hairline text-primary focus:ring-0" type="checkbox"/>
+<span>Drone Corridors</span>
+</label>
+</div>
+</section>
+<!-- Primary Workspace: Interactive Map (70%) + Station Detail Panel (30%) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-[580px]">
+<!-- =================================================================== -->
+<!-- MAP CANVAS WORKSPACE (Col 1-8 / ~70%)                               -->
+<!-- =================================================================== -->
+<section class="lg:col-span-8 bg-canvas border border-border-hairline rounded-DEFAULT relative overflow-hidden flex flex-col shadow-sm india-map-grid">
+<!-- Map Floating HUD Top Bar -->
+<div class="absolute top-4 left-4 z-10 flex items-center gap-2 bg-canvas/90 backdrop-blur-md p-1.5 rounded-DEFAULT border border-border-hairline shadow-sm">
+<button class="px-3 py-1 text-xs font-semibold rounded-full bg-on-background text-canvas flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="layers">layers</span>
+<span>Vector Terrain</span>
+</button>
+<button class="px-3 py-1 text-xs font-semibold rounded-full text-on-surface-variant hover:bg-surface-soft flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="satellite_alt">satellite_alt</span>
+<span>Satellite Sentinel-2</span>
+</button>
+<div class="h-4 w-[1px] bg-border-hairline"></div>
+<span class="text-[11px] text-on-surface-variant px-1 font-mono">EPSG:4326 WGS84</span>
+</div>
+<!-- Map Controls (Top Right: Zoom, Compass, Fullscreen) -->
+<div class="absolute top-4 right-4 z-10 flex flex-col gap-1.5">
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT shadow-sm flex flex-col overflow-hidden">
+<button class="p-2 hover:bg-surface-soft text-on-surface border-b border-border-hairline" title="Zoom In">
+<span class="material-symbols-outlined text-base" data-icon="add">add</span>
+</button>
+<button class="p-2 hover:bg-surface-soft text-on-surface" title="Zoom Out">
+<span class="material-symbols-outlined text-base" data-icon="remove">remove</span>
+</button>
+</div>
+<button class="p-2 bg-canvas border border-border-hairline rounded-DEFAULT shadow-sm text-on-surface hover:bg-surface-soft" title="Reset Compass Bearing">
+<span class="material-symbols-outlined text-base text-risk-critical" data-icon="explore">explore</span>
+</button>
+<button class="p-2 bg-canvas border border-border-hairline rounded-DEFAULT shadow-sm text-on-surface hover:bg-surface-soft" title="Full Screen View">
+<span class="material-symbols-outlined text-base" data-icon="fullscreen">fullscreen</span>
+</button>
+</div>
+<!-- Vector Map Graphic Simulation of India & 11 ICAR Stations -->
+<div class="relative w-full h-full min-h-[520px] flex items-center justify-center p-6 select-none overflow-hidden">
+<!-- High-Contrast Vector Silhouette of India (Stylized SVG Projection) -->
+<svg class="w-full h-full max-h-[500px] text-emerald-950/5 stroke-border-hairline fill-surface-soft" viewbox="0 0 700 800" xmlns="http://www.w3.org/2000/svg">
+<!-- Stylized Geographic outline of India landmass -->
+<path d="M 270 90 L 320 60 L 360 85 L 390 120 L 400 170 L 460 190 L 530 190 L 580 220 L 620 220 L 640 260 L 600 290 L 550 280 L 500 300 L 480 340 L 470 380 L 460 440 L 410 490 L 400 550 L 370 630 L 340 700 L 320 740 L 310 700 L 290 640 L 260 580 L 240 500 L 220 440 L 200 400 L 160 380 L 140 330 L 160 270 L 200 250 L 240 200 L 250 140 Z" fill="#f2f4f5" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1.5"></path>
+<!-- Climatic Eco-Zones (Translucent mint/orange risk bands) -->
+<ellipse cx="330" cy="670" fill="#ecffe0" fill-opacity="0.6" rx="90" ry="70" stroke="#00f0a0" stroke-width="1"></ellipse>
+<ellipse cx="440" cy="420" fill="#fff7ed" fill-opacity="0.5" rx="75" ry="60" stroke="#f97316" stroke-dasharray="4,2" stroke-width="1"></ellipse>
+<ellipse cx="380" cy="470" fill="#fef2f2" fill-opacity="0.4" rx="60" ry="50" stroke="#ef4444" stroke-width="1"></ellipse>
+<ellipse cx="270" cy="180" fill="#ecffe0" fill-opacity="0.5" rx="80" ry="50" stroke="#10b981" stroke-width="1"></ellipse>
+</svg>
+<!-- ========================================================= -->
+<!-- 11 ICAR/TNAU STATIONS POSITIONED GEOGRAPHICALLY           -->
+<!-- ========================================================= -->
+<!-- 1. Ludhiana (PAU Punjab) - Green (Low, 24) -->
+<div class="absolute top-[21%] left-[38%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-low border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-bold text-on-surface shadow-xs">Ludhiana (24)</span>
+</div>
+<!-- 2. Pantnagar (GBPUAT Uttarakhand) - Green (Low, 28) -->
+<div class="absolute top-[24%] left-[46%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-low border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Pantnagar (28)</span>
+</div>
+<!-- 3. Anand (AAU Gujarat) - Green (Low, 31) -->
+<div class="absolute top-[44%] left-[28%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-low border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Anand (31)</span>
+</div>
+<!-- 4. Raipur (IGKV Chhattisgarh) - Critical (Red, 89) -->
+<div class="absolute top-[46%] left-[54%] flex flex-col items-center group cursor-pointer z-20">
+<div class="relative flex items-center justify-center">
+<span class="absolute w-6 h-6 rounded-full bg-red-400/40 animate-ping"></span>
+<span class="w-4 h-4 rounded-full bg-risk-critical border-2 border-canvas shadow-md"></span>
+</div>
+<span class="mt-1 px-1.5 py-0.5 bg-red-50 border border-risk-critical rounded text-[10px] font-bold text-risk-critical shadow-xs">Raipur [89 - STEM BORER]</span>
+</div>
+<!-- 5. Cuttack (NRRI Odisha) - Yellow (Moderate, 58) -->
+<div class="absolute top-[48%] left-[64%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-moderate border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Cuttack (58)</span>
+</div>
+<!-- 6. Warangal (RARS Telangana) - Yellow (Moderate, 62) -->
+<div class="absolute top-[58%] left-[48%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-moderate border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Warangal (62)</span>
+</div>
+<!-- 7. Hyderabad (IIRR Telangana) - Orange (High, 76) -->
+<div class="absolute top-[62%] left-[44%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-high border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-bold text-risk-high shadow-xs">Hyderabad (76)</span>
+</div>
+<!-- 8. Rajahmundry (CTRI Andhra) - Yellow (Moderate, 52) -->
+<div class="absolute top-[63%] left-[56%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-moderate border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Rajahmundry (52)</span>
+</div>
+<!-- 9. Dharwad (UAS Karnataka) - Yellow (Moderate, 48) -->
+<div class="absolute top-[68%] left-[36%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-moderate border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Dharwad (48)</span>
+</div>
+<!-- 10. Coimbatore (TNAU) - Green (Low, 18) -->
+<div class="absolute top-[82%] left-[40%] flex flex-col items-center group cursor-pointer z-10">
+<span class="w-3.5 h-3.5 rounded-full bg-risk-low border-2 border-canvas shadow-sm"></span>
+<span class="mt-1 px-1.5 py-0.5 bg-canvas/90 border border-border-hairline rounded text-[10px] font-semibold text-on-surface shadow-xs">Coimbatore (18)</span>
+</div>
+<!-- 11. Aduthurai (TNAU/ICAR Tamil Nadu Delta) - PRIMARY SELECTED TARGET -->
+<div class="absolute top-[80%] left-[49%] flex flex-col items-center cursor-pointer z-30 group">
+<!-- Radar Pulse Ring -->
+<div class="relative flex items-center justify-center">
+<span class="absolute w-10 h-10 rounded-full bg-orange-500/30 animate-radar"></span>
+<span class="w-5 h-5 rounded-full bg-risk-high border-2 border-canvas shadow-lg flex items-center justify-center text-canvas font-bold text-[9px]">
+                  !
+                </span>
+</div>
+<!-- Station Annotation Card -->
+<div class="mt-1.5 bg-on-background text-canvas px-2.5 py-1 rounded-DEFAULT shadow-lg flex items-center gap-1.5 border border-primary-container">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="text-[11px] font-bold tracking-tight">Aduthurai Hub (84)</span>
+<span class="text-[9px] bg-risk-high text-canvas font-bold px-1 rounded">ACTIVE</span>
+</div>
+</div>
+</div>
+<!-- Bottom Map Legend Strip -->
+<div class="bg-canvas/95 border-t border-border-hairline p-3 flex flex-wrap items-center justify-between text-xs gap-3 z-10">
+<div class="flex items-center gap-4">
+<span class="font-bold text-on-surface">Pest Risk Index:</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-low"></span>
+<span class="text-on-surface-variant font-medium">Low (&lt;30)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-moderate"></span>
+<span class="text-on-surface-variant font-medium">Moderate (30-60)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-high"></span>
+<span class="text-on-surface-variant font-medium">High (60-80)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-risk-critical"></span>
+<span class="text-on-surface-variant font-medium">Critical Outbreak (&gt;80)</span>
+</div>
+</div>
+<!-- Basemap Status & Coordinates -->
+<div class="flex items-center gap-3 text-on-surface-variant font-mono text-[11px]">
+<span>10°59'N 79°29'E</span>
+<span class="border-l border-border-hairline pl-3">Scale: 1 : 2,500,000</span>
+</div>
+</div>
+</section>
+<!-- =================================================================== -->
+<!-- SELECTED STATION TELEMETRY DRAWER / PANEL (Col 9-12 / ~30%)        -->
+<!-- =================================================================== -->
+<aside class="lg:col-span-4 bg-canvas border border-border-hairline rounded-DEFAULT p-5 flex flex-col justify-between shadow-sm space-y-5">
+<!-- Station Header & Live Ping -->
+<div>
+<div class="flex items-start justify-between">
+<div>
+<span class="text-[11px] font-mono text-primary font-bold uppercase tracking-wider block">Station ID: ICAR-TN-04</span>
+<h2 class="font-title-lg text-title-lg text-on-surface mt-0.5">Aduthurai Hub</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">TNAU Rice Research Station | Thanjavur Delta, TN</p>
+</div>
+<span class="px-2 py-0.5 bg-emerald-50 border border-emerald-300 text-risk-low text-[10px] font-bold rounded-full">
+                ONLINE
+              </span>
+</div>
+<!-- Telemetry Ping Metric -->
+<div class="mt-2.5 flex items-center justify-between text-xs text-on-surface-variant bg-surface-soft p-2 rounded-DEFAULT border border-border-hairline">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span>100% Telemetry Active</span>
+</span>
+<span class="font-mono text-[11px]">Ping: 4m ago</span>
+</div>
+</div>
+<!-- Target Crop & Primary Pest Identified -->
+<div class="p-3 bg-surface-container-low/50 rounded-DEFAULT border border-border-hairline">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">Target Crop</span>
+<span class="text-xs font-bold text-on-surface">Rice (Oryza sativa)</span>
+</div>
+<div class="mt-2 pt-2 border-t border-border-hairline flex items-center justify-between">
+<span class="text-xs font-semibold text-on-surface-variant">Primary Vector</span>
+<span class="text-xs font-bold text-risk-high flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="bug_report">bug_report</span>
+                Yellow Stem Borer
+              </span>
+</div>
+</div>
+<!-- Risk Score Metric Ring & Semantic Level -->
+<div class="p-4 rounded-DEFAULT bg-amber-50/50 border border-amber-200 flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-risk-high block">Composite Pest Risk</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface">84</span>
+<span class="text-xs text-on-surface-variant font-semibold">/ 100</span>
+</div>
+<span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-orange-100 text-risk-high text-xs font-bold border border-risk-high">
+                HIGH RISK ALERT
+              </span>
+</div>
+<!-- Mini Circular Dial Graphic -->
+<div class="w-16 h-16 rounded-full border-4 border-amber-200 border-t-risk-high border-r-risk-high flex items-center justify-center bg-canvas">
+<span class="material-symbols-outlined text-risk-high text-2xl" data-icon="warning">warning</span>
+</div>
+</div>
+<!-- Micro-climate & Agronomic Sensors Grid (6-cell) -->
+<div>
+<h3 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">Micro-Climate Telemetry</h3>
+<div class="grid grid-cols-3 gap-2">
+<div class="p-2 bg-surface-soft rounded-DEFAULT border border-border-hairline text-center">
+<span class="text-[11px] text-on-surface-variant block">Temp</span>
+<span class="font-bold text-sm text-on-surface">29.4°C</span>
+</div>
+<div class="p-2 bg-amber-50 rounded-DEFAULT border border-amber-200 text-center">
+<span class="text-[11px] text-risk-moderate font-bold block">Humidity</span>
+<span class="font-bold text-sm text-risk-moderate">84%</span>
+</div>
+<div class="p-2 bg-surface-soft rounded-DEFAULT border border-border-hairline text-center">
+<span class="text-[11px] text-on-surface-variant block">24h Rain</span>
+<span class="font-bold text-sm text-on-surface">14.2 mm</span>
+</div>
+<div class="p-2 bg-surface-soft rounded-DEFAULT border border-border-hairline text-center">
+<span class="text-[11px] text-on-surface-variant block">Wind</span>
+<span class="font-bold text-sm text-on-surface">11.8 km/h</span>
+</div>
+<div class="p-2 bg-surface-soft rounded-DEFAULT border border-border-hairline text-center">
+<span class="text-[11px] text-on-surface-variant block">GDD</span>
+<span class="font-bold text-sm text-on-surface">18.4</span>
+</div>
+<div class="p-2 bg-surface-soft rounded-DEFAULT border border-border-hairline text-center">
+<span class="text-[11px] text-on-surface-variant block">VPD</span>
+<span class="font-bold text-sm text-on-surface">0.82 kPa</span>
+</div>
+</div>
+</div>
+<!-- Economic Threshold Level (ETL) Gauge -->
+<div class="p-3 bg-canvas border border-border-hairline rounded-DEFAULT space-y-2">
+<div class="flex items-center justify-between text-xs">
+<span class="font-semibold text-on-surface">Economic Threshold Level (ETL)</span>
+<span class="font-bold text-risk-high">8.2% / 10.0% ETL</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-soft h-2 rounded-full overflow-hidden border border-border-hairline">
+<div class="bg-risk-high h-full rounded-full" style="width: 82%;"></div>
+</div>
+<p class="text-[11px] text-on-surface-variant">
+              Dead Heart / Tiller damage has reached <strong class="text-on-surface">82% of spray threshold</strong>.
+            </p>
+</div>
+<!-- Recommended Field Action Box -->
+<div class="p-3 bg-surface-soft rounded-DEFAULT border-l-4 border-risk-high space-y-1">
+<span class="text-[11px] font-bold uppercase tracking-wider text-risk-high flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="policy">policy</span>
+              Agronomist Advisory Protocol
+            </span>
+<p class="text-xs text-on-surface leading-relaxed">
+              Mandatory light trap surveillance &amp; 48h tillering inspection. Hold chemical spray unless ETL hits 10%.
+            </p>
+</div>
+<!-- Drawer Action CTAs -->
+<div class="space-y-2 pt-2 border-t border-border-hairline">
+<button class="w-full py-2.5 px-4 rounded-DEFAULT bg-primary-container hover:bg-primary-fixed text-on-surface font-label-sm text-label-sm font-semibold border border-on-surface transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="person_search">person_search</span>
+<span>Dispatch Field Scout</span>
+</button>
+<div class="grid grid-cols-2 gap-2">
+<button class="py-2 px-3 rounded-DEFAULT bg-canvas border border-border-hairline hover:bg-surface-soft text-on-surface text-xs font-semibold flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="timeline">timeline</span>
+<span>Risk History</span>
+</button>
+<button class="py-2 px-3 rounded-DEFAULT bg-canvas border border-border-hairline hover:bg-surface-soft text-on-surface text-xs font-semibold flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="campaign">campaign</span>
+<span>Issue Advisory</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- =================================================================== -->
+<!-- BOTTOM REGIONAL SUMMARY STRIP                                       -->
+<!-- =================================================================== -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<!-- Metric 1: High Risk Clusters -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-4 flex items-center justify-between shadow-xs">
+<div>
+<span class="text-xs font-semibold text-on-surface-variant block">High Risk Clusters</span>
+<span class="font-headline-sm text-headline-sm text-on-surface mt-1 block">2 Stations</span>
+<span class="text-[11px] text-risk-high font-medium">Aduthurai &amp; Raipur breached</span>
+</div>
+<div class="w-11 h-11 rounded-DEFAULT bg-orange-50 border border-orange-200 flex items-center justify-center text-risk-high">
+<span class="material-symbols-outlined text-2xl" data-icon="fmd_bad">fmd_bad</span>
+</div>
+</div>
+<!-- Metric 2: Monitored Acreage -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-4 flex items-center justify-between shadow-xs">
+<div>
+<span class="text-xs font-semibold text-on-surface-variant block">Monitored Acreage</span>
+<span class="font-headline-sm text-headline-sm text-on-surface mt-1 block">142,500 Ha</span>
+<span class="text-[11px] text-risk-low font-medium">100% GIS Coverage across 5 basins</span>
+</div>
+<div class="w-11 h-11 rounded-DEFAULT bg-emerald-50 border border-emerald-200 flex items-center justify-center text-risk-low">
+<span class="material-symbols-outlined text-2xl" data-icon="agriculture">agriculture</span>
+</div>
+</div>
+<!-- Metric 3: Active Sensor Nodes -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-4 flex items-center justify-between shadow-xs">
+<div>
+<span class="text-xs font-semibold text-on-surface-variant block">Active IoT Sensor Nodes</span>
+<span class="font-headline-sm text-headline-sm text-on-surface mt-1 block">88 / 88 Online</span>
+<span class="text-[11px] text-on-surface-variant font-medium">Across all 11 ICAR stations</span>
+</div>
+<div class="w-11 h-11 rounded-DEFAULT bg-surface-soft border border-border-hairline flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" data-icon="sensors">sensors</span>
+</div>
+</div>
+<!-- Metric 4: Satellite / Drone Sweep -->
+<div class="bg-canvas border border-border-hairline rounded-DEFAULT p-4 flex items-center justify-between shadow-xs">
+<div>
+<span class="text-xs font-semibold text-on-surface-variant block">Next Satellite / Drone Pass</span>
+<span class="font-headline-sm text-headline-sm text-on-surface mt-1 block">14:30 IST</span>
+<span class="text-[11px] text-primary font-medium">Sentinel-2 MSI Multi-spectral</span>
+</div>
+<div class="w-11 h-11 rounded-DEFAULT bg-surface-soft border border-border-hairline flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-2xl" data-icon="satellite_alt">satellite_alt</span>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>
